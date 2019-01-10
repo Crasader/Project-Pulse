@@ -25,6 +25,8 @@
 #include "MainScene.h"
 #include "SimpleAudioEngine.h"
 
+#include "KeyboardManager.h"
+
 USING_NS_CC;
 
 Scene* MainScene::createScene() {
@@ -102,6 +104,11 @@ bool MainScene::init() {
 		// add the sprite as a child to this layer
 		this->addChild(sprite, 0);
 	}
+
+	this->_eventDispatcher->addEventListenerWithSceneGraphPriority(KeyboardManager::getInstance()->createListener(), this);
+	  
+	this->scheduleUpdate();
+
 	return true;
 }
 
@@ -111,17 +118,22 @@ void MainScene::menuCloseCallback(Ref* pSender) {
 	Director::getInstance()->setContentScaleFactor(MIN(1080.f / 720.f, 1920.f / 1280.f));
 	dynamic_cast<GLViewImpl*>(cocos2d::Director::getInstance()->getOpenGLView())->setFullscreen();
 
+	//Director::getInstance()->setContentScaleFactor(1);
+	//dynamic_cast<GLViewImpl*>(cocos2d::Director::getInstance()->getOpenGLView())->setWindowed(1280.0f, 720.0f);
+
 	//Close the cocos2d-x game scene and quit the application
 	//Director::getInstance()->end();
+}
 
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-	exit(0);
-#endif
+void MainScene::update(float delta) {
+	auto input = KeyboardManager::getInstance();
+	using namespace cocos2d;
+	if (input->isKeyDown(EventKeyboard::KeyCode::KEY_SPACE)) {
+		
+	}     
 
-	/*To navigate back to native iOS screen(if present) without quitting the application  ,do not use Director::getInstance()->end() and exit(0) as given above,instead trigger a custom event created in RootViewController.mm as below*/
+	if (input->isKeyPressed(EventKeyboard::KeyCode::KEY_SPACE))
+		log("Space has been pressed for %.3f seconds!", input->keyPressedDuration(EventKeyboard::KeyCode::KEY_SPACE));
 
-	//EventCustom customEndEvent("game_scene_close_event");
-	//_eventDispatcher->dispatchEvent(&customEndEvent);
-
-
+	input->flush();
 }

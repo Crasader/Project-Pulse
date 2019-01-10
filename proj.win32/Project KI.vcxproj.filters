@@ -10,54 +10,66 @@
     <Filter Include="src">
       <UniqueIdentifier>{bb6c862e-70e9-49d9-81b7-3829a6f50471}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\main">
-      <UniqueIdentifier>{f57fb927-619e-4427-a241-5d001c5a92c0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\scenes">
       <UniqueIdentifier>{73f808e8-691e-48be-becf-e753fe29482b}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\entities">
       <UniqueIdentifier>{4c7a00e6-4df2-4f5a-a5e1-2baf82a69691}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\system">
+      <UniqueIdentifier>{f57fb927-619e-4427-a241-5d001c5a92c0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>win32</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\Actor.cpp">
+      <Filter>src\entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Enemy.cpp">
+      <Filter>src\entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Player.cpp">
+      <Filter>src\entities</Filter>
+    </ClCompile>
     <ClCompile Include="..\Classes\AppDelegate.cpp">
-      <Filter>src\main</Filter>
+      <Filter>src\system</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\MainScene.cpp">
       <Filter>src\scenes</Filter>
     </ClCompile>
-    <ClCompile Include="Actor.cpp">
-      <Filter>src\entities</Filter>
+    <ClCompile Include="..\Classes\AudioManager.cpp">
+      <Filter>src\system</Filter>
     </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>src\entities</Filter>
-    </ClCompile>
-    <ClCompile Include="Enemy.cpp">
-      <Filter>src\entities</Filter>
+    <ClCompile Include="..\Classes\KeyboardManager.cpp">
+      <Filter>src\system</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
       <Filter>win32</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\Actor.h">
+      <Filter>src\entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Enemy.h">
+      <Filter>src\entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Player.h">
+      <Filter>src\entities</Filter>
+    </ClInclude>
     <ClInclude Include="..\Classes\AppDelegate.h">
-      <Filter>src\main</Filter>
+      <Filter>src\system</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\MainScene.h">
       <Filter>src\scenes</Filter>
     </ClInclude>
-    <ClInclude Include="Actor.h">
-      <Filter>src\entities</Filter>
+    <ClInclude Include="..\Classes\AudioManager.h">
+      <Filter>src\system</Filter>
     </ClInclude>
-    <ClInclude Include="Player.h">
-      <Filter>src\entities</Filter>
-    </ClInclude>
-    <ClInclude Include="Enemy.h">
-      <Filter>src\entities</Filter>
+    <ClInclude Include="..\Classes\KeyboardManager.h">
+      <Filter>src\system</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
