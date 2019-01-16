@@ -23,14 +23,11 @@
  ****************************************************************************/
 
 #include "MainScene.h"
-//#include "SimpleAudioEngine.h"
 
 #include "KeyboardManager.h"
 #include "MouseManager.h"
 #include "AudioManager.h"
 #include "ControllerManager.h"
-
-//#include "AudioEngine.h"
 
 USING_NS_CC;
 
@@ -47,19 +44,13 @@ void MainScene::onEnter() {
 	Scene::onEnter();
 }
 
-
-static void problemLoading(const char* filename) {
-	printf("Error while loading: %s\n", filename);
-	printf("Depending on how you compiled you might have to add 'Resources/' in front of filenames in HelloWorldScene.cpp\n");
-}
-
 bool MainScene::init() {
 	if (!Scene::init()) {
 		return false;
 	}
 
-	player = new Player("amheck.png", Vec2(1280 / 2, 720 / 2));
-	//player->getSprite()->setScale(0.3f);
+	player = new Player("CloseNormal.png", Vec2(1230, 50));
+	player->getSprite()->setScale(1.2f);
 	this->addChild(player->getSprite(), 100);
 
 	background = Sprite::create("HelloWorld.png");
@@ -92,19 +83,12 @@ void MainScene::update(float delta) {
 		Director::getInstance()->end();
 	}
 
-	//player->update(delta);
+	player->update(delta);
 
-	//auto camera = this->getDefaultCamera();
-	//camera->runAction(MoveBy::create(0, (player->getSprite()->getPosition() - camera->getPosition()) * move));
+	auto camera = this->getDefaultCamera();
+	//camera->runAction(MoveBy::create(0, (player->getSprite()->getPosition() - camera->getPosition()) * delta * 4));
 
-	player->getSprite()->setPosition(Vec2(1280 / 2, 720 / 2) + controllerIn->getLStick(0) * 200 + controllerIn->getLStick(1) * 50);
-
-	if (controllerIn->isButtonDown(ControllerButton::A)) {
-		log("A was pressed!");
-	}
-
-
-	audio->setMasterVolume(mouseIn->getY() / 720.f);
+	//audio->setMasterVolume(mouseIn->getY() / 720.f);
 
 	keyIn->refresh();
 	mouseIn->refresh();

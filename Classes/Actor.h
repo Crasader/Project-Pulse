@@ -1,10 +1,6 @@
 #pragma once
 #include "cocos2d.h"
 
-#include "KeyboardManager.h"
-#include "MouseManager.h"
-#include "AudioManager.h"
-
 using namespace cocos2d;
 
 class Actor {
@@ -25,9 +21,5 @@ public:
 
 protected:
 	Sprite* sprite;
-
-	static Retry::KeyboardManager* keyIn;
-	static Retry::MouseManager* mouseIn;
-	static Retry::AudioManager* audio;
 };
 

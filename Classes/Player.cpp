@@ -1,55 +1,84 @@
 #include "Player.h"
 
+Retry::KeyboardManager* Player::keyIn = Retry::KeyboardManager::getInstance();
+Retry::MouseManager* Player::mouseIn = Retry::MouseManager::getInstance();
+Retry::ControllerManager* Player::controllerIn = Retry::ControllerManager::getInstance();
+Retry::AudioManager* Player::audio = Retry::AudioManager::getInstance();
+
 Player::Player(std::string path, Vec2 pos) {
 	load(path, pos);
+}
+
+float lerp(float p0, float p1, float t) {
+	t = t < 0 ? 0 : t > 1 ? 1 : t;
+	return p1 * t + p0 * (1 - t);
+}
+
+float lerpSq(float p0, float p1, float t) {
+	t = t < 0 ? 0 : t > 1 ? 1 : t;
+	return p1 * t * t + p0 * (1 - t * t);
+}
+
+int sign(float x) {
+	return x < 0 ? -1 : x > 0 ? 1 : 0;
 }
 
 void Player::update(float delta) {
 	using namespace Retry;
 	static auto space = KeyCode::SPACE;
-	float jumpFallMultiplier = 7.0f;
-	float fastFallMultiplier = 2.0f;
 
-	const char nJumpFrames = 7;
+	// Side Movement Constants and Variables
+	static const float sideMove = 450;
+	static const float timeToMax = 0.1f;
+	static float time = 0;
 
-	static char doJump = 0;
-	static char jumpTimer = 0;
-	float move = 800;
-	static Vec2 accel = Vec2(0, -2000);
-	static Vec2 veloc = Vec2(0, 0);
+	// Jumping Constants and Variables
+	static const float h = 200;
+	static const float t_h = 0.5f;
+	static const float g = (-2 * h) / (t_h * t_h);
+	static const float fastFall = 2.5f;
+	static int doJump = 0;
+	static bool hasMoved = false;
 
-	if (keyIn->isKeyPressed(KeyCode::A)) {
-		veloc.x = -move;
-	}
-	if (keyIn->isKeyPressed(KeyCode::D)) {
-		veloc.x = move;
-	}
+	static Vec2 vel = Vec2(0, 0), acc = Vec2(0, g);
 
-	if (doJump < 2 && keyIn->isKeyDown(KeyCode::SPACE)) {
-		veloc.y = 2000;
-		doJump++;
-		jumpTimer = 0;
-	}
-
-	if (jumpTimer <= nJumpFrames && keyIn->isKeyUp(space)) jumpTimer = nJumpFrames + 1;
-	if (!keyIn->isKeyPressed(space) || jumpTimer >= nJumpFrames) {
-		if (veloc.y > 0) {
-			veloc += Vec2(0, 1) * accel.y * jumpFallMultiplier * delta;
-		} else if (jumpTimer >= nJumpFrames * 2.5f) {
-			veloc += Vec2(0, 1) * accel.y * fastFallMultiplier * delta;
-		} else {
-			veloc.y = 0;
-		}
-	}
-
-
-	if (sprite->getPosition().y < 100) {
-		sprite->setPositionY(100);
+	static const float groundHeight = 50;
+	if (sprite->getPosition().y < groundHeight) {
+		sprite->setPositionY(groundHeight);
 		doJump = 0;
+		hasMoved = false;
 	}
-	//veloc += Vec2(0, 1) * accel.y * delta;
-	if (veloc.y < -1100) veloc.y = -1100;
-	moveBy(veloc * delta);
-	jumpTimer++;
-	veloc.x = 0;
+
+	bool jumpButtonDown = keyIn->isKeyDown(KeyCode::SPACE) || controllerIn->isButtonDown(ControllerButton::A);
+	bool jumpButtonPressed = keyIn->isKeyPressed(KeyCode::SPACE) || controllerIn->isButtonPressed(ControllerButton::A);
+
+	bool goLeft = keyIn->isKeyPressed(KeyCode::A) || controllerIn->getLStickX() < -0.5f,
+		 goRight = keyIn->isKeyPressed(KeyCode::D) || controllerIn->getLStickX() > 0.5f;
+	float step = (!doJump || goLeft || goRight) * (delta / timeToMax) / (doJump ? (vel.y > 100 ? 5.0f : 3.0f) : 1);
+
+	//if (doJump && abs(time) - step < 0) time = step = 0;
+
+	if (goLeft || goRight) hasMoved = true;
+
+	if (goLeft && !goRight) {
+		time = time - step < -1 ? -1 : time - step;
+	} else if (goRight && !goLeft) {
+		time = time + step > 1 ? 1 : time + step;
+	} else {
+		time = abs(time) - step < 0 ? 0 : time - sign(time) * step;
+	}
+	vel.x = (lerp(0, sideMove, abs(time)) + (doJump ? lerp(0, 100, abs(time)) : 0)) * sign(time);
+
+	if (doJump < 2 && jumpButtonDown) {
+		vel.y = -g * t_h;
+		doJump++;
+		if (goLeft && vel.x > 0 || goRight && vel.x < 0) 
+			vel.x = (lerp(0, sideMove, abs(time *= -0.5f)) + (doJump ? lerp(0, 100, abs(time)) : 0)) * sign(time);
+		else if (!goLeft && !goRight)
+			vel.x = (lerp(0, sideMove, abs(time /= 5)) + (doJump ? lerp(0, 100, abs(time)) : 0)) * sign(time);
+	}
+
+	moveBy(vel * delta + 0.5f * acc * delta * delta);
+
+	vel += (!jumpButtonPressed || vel.y < 0 ? fastFall : 1) * acc * delta;
 }
