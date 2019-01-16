@@ -14,6 +14,10 @@ void Actor::moveBy(Vec2 movement, float duration) {
 
 void Actor::load(std::string path, Vec2 position) {
 	sprite = Sprite::create(path);
+	if (sprite == nullptr) {
+		cocos2d::log("Sprite %s could not be loaded!", path.c_str());
+		sprite = Sprite::create("default.png");
+	}
 	sprite->setAnchorPoint(Vec2(0.5f, 0.5f));
 	sprite->setPosition(position);
 }

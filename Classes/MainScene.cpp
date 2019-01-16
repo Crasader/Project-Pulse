@@ -59,7 +59,7 @@ bool MainScene::init() {
 	}
 
 	player = new Player("amheck.png", Vec2(1280 / 2, 720 / 2));
-	player->getSprite()->setScale(0.3f);
+	//player->getSprite()->setScale(0.3f);
 	this->addChild(player->getSprite(), 100);
 
 	background = Sprite::create("HelloWorld.png");
