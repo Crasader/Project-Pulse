@@ -25,8 +25,8 @@
 #include "AppDelegate.h"
 #include "MainScene.h"
 
-// #define USE_AUDIO_ENGINE 1
-// #define USE_SIMPLE_AUDIO_ENGINE 1
+ #define USE_AUDIO_ENGINE 1
+ //#define USE_SIMPLE_AUDIO_ENGINE 1
 
 #if USE_AUDIO_ENGINE && USE_SIMPLE_AUDIO_ENGINE
 #error "Don't use AudioEngine and SimpleAudioEngine at the same time. Please just select one in your game!"
@@ -51,7 +51,7 @@ AppDelegate::AppDelegate() {}
 
 AppDelegate::~AppDelegate() {
 #if USE_AUDIO_ENGINE
-	AudioEngine::end();
+	//AudioEngine::end();
 #elif USE_SIMPLE_AUDIO_ENGINE
 	SimpleAudioEngine::end();
 #endif
@@ -109,8 +109,8 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
 	register_all_packages();
 
-	//dynamic_cast<GLViewImpl*>(cocos2d::Director::getInstance()->getOpenGLView())->setFullscreen();
-	//director->setContentScaleFactor(MIN(smallResolutionSize.height / designResolutionSize.height, smallResolutionSize.width / designResolutionSize.width));
+	//dynamic_cast<GLViewImpl*>(director->getOpenGLView())->setFullscreen();
+	//director->setContentScaleFactor(MIN((director->getOpenGLView())->getFrameSize().height / designResolutionSize.height, (director->getOpenGLView())->getFrameSize().width / designResolutionSize.width));
 
 	// create a scene. it's an autorelease object
 	auto scene = MainScene::createScene();
@@ -138,6 +138,7 @@ void AppDelegate::applicationWillEnterForeground() {
 	Director::getInstance()->startAnimation();
 
 #if USE_AUDIO_ENGINE
+	/// Only resume ones I haven't paused manually
 	AudioEngine::resumeAll();
 #elif USE_SIMPLE_AUDIO_ENGINE
 	SimpleAudioEngine::getInstance()->resumeBackgroundMusic();

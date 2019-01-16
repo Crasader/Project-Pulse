@@ -10,19 +10,40 @@
     <Filter Include="src">
       <UniqueIdentifier>{bb6c862e-70e9-49d9-81b7-3829a6f50471}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\main">
+      <UniqueIdentifier>{373e5b4e-11ea-476a-8cee-b57f53251f74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\managers">
+      <UniqueIdentifier>{94af4a58-7234-440f-befa-c774f0b8a245}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\scenes">
-      <UniqueIdentifier>{73f808e8-691e-48be-becf-e753fe29482b}</UniqueIdentifier>
+      <UniqueIdentifier>{57e965d7-570e-411d-a810-5450474893fe}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\entities">
-      <UniqueIdentifier>{4c7a00e6-4df2-4f5a-a5e1-2baf82a69691}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\system">
-      <UniqueIdentifier>{f57fb927-619e-4427-a241-5d001c5a92c0}</UniqueIdentifier>
+      <UniqueIdentifier>{cde7333a-5257-4b4e-a37f-6dea4da8e8b8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\AppDelegate.cpp">
+      <Filter>src\main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\ControllerManager.cpp">
+      <Filter>src\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\AudioManager.cpp">
+      <Filter>src\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\MouseManager.cpp">
+      <Filter>src\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\KeyboardManager.cpp">
+      <Filter>src\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\MainScene.cpp">
+      <Filter>src\scenes</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\Actor.cpp">
       <Filter>src\entities</Filter>
@@ -33,22 +54,28 @@
     <ClCompile Include="..\Classes\Player.cpp">
       <Filter>src\entities</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\AppDelegate.cpp">
-      <Filter>src\system</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\MainScene.cpp">
-      <Filter>src\scenes</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\AudioManager.cpp">
-      <Filter>src\system</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\KeyboardManager.cpp">
-      <Filter>src\system</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
       <Filter>win32</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\AppDelegate.h">
+      <Filter>src\main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\ControllerManager.h">
+      <Filter>src\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\AudioManager.h">
+      <Filter>src\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\MouseManager.h">
+      <Filter>src\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\KeyboardManager.h">
+      <Filter>src\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\MainScene.h">
+      <Filter>src\scenes</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\Actor.h">
       <Filter>src\entities</Filter>
@@ -58,18 +85,6 @@
     </ClInclude>
     <ClInclude Include="..\Classes\Player.h">
       <Filter>src\entities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\AppDelegate.h">
-      <Filter>src\system</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\MainScene.h">
-      <Filter>src\scenes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\AudioManager.h">
-      <Filter>src\system</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\KeyboardManager.h">
-      <Filter>src\system</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

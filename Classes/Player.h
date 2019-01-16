@@ -1,9 +1,9 @@
 #pragma once
 #include "Actor.h"
-class Player : Actor {
+class Player : public Actor {
 public:
 	Player(std::string path, Vec2 pos);
 
-	void update(float dt);
+	void update(float delta);
 };
 

@@ -27,10 +27,16 @@
 
 #include "cocos2d.h"
 
+#include "Player.h"
+
 class MainScene : public cocos2d::Scene {
 public:
+	// implement the "static create()" method manually
+	CREATE_FUNC(MainScene);
+	
 	static cocos2d::Scene* createScene();
-
+	virtual void onExit();
+	virtual void onEnter(); 
 	virtual bool init();
 
 	// a selector callback
@@ -38,8 +44,18 @@ public:
 
 	void update(float delta);
 
-	// implement the "static create()" method manually
-	CREATE_FUNC(MainScene);
+	//void onConnected(Controller* controller, Event* event);
+	//void onDisconnected(Controller* controller, Event* event);
+	//void onKeyDown(Controller* controller, int key, Event* event);
+	//void onKeyUp(Controller* controller, int key, Event* event);
+	//void onKeyRepeat(Controller* controller, int key, Event* event);
+	//void onAxisEvent(Controller* controller, int key, Event* event);
+
+
+private:
+	Player* player;
+
+	Sprite* background;
 };
 
 #endif // __HELLOWORLD_SCENE_H__
