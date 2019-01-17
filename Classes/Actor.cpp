@@ -32,7 +32,7 @@ void Actor::updateActionBuffer() {
 
 bool Actor::isActionPressed(std::string action) {
 	if (actionBuffer.find(action) != actionBuffer.end())
-		return actionBuffer[action].time != 0;
+		return actionBuffer[action].pressed;
 	return false;
 }
 

@@ -10,7 +10,9 @@ using namespace cocos2d;
 namespace {
 struct ActionInfo {
 	float time = 0;
-	bool down = false, up = false;
+	bool down = false;
+	bool up = false;
+	bool pressed = false;
 };
 }
 

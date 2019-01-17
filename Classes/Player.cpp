@@ -14,12 +14,16 @@ Player::Player(std::string path, Vec2 pos) {
 	actionBuffer["left"];
 	actionBuffer["right"];
 
+	using namespace Retry;
 	KeyMap jump;
-	jump.kButtons.push_back(Retry::KeyCode::SPACE);
+	jump.kButtons.push_back(KeyCode::SPACE);
+	jump.cButtons.push_back(ControllerButton::A);
 	KeyMap left;
-	left.kButtons.push_back(Retry::KeyCode::A);
+	left.kButtons.push_back(KeyCode::A);
+	left.cButtons.push_back(ControllerButton::LEFT_STICK_LEFT);
 	KeyMap right;
-	right.kButtons.push_back(Retry::KeyCode::D);
+	right.kButtons.push_back(KeyCode::D);
+	right.cButtons.push_back(ControllerButton::LEFT_STICK_RIGHT);
 
 	actionMapping["jump"] = jump;
 	actionMapping["left"] = left;
@@ -106,30 +110,29 @@ void Player::updateActionBuffer() {
 	for (auto &i : actionBuffer) {
 		float time = 0;
 		int count = 0;
+		i.second.down = false;
+		i.second.up = false;
+		i.second.pressed = false;
 		for (auto j : actionMapping[i.first].kButtons) {
-			i.second.down |= keyIn->isKeyDown(j);
-			i.second.up |= keyIn->isKeyUp(j);
-			if (keyIn->isKeyPressed(j)) {
-				time += keyIn->keyPressedDuration(j);
-				count++;
-			}
+			i.second.down = i.second.down || keyIn->isKeyDown(j);
+			i.second.up = i.second.up || keyIn->isKeyUp(j);
+			i.second.pressed = i.second.pressed || keyIn->isKeyPressed(j);
 		}
 		for (auto j : actionMapping[i.first].mButtons) {
-			i.second.down |= mouseIn->isButtonDown(j);
-			i.second.up |= mouseIn->isButtonUp(j);
-			if (mouseIn->isButtonPressed(j)) {
-				time += mouseIn->buttonPressedDuration(j);
-				count++;
-			}
+			i.second.down = i.second.down || mouseIn->isButtonDown(j);
+			i.second.up = i.second.up || mouseIn->isButtonUp(j);
+			i.second.pressed = i.second.pressed || mouseIn->isButtonPressed(j);
 		}
 		for (auto j : actionMapping[i.first].cButtons) {
-			i.second.down |= controllerIn->isButtonDown(j);
-			i.second.up |= controllerIn->isButtonUp(j);
-			if (controllerIn->isButtonPressed(j)) {
-				time += controllerIn->buttonPressedDuration(j);
-				count++;
+			if ((int) j < (int) ControllerButton::AXIS_START) {
+				i.second.down = i.second.down || controllerIn->isButtonDown(j);
+				i.second.up = i.second.up || controllerIn->isButtonUp(j);
+				i.second.pressed = i.second.pressed || controllerIn->isButtonPressed(j);
+			} else {
+				i.second.down = i.second.down || controllerIn->isAxisDown(j);
+				i.second.up = i.second.up || controllerIn->isAxisUp(j);
+				i.second.pressed = i.second.pressed || controllerIn->isAxisPressed(j);
 			}
 		}
-		i.second.time = time / (float) count;
 	}
 }
