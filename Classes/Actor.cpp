@@ -1,13 +1,5 @@
 #include "Actor.h"
 
-void Actor::kill(float delay) {
-	sprite->runAction(RemoveSelf::create());
-}
-
-void Actor::moveBy(Vec2 movement, float duration) {
-	sprite->runAction(MoveBy::create(duration, movement)->clone());
-}
-
 void Actor::load(std::string path, Vec2 position) {
 	sprite = Sprite::create(path);
 	if (sprite == nullptr) {
@@ -20,4 +12,49 @@ void Actor::load(std::string path, Vec2 position) {
 	sprite->setAnchorPoint(Vec2(0.5f, 0.5f));
 	sprite->setPosition(position);
 }
+
+void Actor::kill(float delay) {
+	sprite->runAction(RemoveSelf::create());
+}
+
+void Actor::moveBy(Vec2 movement, float duration) {
+	sprite->runAction(MoveBy::create(duration, movement)->clone());
+}
+
+void Actor::bufferAction(std::string action) {
+	if (actionBuffer.find(action) != actionBuffer.end())
+		actionBuffer[action];
+}
+
+void Actor::updateActionBuffer() {
+
+}
+
+bool Actor::isActionPressed(std::string action) {
+	if (actionBuffer.find(action) != actionBuffer.end())
+		return actionBuffer[action].time != 0;
+	return false;
+}
+
+bool Actor::isActionDown(std::string action) {
+	if (actionBuffer.find(action) != actionBuffer.end())
+		return actionBuffer[action].down;
+	return false;
+}
+
+bool Actor::isActionUp(std::string action) {
+	if (actionBuffer.find(action) != actionBuffer.end())
+		return actionBuffer[action].up;
+	return false;
+}
+
+float Actor::actionPressedDuration(std::string action) {
+	if (actionBuffer.find(action) != actionBuffer.end())
+		return actionBuffer[action].time;
+	return false;
+}
+
+
+
+
 

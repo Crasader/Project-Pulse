@@ -5,8 +5,25 @@ Retry::MouseManager* Player::mouseIn = Retry::MouseManager::getInstance();
 Retry::ControllerManager* Player::controllerIn = Retry::ControllerManager::getInstance();
 Retry::AudioManager* Player::audio = Retry::AudioManager::getInstance();
 
+std::unordered_map<std::string, KeyMap> Player::actionMapping;
+
 Player::Player(std::string path, Vec2 pos) {
 	load(path, pos);
+
+	actionBuffer["jump"];
+	actionBuffer["left"];
+	actionBuffer["right"];
+
+	KeyMap jump;
+	jump.kButtons.push_back(Retry::KeyCode::SPACE);
+	KeyMap left;
+	left.kButtons.push_back(Retry::KeyCode::A);
+	KeyMap right;
+	right.kButtons.push_back(Retry::KeyCode::D);
+
+	actionMapping["jump"] = jump;
+	actionMapping["left"] = left;
+	actionMapping["right"] = right;
 }
 
 float lerp(float p0, float p1, float t) {
@@ -24,6 +41,8 @@ int sign(float x) {
 }
 
 void Player::update(float delta) {
+	updateActionBuffer();
+
 	using namespace Retry;
 	static auto space = KeyCode::SPACE;
 
@@ -49,11 +68,11 @@ void Player::update(float delta) {
 		hasMoved = false;
 	}
 
-	bool jumpButtonDown = keyIn->isKeyDown(KeyCode::SPACE) || controllerIn->isButtonDown(ControllerButton::A);
-	bool jumpButtonPressed = keyIn->isKeyPressed(KeyCode::SPACE) || controllerIn->isButtonPressed(ControllerButton::A);
+	bool jumpButtonDown = isActionDown("jump");
+	bool jumpButtonPressed = isActionPressed("jump");
 
-	bool goLeft = keyIn->isKeyPressed(KeyCode::A) || controllerIn->getLStickX() < -0.5f,
-		 goRight = keyIn->isKeyPressed(KeyCode::D) || controllerIn->getLStickX() > 0.5f;
+	bool goLeft = isActionPressed("left"),
+		 goRight = isActionPressed("right");
 	float step = (!doJump || goLeft || goRight) * (delta / timeToMax) / (doJump ? (vel.y > 100 ? 5.0f : 3.0f) : 1);
 
 	//if (doJump && abs(time) - step < 0) time = step = 0;
@@ -81,4 +100,36 @@ void Player::update(float delta) {
 	moveBy(vel * delta + 0.5f * acc * delta * delta);
 
 	vel += (!jumpButtonPressed || vel.y < 0 ? fastFall : 1) * acc * delta;
+}
+
+void Player::updateActionBuffer() {
+	for (auto &i : actionBuffer) {
+		float time = 0;
+		int count = 0;
+		for (auto j : actionMapping[i.first].kButtons) {
+			i.second.down |= keyIn->isKeyDown(j);
+			i.second.up |= keyIn->isKeyUp(j);
+			if (keyIn->isKeyPressed(j)) {
+				time += keyIn->keyPressedDuration(j);
+				count++;
+			}
+		}
+		for (auto j : actionMapping[i.first].mButtons) {
+			i.second.down |= mouseIn->isButtonDown(j);
+			i.second.up |= mouseIn->isButtonUp(j);
+			if (mouseIn->isButtonPressed(j)) {
+				time += mouseIn->buttonPressedDuration(j);
+				count++;
+			}
+		}
+		for (auto j : actionMapping[i.first].cButtons) {
+			i.second.down |= controllerIn->isButtonDown(j);
+			i.second.up |= controllerIn->isButtonUp(j);
+			if (controllerIn->isButtonPressed(j)) {
+				time += controllerIn->buttonPressedDuration(j);
+				count++;
+			}
+		}
+		i.second.time = time / (float) count;
+	}
 }

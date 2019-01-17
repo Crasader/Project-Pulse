@@ -125,6 +125,8 @@ bool AppDelegate::applicationDidFinishLaunching() {
 void AppDelegate::applicationDidEnterBackground() {
 	Director::getInstance()->stopAnimation();
 
+	Controller::stopDiscoveryController();
+
 #if USE_AUDIO_ENGINE
 	AudioEngine::pauseAll();
 #elif USE_SIMPLE_AUDIO_ENGINE
@@ -136,6 +138,8 @@ void AppDelegate::applicationDidEnterBackground() {
 // this function will be called when the app is active again
 void AppDelegate::applicationWillEnterForeground() {
 	Director::getInstance()->startAnimation();
+
+	Controller::startDiscoveryController();
 
 #if USE_AUDIO_ENGINE
 	/// Only resume ones I haven't paused manually
