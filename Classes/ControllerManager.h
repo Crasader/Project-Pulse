@@ -60,10 +60,15 @@ public:
 
 	void setDeadZone(ControllerButton key, float t, int id = 0);
 
+	bool doUseController() { return useController; }
+	void setUseController(bool useController) { this->useController = useController; }
+
 private:
 	static std::map<int, ControllerInfo> controllers;
 
 	static clock_t currentTime;
+
+	static bool useController;
 };
 
 enum class ControllerButton {
@@ -120,7 +125,7 @@ struct ControllerInfo {
 	float leftTrigger = 0, rightTrigger = 0;
 	float deltaLeftTrigger = 0, deltaRightTrigger = 0;
 
-	float sensitivity[6]{ 0.5f, 0.5f, 0.5f, 0.5f, 0.5f, 0.5f };
+	float sensitivity[6]{ 0.2f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f };
 };
 }
 

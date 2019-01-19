@@ -8,6 +8,8 @@ std::map<int, ControllerInfo> ControllerManager::controllers;
 
 clock_t ControllerManager::currentTime = 0;
 
+bool ControllerManager::useController = false;
+
 ControllerManager* ControllerManager::getInstance() {
 	return instance == 0 ? (instance = new ControllerManager()) : instance;
 }
@@ -39,14 +41,17 @@ void ControllerManager::createListener(cocos2d::EventDispatcher* dispatcher, coc
 	};
 	eventListener->onKeyDown = [](cocos2d::Controller* controller, int key, Event* event) {
 		ControllerManager::getInstance()->updateButton((Retry::ControllerButton) key, true, controller->getDeviceId());
+		ControllerManager::getInstance()->setUseController(true);
 	};
 	eventListener->onKeyUp = [](cocos2d::Controller* controller, int key, Event* event) {
 		ControllerManager::getInstance()->updateButton((Retry::ControllerButton) key, false, controller->getDeviceId());
+		ControllerManager::getInstance()->setUseController(true);
 	};
 	eventListener->onKeyRepeat = [](cocos2d::Controller* controller, int key, Event* event) {
 
 	};
 	eventListener->onAxisEvent = [](cocos2d::Controller* controller, int key, Event* event) {
+		ControllerManager::getInstance()->setUseController(true);
 		if (controllers.find(controller->getDeviceId()) != controllers.end()) {
 			auto c = &controllers[controller->getDeviceId()];
 			float newValue = controller->getKeyStatus(((EventController*) event)->getKeyCode()).value;

@@ -29,6 +29,8 @@
 #include "AudioManager.h"
 #include "ControllerManager.h"
 
+#include "CameraManager.h"
+
 USING_NS_CC;
 
 Scene* MainScene::createScene() {
@@ -63,7 +65,8 @@ bool MainScene::init() {
 	Retry::ControllerManager::getInstance()->createListener(_eventDispatcher, this);
 
 	this->scheduleUpdate();
-	
+
+	CameraManager::getInstance()->setCamera(this->getDefaultCamera());
 
 	return true;
 }
@@ -73,11 +76,13 @@ void MainScene::menuCloseCallback(Ref* pSender) {
 }
 
 void MainScene::update(float delta) {
+
 	using namespace Retry;
-	auto keyIn = KeyboardManager::getInstance();
-	auto mouseIn = MouseManager::getInstance();
-	auto controllerIn = ControllerManager::getInstance();
-	auto audio = AudioManager::getInstance();
+	static auto keyIn = KeyboardManager::getInstance();
+	static auto mouseIn = MouseManager::getInstance();
+	static auto controllerIn = ControllerManager::getInstance();
+	static auto audio = AudioManager::getInstance();
+
 
 	if (keyIn->isKeyPressed(KeyCode::ESCAPE)) {
 		Director::getInstance()->end();
@@ -85,7 +90,15 @@ void MainScene::update(float delta) {
 
 	player->update(delta);
 
-	auto camera = this->getDefaultCamera();
+	CameraManager::getInstance()->lazyFollowTarget(player->getSprite(), 0.25f);
+	//CameraManager::getInstance()->moveBy((player->getSprite()->getPosition() - CameraManager::getInstance()->getPosition()) * delta * 4);
+
+	if (keyIn->isKeyPressed(KeyCode::E))
+		CameraManager::getInstance()->setTrauma(0.3f);
+
+	if (keyIn->isKeyPressed(KeyCode::R))
+		CameraManager::getInstance()->lazyFollowTarget(0);
+	
 	//camera->runAction(MoveBy::create(0, (player->getSprite()->getPosition() - camera->getPosition()) * delta * 4));
 
 	//audio->setMasterVolume(mouseIn->getY() / 720.f);
@@ -93,4 +106,5 @@ void MainScene::update(float delta) {
 	keyIn->refresh();
 	mouseIn->refresh();
 	controllerIn->refresh();
+	CameraManager::getInstance()->update(delta);
 }

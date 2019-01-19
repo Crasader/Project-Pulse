@@ -21,9 +21,11 @@ Player::Player(std::string path, Vec2 pos) {
 	KeyMap left;
 	left.kButtons.push_back(KeyCode::A);
 	left.cButtons.push_back(ControllerButton::LEFT_STICK_LEFT);
+	left.cButtons.push_back(ControllerButton::DPAD_LEFT);
 	KeyMap right;
 	right.kButtons.push_back(KeyCode::D);
 	right.cButtons.push_back(ControllerButton::LEFT_STICK_RIGHT);
+	right.cButtons.push_back(ControllerButton::DPAD_RIGHT);
 
 	actionMapping["jump"] = jump;
 	actionMapping["left"] = left;
@@ -48,7 +50,15 @@ void Player::update(float delta) {
 	updateActionBuffer();
 
 	using namespace Retry;
-	static auto space = KeyCode::SPACE;
+
+	bool jumpButtonDown = isActionDown("jump");
+	bool jumpButtonPressed = isActionPressed("jump");
+
+	bool goLeft = isActionPressed("left"),
+		goRight = isActionPressed("right");
+
+	bool leftStickSens = controllerIn->isAxisPressed(ControllerButton::LEFT_STICK_LEFT) || 
+		                 controllerIn->isAxisPressed(ControllerButton::LEFT_STICK_RIGHT);
 
 	// Side Movement Constants and Variables
 	static const float sideMove = 450;
@@ -71,15 +81,8 @@ void Player::update(float delta) {
 		doJump = 0;
 		hasMoved = false;
 	}
-
-	bool jumpButtonDown = isActionDown("jump");
-	bool jumpButtonPressed = isActionPressed("jump");
-
-	bool goLeft = isActionPressed("left"),
-		 goRight = isActionPressed("right");
+	
 	float step = (!doJump || goLeft || goRight) * (delta / timeToMax) / (doJump ? (vel.y > 100 ? 5.0f : 3.0f) : 1);
-
-	//if (doJump && abs(time) - step < 0) time = step = 0;
 
 	if (goLeft || goRight) hasMoved = true;
 
@@ -90,13 +93,17 @@ void Player::update(float delta) {
 	} else {
 		time = abs(time) - step < 0 ? 0 : time - sign(time) * step;
 	}
+	if (controllerIn->doUseController() && leftStickSens) {
+		if (!doJump)
+			time = abs(time) > abs(controllerIn->getLStickX()) ? sign(time) * abs(controllerIn->getLStickX() * controllerIn->getLStickX()) : time;
+	} 
 	vel.x = (lerp(0, sideMove, abs(time)) + (doJump ? lerp(0, 100, abs(time)) : 0)) * sign(time);
 
 	if (doJump < 2 && jumpButtonDown) {
 		vel.y = -g * t_h;
 		doJump++;
 		if (goLeft && vel.x > 0 || goRight && vel.x < 0) 
-			vel.x = (lerp(0, sideMove, abs(time *= -0.5f)) + (doJump ? lerp(0, 100, abs(time)) : 0)) * sign(time);
+			vel.x = (lerp(0, sideMove, abs(time = -0.5 * sign(time))) + (doJump ? lerp(0, 100, abs(time)) : 0)) * sign(time);
 		else if (!goLeft && !goRight)
 			vel.x = (lerp(0, sideMove, abs(time /= 5)) + (doJump ? lerp(0, 100, abs(time)) : 0)) * sign(time);
 	}

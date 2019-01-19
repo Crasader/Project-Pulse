@@ -22,6 +22,9 @@
     <Filter Include="src\entities">
       <UniqueIdentifier>{cde7333a-5257-4b4e-a37f-6dea4da8e8b8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\utilities">
+      <UniqueIdentifier>{f72efda9-644f-4d8e-b577-2f34dfe38b88}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -54,6 +57,12 @@
     <ClCompile Include="..\Classes\Player.cpp">
       <Filter>src\entities</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\PerlinNoise.cpp">
+      <Filter>src\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\CameraManager.cpp">
+      <Filter>src\managers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -85,6 +94,12 @@
     </ClInclude>
     <ClInclude Include="..\Classes\Player.h">
       <Filter>src\entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\PerlinNoise.h">
+      <Filter>src\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\CameraManager.h">
+      <Filter>src\managers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
