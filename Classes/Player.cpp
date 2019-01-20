@@ -1,5 +1,7 @@
 #include "Player.h"
 
+#include "CameraManager.h"
+
 Retry::KeyboardManager* Player::keyIn = Retry::KeyboardManager::getInstance();
 Retry::MouseManager* Player::mouseIn = Retry::MouseManager::getInstance();
 Retry::ControllerManager* Player::controllerIn = Retry::ControllerManager::getInstance();
@@ -72,20 +74,28 @@ void Player::update(float delta) {
 	static const float fastFall = 2.5f;
 	static int doJump = 0;
 	static bool hasMoved = false;
+	static bool onGround = true;
 
 	static Vec2 vel = Vec2(0, 0), acc = Vec2(0, g);
 
+	// LANDING
 	static const float groundHeight = 50;
 	if (sprite->getPosition().y < groundHeight) {
+
+		if (!onGround)
+			CameraManager::getInstance()->addTrauma(0.3f);
+
 		sprite->setPositionY(groundHeight);
 		doJump = 0;
 		hasMoved = false;
+		onGround = true;
 	}
 	
 	float step = (!doJump || goLeft || goRight) * (delta / timeToMax) / (doJump ? (vel.y > 100 ? 5.0f : 3.0f) : 1);
 
 	if (goLeft || goRight) hasMoved = true;
 
+	// MOVEMENT
 	if (goLeft && !goRight) {
 		time = time - step < -1 ? -1 : time - step;
 	} else if (goRight && !goLeft) {
@@ -99,7 +109,9 @@ void Player::update(float delta) {
 	} 
 	vel.x = (lerp(0, sideMove, abs(time)) + (doJump ? lerp(0, 100, abs(time)) : 0)) * sign(time);
 
+	// JUMP
 	if (doJump < 2 && jumpButtonDown) {
+		onGround = false;
 		vel.y = -g * t_h;
 		doJump++;
 		if (goLeft && vel.x > 0 || goRight && vel.x < 0) 

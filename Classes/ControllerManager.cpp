@@ -81,13 +81,13 @@ void ControllerManager::createListener(cocos2d::EventDispatcher* dispatcher, coc
 																 c->rightStick.y, c->deltaRightStick.y, controller->getDeviceId());
 					break;
 				case 4: // Left Trigger
-					c->deltaLeftTrigger = newValue - c->deltaLeftTrigger;
+					c->deltaLeftTrigger = newValue - c->leftTrigger;
 					c->leftTrigger = newValue;
 					ControllerManager::getInstance()->updateAxis((Retry::ControllerButton) (key + (int) ControllerButton::AXIS_START),
-																 c->leftTrigger, c->rightTrigger, controller->getDeviceId());
+																 c->leftTrigger, c->deltaLeftTrigger, controller->getDeviceId());
 					break;
 				case 5: // Right Trigger
-					c->deltaRightTrigger = newValue - c->deltaRightTrigger;
+					c->deltaRightTrigger = newValue - c->rightTrigger;
 					c->rightTrigger = newValue;
 					ControllerManager::getInstance()->updateAxis((Retry::ControllerButton) (key + (int) ControllerButton::AXIS_START),
 																 c->rightTrigger, c->deltaRightTrigger, controller->getDeviceId());
@@ -128,13 +128,27 @@ void ControllerManager::updateAxis(ControllerButton axis, float x, float dx, int
 				newAxis = x < 0 ? ControllerButton::RIGHT_STICK_DOWN : ControllerButton::RIGHT_STICK_UP; break;
 		}
 
-		if (c->axes.find(newAxis) == c->axes.end()) c->axes[newAxis];
-		if (abs(x) >= abs(c->sensitivity[(int) axis - (int) ControllerButton::AXIS_START]))      c->axes[newAxis] |= 0b1;
-		else                                                                                     c->axes[newAxis] &= ~0b1;
-		if (abs(x + dx) >= abs(c->sensitivity[(int) axis - (int) ControllerButton::AXIS_START])) c->axes[newAxis] |= 0b10;
-		else                                                                                     c->axes[newAxis] &= ~0b10;
-		if (abs(x + dx) <= abs(c->sensitivity[(int) axis - (int) ControllerButton::AXIS_START])) c->axes[newAxis] |= 0b100;
-		else                                                                                     c->axes[newAxis] &= ~0b100;
+		if (newAxis == ControllerButton::LEFT_TRIGGER || newAxis == ControllerButton::RIGHT_TRIGGER) {
+			if (c->axes.find(newAxis) == c->axes.end()) c->axes[newAxis];
+			if (x >= c->sensitivity[(int) axis - (int) ControllerButton::AXIS_START])                 c->axes[newAxis] |= 0b1;
+			else                                                                                      c->axes[newAxis] &= ~0b1;
+
+			if (dx != 0 && x + dx >= c->sensitivity[(int) axis - (int) ControllerButton::AXIS_START]) c->axes[newAxis] |= 0b10;
+			else                                                                                      c->axes[newAxis] &= ~0b10;
+
+			if (dx != 0 && x + dx <= c->sensitivity[(int) axis - (int) ControllerButton::AXIS_START]) c->axes[newAxis] |= 0b100;
+			else                                                                                      c->axes[newAxis] &= ~0b100;
+		} else {
+			if (c->axes.find(newAxis) == c->axes.end()) c->axes[newAxis];
+			if (abs(x) >= abs(c->sensitivity[(int) axis - (int) ControllerButton::AXIS_START]))                 c->axes[newAxis] |= 0b1;
+			else                                                                                                c->axes[newAxis] &= ~0b1;
+
+			if (dx != 0 && abs(x + dx) >= abs(c->sensitivity[(int) axis - (int) ControllerButton::AXIS_START])) c->axes[newAxis] |= 0b10;
+			else                                                                                                c->axes[newAxis] &= ~0b10;
+
+			if (dx != 0 && abs(x + dx) <= abs(c->sensitivity[(int) axis - (int) ControllerButton::AXIS_START])) c->axes[newAxis] |= 0b100;
+			else                                                                                                c->axes[newAxis] &= ~0b100;
+		}
 	}
 }
 

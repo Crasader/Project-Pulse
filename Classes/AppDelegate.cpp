@@ -110,7 +110,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	register_all_packages();
 
 	//dynamic_cast<GLViewImpl*>(director->getOpenGLView())->setFullscreen();
-	//director->setContentScaleFactor(MIN((director->getOpenGLView())->getFrameSize().height / designResolutionSize.height, (director->getOpenGLView())->getFrameSize().width / designResolutionSize.width));
+	//glview->setDesignResolutionSize(glview->getFrameSize().width, glview->getFrameSize().height, ResolutionPolicy::NO_BORDER);
 
 	// create a scene. it's an autorelease object
 	auto scene = MainScene::createScene();

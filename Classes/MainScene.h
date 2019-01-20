@@ -53,9 +53,15 @@ public:
 
 
 private:
+
+	//Layer* background;
+	Layer* foreground;
+
 	Player* player;
 
 	Sprite* background;
+
+	std::vector<cocos2d::Sprite*> cameraAnchors;
 };
 
 #endif // __HELLOWORLD_SCENE_H__

@@ -125,7 +125,7 @@ struct ControllerInfo {
 	float leftTrigger = 0, rightTrigger = 0;
 	float deltaLeftTrigger = 0, deltaRightTrigger = 0;
 
-	float sensitivity[6]{ 0.2f, 0.2f, 0.2f, 0.2f, 0.2f, 0.2f };
+	float sensitivity[6]{ 0.2f, 0.2f, 0.2f, 0.2f, 0.0f, 0.0f };
 };
 }
 
