@@ -30,24 +30,6 @@
     <ClCompile Include="main.cpp">
       <Filter>win32</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\AppDelegate.cpp">
-      <Filter>src\main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\ControllerManager.cpp">
-      <Filter>src\managers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\AudioManager.cpp">
-      <Filter>src\managers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\MouseManager.cpp">
-      <Filter>src\managers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\KeyboardManager.cpp">
-      <Filter>src\managers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\MainScene.cpp">
-      <Filter>src\scenes</Filter>
-    </ClCompile>
     <ClCompile Include="..\Classes\Actor.cpp">
       <Filter>src\entities</Filter>
     </ClCompile>
@@ -57,34 +39,34 @@
     <ClCompile Include="..\Classes\Player.cpp">
       <Filter>src\entities</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\PerlinNoise.cpp">
-      <Filter>src\utilities</Filter>
+    <ClCompile Include="..\Classes\AppDelegate.cpp">
+      <Filter>src\main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\AudioManager.cpp">
+      <Filter>src\managers</Filter>
     </ClCompile>
     <ClCompile Include="..\Classes\CameraManager.cpp">
       <Filter>src\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\ControllerManager.cpp">
+      <Filter>src\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\KeyboardManager.cpp">
+      <Filter>src\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\MainScene.cpp">
+      <Filter>src\scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\MouseManager.cpp">
+      <Filter>src\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\PerlinNoise.cpp">
+      <Filter>src\utilities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
       <Filter>win32</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\AppDelegate.h">
-      <Filter>src\main</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\ControllerManager.h">
-      <Filter>src\managers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\AudioManager.h">
-      <Filter>src\managers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\MouseManager.h">
-      <Filter>src\managers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\KeyboardManager.h">
-      <Filter>src\managers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\MainScene.h">
-      <Filter>src\scenes</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\Actor.h">
       <Filter>src\entities</Filter>
@@ -95,11 +77,29 @@
     <ClInclude Include="..\Classes\Player.h">
       <Filter>src\entities</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\PerlinNoise.h">
-      <Filter>src\utilities</Filter>
+    <ClInclude Include="..\Classes\AppDelegate.h">
+      <Filter>src\main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\AudioManager.h">
+      <Filter>src\managers</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\CameraManager.h">
       <Filter>src\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\ControllerManager.h">
+      <Filter>src\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\KeyboardManager.h">
+      <Filter>src\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\MainScene.h">
+      <Filter>src\scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\MouseManager.h">
+      <Filter>src\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\PerlinNoise.h">
+      <Filter>src\utilities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
