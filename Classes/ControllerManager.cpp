@@ -8,6 +8,8 @@ std::map<int, ControllerInfo> ControllerManager::controllers;
 
 clock_t ControllerManager::currentTime = 0;
 
+bool ControllerManager::useController = false;
+
 ControllerManager* ControllerManager::getInstance() {
 	return instance == 0 ? (instance = new ControllerManager()) : instance;
 }
@@ -16,6 +18,9 @@ void ControllerManager::refresh() {
 	for (auto &i : controllers)
 		i.second.buttonsLast.clear();
 	currentTime = clock();
+	for (auto &i : controllers)
+		for (auto &j : i.second.axes)
+			j.second = 0;
 }
 
 void ControllerManager::createListener(cocos2d::EventDispatcher* dispatcher, cocos2d::Node* node) {
@@ -36,14 +41,17 @@ void ControllerManager::createListener(cocos2d::EventDispatcher* dispatcher, coc
 	};
 	eventListener->onKeyDown = [](cocos2d::Controller* controller, int key, Event* event) {
 		ControllerManager::getInstance()->updateButton((Retry::ControllerButton) key, true, controller->getDeviceId());
+		ControllerManager::getInstance()->setUseController(true);
 	};
 	eventListener->onKeyUp = [](cocos2d::Controller* controller, int key, Event* event) {
 		ControllerManager::getInstance()->updateButton((Retry::ControllerButton) key, false, controller->getDeviceId());
+		ControllerManager::getInstance()->setUseController(true);
 	};
 	eventListener->onKeyRepeat = [](cocos2d::Controller* controller, int key, Event* event) {
 
 	};
 	eventListener->onAxisEvent = [](cocos2d::Controller* controller, int key, Event* event) {
+		ControllerManager::getInstance()->setUseController(true);
 		if (controllers.find(controller->getDeviceId()) != controllers.end()) {
 			auto c = &controllers[controller->getDeviceId()];
 			float newValue = controller->getKeyStatus(((EventController*) event)->getKeyCode()).value;
@@ -51,26 +59,38 @@ void ControllerManager::createListener(cocos2d::EventDispatcher* dispatcher, coc
 				case 0: // Left Stick X Axis
 					c->deltaLeftStick.x = newValue - c->leftStick.x;
 					c->leftStick.x = newValue;
+					ControllerManager::getInstance()->updateAxis((Retry::ControllerButton) (key + (int) ControllerButton::AXIS_START),
+																 c->leftStick.x, c->deltaLeftStick.x, controller->getDeviceId());
 					break;
 				case 1: // Left Stick Y Axis
 					c->deltaLeftStick.y = newValue - c->leftStick.y;
 					c->leftStick.y = newValue;
+					ControllerManager::getInstance()->updateAxis((Retry::ControllerButton) (key + (int) ControllerButton::AXIS_START),
+																 c->leftStick.y, c->deltaLeftStick.y, controller->getDeviceId());
 					break;
 				case 2: // Right Stick X Axis
 					c->deltaRightStick.x = newValue - c->rightStick.x;
 					c->rightStick.x = newValue;
+					ControllerManager::getInstance()->updateAxis((Retry::ControllerButton) (key + (int) ControllerButton::AXIS_START),
+																 c->rightStick.x, c->deltaRightStick.x, controller->getDeviceId());
 					break;
 				case 3: // Right Stick Y Axis
 					c->deltaRightStick.y = newValue - c->rightStick.y;
 					c->rightStick.y = newValue;
+					ControllerManager::getInstance()->updateAxis((Retry::ControllerButton) (key + (int) ControllerButton::AXIS_START),
+																 c->rightStick.y, c->deltaRightStick.y, controller->getDeviceId());
 					break;
 				case 4: // Left Trigger
-					c->deltaLeftTrigger = newValue - c->deltaLeftTrigger;
+					c->deltaLeftTrigger = newValue - c->leftTrigger;
 					c->leftTrigger = newValue;
+					ControllerManager::getInstance()->updateAxis((Retry::ControllerButton) (key + (int) ControllerButton::AXIS_START),
+																 c->leftTrigger, c->deltaLeftTrigger, controller->getDeviceId());
 					break;
 				case 5: // Right Trigger
-					c->deltaRightTrigger = newValue - c->deltaRightTrigger;
+					c->deltaRightTrigger = newValue - c->rightTrigger;
 					c->rightTrigger = newValue;
+					ControllerManager::getInstance()->updateAxis((Retry::ControllerButton) (key + (int) ControllerButton::AXIS_START),
+																 c->rightTrigger, c->deltaRightTrigger, controller->getDeviceId());
 					break;
 			}
 		}
@@ -90,6 +110,46 @@ void ControllerManager::updateButton(ControllerButton key, bool isPressed, int i
 		bCurr->erase(key);
 	}
 	controllers[id].buttonsLast[key] = isPressed;
+}
+
+void ControllerManager::updateAxis(ControllerButton axis, float x, float dx, int id) {
+	if (controllers.find(id) != controllers.end()) {
+		auto c = &controllers[id];
+
+		auto newAxis = axis;
+		switch (axis) {
+			case ControllerButton::LEFT_STICK_X:
+				newAxis = x < 0 ? ControllerButton::LEFT_STICK_LEFT : ControllerButton::LEFT_STICK_RIGHT; break;
+			case ControllerButton::LEFT_STICK_Y:
+				newAxis = x < 0 ? ControllerButton::LEFT_STICK_DOWN : ControllerButton::LEFT_STICK_UP; break;
+			case ControllerButton::RIGHT_STICK_X:
+				newAxis = x < 0 ? ControllerButton::RIGHT_STICK_LEFT : ControllerButton::RIGHT_STICK_RIGHT; break;
+			case ControllerButton::RIGHT_STICK_Y:
+				newAxis = x < 0 ? ControllerButton::RIGHT_STICK_DOWN : ControllerButton::RIGHT_STICK_UP; break;
+		}
+
+		if (newAxis == ControllerButton::LEFT_TRIGGER || newAxis == ControllerButton::RIGHT_TRIGGER) {
+			if (c->axes.find(newAxis) == c->axes.end()) c->axes[newAxis];
+			if (x >= c->sensitivity[(int) axis - (int) ControllerButton::AXIS_START])                 c->axes[newAxis] |= 0b1;
+			else                                                                                      c->axes[newAxis] &= ~0b1;
+
+			if (dx != 0 && x + dx >= c->sensitivity[(int) axis - (int) ControllerButton::AXIS_START]) c->axes[newAxis] |= 0b10;
+			else                                                                                      c->axes[newAxis] &= ~0b10;
+
+			if (dx != 0 && x + dx <= c->sensitivity[(int) axis - (int) ControllerButton::AXIS_START]) c->axes[newAxis] |= 0b100;
+			else                                                                                      c->axes[newAxis] &= ~0b100;
+		} else {
+			if (c->axes.find(newAxis) == c->axes.end()) c->axes[newAxis];
+			if (abs(x) >= abs(c->sensitivity[(int) axis - (int) ControllerButton::AXIS_START]))                 c->axes[newAxis] |= 0b1;
+			else                                                                                                c->axes[newAxis] &= ~0b1;
+
+			if (dx != 0 && abs(x + dx) >= abs(c->sensitivity[(int) axis - (int) ControllerButton::AXIS_START])) c->axes[newAxis] |= 0b10;
+			else                                                                                                c->axes[newAxis] &= ~0b10;
+
+			if (dx != 0 && abs(x + dx) <= abs(c->sensitivity[(int) axis - (int) ControllerButton::AXIS_START])) c->axes[newAxis] |= 0b100;
+			else                                                                                                c->axes[newAxis] &= ~0b100;
+		}
+	}
 }
 
 bool ControllerManager::isButtonPressed(ControllerButton key, int id) {
@@ -123,6 +183,18 @@ float ControllerManager::buttonPressedDuration(ControllerButton key, int id) {
 			return float(currentTime - (*bCurr)[key]) / (float) CLOCKS_PER_SEC;
 	}
 	return 0;
+}
+
+bool ControllerManager::isAxisPressed(ControllerButton axis, int id) {
+	return controllers[id].axes[axis] & 0b1;
+}
+
+bool ControllerManager::isAxisDown(ControllerButton axis, int id) {
+	return controllers[id].axes[axis] & 0b10;
+}
+
+bool ControllerManager::isAxisUp(ControllerButton axis, int id) {
+	return controllers[id].axes[axis] & 0b100;
 }
 
 cocos2d::Vec2 ControllerManager::getLStick(int id) {
@@ -187,4 +259,9 @@ float ControllerManager::getRTrigger(int id) {
 
 float ControllerManager::getDeltaRTrigger(int id) {
 	return controllers[id].deltaRightTrigger;
+}
+
+void ControllerManager::setDeadZone(ControllerButton key, float t, int id) {
+	t = t < 0 ? 0 : t > 1.0f ? 1.0f : t;
+	controllers[id].sensitivity[(int) key - (int) ControllerButton::AXIS_START] = t;
 }

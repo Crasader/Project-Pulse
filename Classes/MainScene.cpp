@@ -29,6 +29,8 @@
 #include "AudioManager.h"
 #include "ControllerManager.h"
 
+#include "CameraManager.h"
+
 USING_NS_CC;
 
 Scene* MainScene::createScene() {
@@ -58,12 +60,39 @@ bool MainScene::init() {
 	background->setPosition(Vec2(1280 / 2, 720 / 2));
 	this->addChild(background, 0);
 
+	cameraAnchors.push_back(Sprite::create("CloseSelected.png"));
+	cameraAnchors.back()->setAnchorPoint(Vec2(0.5, 0.5f));
+	cameraAnchors.back()->setPosition(Vec2(-500, -200));
+
+	cameraAnchors.push_back(Sprite::create("CloseSelected.png"));
+	cameraAnchors.back()->setAnchorPoint(Vec2(0.5, 0.5f));
+	cameraAnchors.back()->setPosition(Vec2(1800, -150));
+
+	cameraAnchors.push_back(Sprite::create("CloseSelected.png"));
+	cameraAnchors.back()->setAnchorPoint(Vec2(0.5, 0.5f));
+	cameraAnchors.back()->setPosition(Vec2(-300, 500));
+
+	//this->addChild(cameraAnchors.front());
+	//CameraManager::getInstance()->lazyFollowTarget(player->getSprite(), 0.25f);
+	////for (auto i : cameraAnchors)
+	//CameraManager::getInstance()->addTarget(cameraAnchors.front());
+
+	for (auto i : cameraAnchors)
+		this->addChild(i);
+	CameraManager::getInstance()->lazyFollowTarget(player->getSprite(), 0.25f);
+	for (auto i : cameraAnchors)
+		CameraManager::getInstance()->addTarget(i);
+
+
 	Retry::KeyboardManager::getInstance()->createListener(_eventDispatcher, this);
 	Retry::MouseManager::getInstance()->createListener(_eventDispatcher, this);
 	Retry::ControllerManager::getInstance()->createListener(_eventDispatcher, this);
 
 	this->scheduleUpdate();
-	
+
+	CameraManager::getInstance()->setCamera(this->getDefaultCamera());
+
+	//this->setScale(0.25);
 
 	return true;
 }
@@ -73,11 +102,13 @@ void MainScene::menuCloseCallback(Ref* pSender) {
 }
 
 void MainScene::update(float delta) {
+
 	using namespace Retry;
-	auto keyIn = KeyboardManager::getInstance();
-	auto mouseIn = MouseManager::getInstance();
-	auto controllerIn = ControllerManager::getInstance();
-	auto audio = AudioManager::getInstance();
+	static auto keyIn = KeyboardManager::getInstance();
+	static auto mouseIn = MouseManager::getInstance();
+	static auto controllerIn = ControllerManager::getInstance();
+	static auto audio = AudioManager::getInstance();
+
 
 	if (keyIn->isKeyPressed(KeyCode::ESCAPE)) {
 		Director::getInstance()->end();
@@ -85,12 +116,22 @@ void MainScene::update(float delta) {
 
 	player->update(delta);
 
-	auto camera = this->getDefaultCamera();
-	//camera->runAction(MoveBy::create(0, (player->getSprite()->getPosition() - camera->getPosition()) * delta * 4));
+	//CameraManager::getInstance()->moveBy((player->getSprite()->getPosition() - CameraManager::getInstance()->getPosition()) * delta * 4);
 
-	//audio->setMasterVolume(mouseIn->getY() / 720.f);
+	if (keyIn->isKeyPressed(KeyCode::E))
+		CameraManager::getInstance()->setTrauma(0.5f);
+
+	if (keyIn->isKeyPressed(KeyCode::LEFT_ARROW))
+		cameraAnchors.front()->runAction(MoveBy::create(0, Vec2(-500 * delta, 0)));
+	if (keyIn->isKeyPressed(KeyCode::RIGHT_ARROW))
+		cameraAnchors.front()->runAction(MoveBy::create(0, Vec2(500 * delta, 0)));
+
+	//if (keyIn->isKeyPressed(KeyCode::R) || controllerIn->isAxisPressed(ControllerButton::RIGHT_TRIGGER))
+	//	CameraManager::getInstance()->lazyFollowTarget(0);
 
 	keyIn->refresh();
 	mouseIn->refresh();
 	controllerIn->refresh();
+	CameraManager::getInstance()->update(delta);
+
 }

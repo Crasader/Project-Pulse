@@ -11,10 +11,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{76A39BB2-9B84-4C65-98A5-654D86B86F2A}</ProjectGuid>
+    <ProjectGuid>{EE59A222-AAA5-4240-B61F-1EBF33FC54D8}</ProjectGuid>
     <RootNamespace>test_win32</RootNamespace>
     <Keyword>Win32Proj</Keyword>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <ProjectName>Project Pulse</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -43,13 +44,13 @@
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(COCOS_X_ROOT)\cocos2d-x-3.17\cocos\2d\cocos2dx.props" />
-    <Import Project="$(COCOS_X_ROOT)\cocos2d-x-3.17\cocos\2d\cocos2d_headers.props" />
+    <Import Project="$(COCOS_X_ROOT)\cocos2d-x-3.17.1\cocos\2d\cocos2dx.props" />
+    <Import Project="$(COCOS_X_ROOT)\cocos2d-x-3.17.1\cocos\2d\cocos2d_headers.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="$(COCOS_X_ROOT)\cocos2d-x-3.17\cocos\2d\cocos2dx.props" />
-    <Import Project="$(COCOS_X_ROOT)\cocos2d-x-3.17\cocos\2d\cocos2d_headers.props" />
+    <Import Project="$(COCOS_X_ROOT)\cocos2d-x-3.17.1\cocos\2d\cocos2dx.props" />
+    <Import Project="$(COCOS_X_ROOT)\cocos2d-x-3.17.1\cocos\2d\cocos2d_headers.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
@@ -91,7 +92,7 @@
     <Link>
       <AdditionalDependencies>libcocos2d.lib;librecast.lib;libbullet.lib;libcurl.lib;%(AdditionalDependencies);$(_COCOS_LIB_WIN32_BEGIN);$(_COCOS_LIB_WIN32_END)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
-      <AdditionalLibraryDirectories>$(COCOS_X_ROOT)\cocos2d-x-3.17\build\Debug.win32;$(OutDir);%(AdditionalLibraryDirectories);$(_COCOS_LIB_PATH_WIN32_BEGIN);$(_COCOS_LIB_PATH_WIN32_END)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(COCOS_X_ROOT)\cocos2d-x-3.17.1\build\Debug.win32;$(OutDir);%(AdditionalLibraryDirectories);$(_COCOS_LIB_PATH_WIN32_BEGIN);$(_COCOS_LIB_PATH_WIN32_END)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
@@ -108,7 +109,7 @@
   <ItemDefinitionGroup>
     <CustomBuildStep>
       <Command>if not exist "$(OutDir)" mkdir "$(OutDir)"
-xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
+xcopy "$(ProjectDir)..\Resources" "$(OutDir)\Resources" /D /E /I /F /Y
       </Command>
       <Outputs>$(TargetName).cab</Outputs>
       <Inputs>$(TargetFileName)</Inputs>
@@ -132,7 +133,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <Link>
       <AdditionalDependencies>libcocos2d.lib;librecast.lib;libbullet.lib;libcurl.lib;%(AdditionalDependencies);$(_COCOS_LIB_WIN32_BEGIN);$(_COCOS_LIB_WIN32_END)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
-      <AdditionalLibraryDirectories>$(COCOS_X_ROOT)\cocos2d-x-3.17\build\Debug.win32;$(OutDir);%(AdditionalLibraryDirectories);$(_COCOS_LIB_PATH_WIN32_BEGIN);$(_COCOS_LIB_PATH_WIN32_END)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(COCOS_X_ROOT)\cocos2d-x-3.17.1\build\Debug.win32;$(OutDir);%(AdditionalLibraryDirectories);$(_COCOS_LIB_PATH_WIN32_BEGIN);$(_COCOS_LIB_PATH_WIN32_END)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -152,11 +153,13 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClCompile Include="..\Classes\Actor.cpp" />
     <ClCompile Include="..\Classes\AppDelegate.cpp" />
     <ClCompile Include="..\Classes\AudioManager.cpp" />
+    <ClCompile Include="..\Classes\CameraManager.cpp" />
     <ClCompile Include="..\Classes\ControllerManager.cpp" />
     <ClCompile Include="..\Classes\Enemy.cpp" />
     <ClCompile Include="..\Classes\KeyboardManager.cpp" />
     <ClCompile Include="..\Classes\MainScene.cpp" />
     <ClCompile Include="..\Classes\MouseManager.cpp" />
+    <ClCompile Include="..\Classes\PerlinNoise.cpp" />
     <ClCompile Include="..\Classes\Player.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -164,11 +167,13 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)" /D /E /I /F /Y
     <ClInclude Include="..\Classes\Actor.h" />
     <ClInclude Include="..\Classes\AppDelegate.h" />
     <ClInclude Include="..\Classes\AudioManager.h" />
+    <ClInclude Include="..\Classes\CameraManager.h" />
     <ClInclude Include="..\Classes\ControllerManager.h" />
     <ClInclude Include="..\Classes\Enemy.h" />
     <ClInclude Include="..\Classes\KeyboardManager.h" />
     <ClInclude Include="..\Classes\MainScene.h" />
     <ClInclude Include="..\Classes\MouseManager.h" />
+    <ClInclude Include="..\Classes\PerlinNoise.h" />
     <ClInclude Include="..\Classes\Player.h" />
     <ClInclude Include="main.h" />
   </ItemGroup>

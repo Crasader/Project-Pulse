@@ -110,7 +110,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	register_all_packages();
 
 	//dynamic_cast<GLViewImpl*>(director->getOpenGLView())->setFullscreen();
-	//director->setContentScaleFactor(MIN((director->getOpenGLView())->getFrameSize().height / designResolutionSize.height, (director->getOpenGLView())->getFrameSize().width / designResolutionSize.width));
+	//glview->setDesignResolutionSize(glview->getFrameSize().width, glview->getFrameSize().height, ResolutionPolicy::NO_BORDER);
 
 	// create a scene. it's an autorelease object
 	auto scene = MainScene::createScene();
@@ -125,6 +125,8 @@ bool AppDelegate::applicationDidFinishLaunching() {
 void AppDelegate::applicationDidEnterBackground() {
 	Director::getInstance()->stopAnimation();
 
+	Controller::stopDiscoveryController();
+
 #if USE_AUDIO_ENGINE
 	AudioEngine::pauseAll();
 #elif USE_SIMPLE_AUDIO_ENGINE
@@ -136,6 +138,8 @@ void AppDelegate::applicationDidEnterBackground() {
 // this function will be called when the app is active again
 void AppDelegate::applicationWillEnterForeground() {
 	Director::getInstance()->startAnimation();
+
+	Controller::startDiscoveryController();
 
 #if USE_AUDIO_ENGINE
 	/// Only resume ones I haven't paused manually

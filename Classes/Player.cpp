@@ -1,12 +1,37 @@
 #include "Player.h"
 
+#include "CameraManager.h"
+
 Retry::KeyboardManager* Player::keyIn = Retry::KeyboardManager::getInstance();
 Retry::MouseManager* Player::mouseIn = Retry::MouseManager::getInstance();
 Retry::ControllerManager* Player::controllerIn = Retry::ControllerManager::getInstance();
 Retry::AudioManager* Player::audio = Retry::AudioManager::getInstance();
 
+std::unordered_map<std::string, KeyMap> Player::actionMapping;
+
 Player::Player(std::string path, Vec2 pos) {
 	load(path, pos);
+
+	actionBuffer["jump"];
+	actionBuffer["left"];
+	actionBuffer["right"];
+
+	using namespace Retry;
+	KeyMap jump;
+	jump.kButtons.push_back(KeyCode::SPACE);
+	jump.cButtons.push_back(ControllerButton::A);
+	KeyMap left;
+	left.kButtons.push_back(KeyCode::A);
+	left.cButtons.push_back(ControllerButton::LEFT_STICK_LEFT);
+	left.cButtons.push_back(ControllerButton::DPAD_LEFT);
+	KeyMap right;
+	right.kButtons.push_back(KeyCode::D);
+	right.cButtons.push_back(ControllerButton::LEFT_STICK_RIGHT);
+	right.cButtons.push_back(ControllerButton::DPAD_RIGHT);
+
+	actionMapping["jump"] = jump;
+	actionMapping["left"] = left;
+	actionMapping["right"] = right;
 }
 
 float lerp(float p0, float p1, float t) {
@@ -24,8 +49,18 @@ int sign(float x) {
 }
 
 void Player::update(float delta) {
+	updateActionBuffer();
+
 	using namespace Retry;
-	static auto space = KeyCode::SPACE;
+
+	bool jumpButtonDown = isActionDown("jump");
+	bool jumpButtonPressed = isActionPressed("jump");
+
+	bool goLeft = isActionPressed("left"),
+		goRight = isActionPressed("right");
+
+	bool leftStickSens = controllerIn->isAxisPressed(ControllerButton::LEFT_STICK_LEFT) || 
+		                 controllerIn->isAxisPressed(ControllerButton::LEFT_STICK_RIGHT);
 
 	// Side Movement Constants and Variables
 	static const float sideMove = 450;
@@ -39,27 +74,28 @@ void Player::update(float delta) {
 	static const float fastFall = 2.5f;
 	static int doJump = 0;
 	static bool hasMoved = false;
+	static bool onGround = true;
 
-	static Vec2 vel = Vec2(0, 0), acc = Vec2(0, g);
+	acceleration = Vec2(0, g);
 
+	// LANDING
 	static const float groundHeight = 50;
 	if (sprite->getPosition().y < groundHeight) {
+
+		if (!onGround)
+			CameraManager::getInstance()->addTrauma(0.3f);
+
 		sprite->setPositionY(groundHeight);
 		doJump = 0;
 		hasMoved = false;
+		onGround = true;
 	}
-
-	bool jumpButtonDown = keyIn->isKeyDown(KeyCode::SPACE) || controllerIn->isButtonDown(ControllerButton::A);
-	bool jumpButtonPressed = keyIn->isKeyPressed(KeyCode::SPACE) || controllerIn->isButtonPressed(ControllerButton::A);
-
-	bool goLeft = keyIn->isKeyPressed(KeyCode::A) || controllerIn->getLStickX() < -0.5f,
-		 goRight = keyIn->isKeyPressed(KeyCode::D) || controllerIn->getLStickX() > 0.5f;
-	float step = (!doJump || goLeft || goRight) * (delta / timeToMax) / (doJump ? (vel.y > 100 ? 5.0f : 3.0f) : 1);
-
-	//if (doJump && abs(time) - step < 0) time = step = 0;
+	
+	float step = (!doJump || goLeft || goRight) * (delta / timeToMax) / (doJump ? (velocity.y > 100 ? 5.0f : 3.0f) : 1);
 
 	if (goLeft || goRight) hasMoved = true;
 
+	// MOVEMENT
 	if (goLeft && !goRight) {
 		time = time - step < -1 ? -1 : time - step;
 	} else if (goRight && !goLeft) {
@@ -67,18 +103,55 @@ void Player::update(float delta) {
 	} else {
 		time = abs(time) - step < 0 ? 0 : time - sign(time) * step;
 	}
-	vel.x = (lerp(0, sideMove, abs(time)) + (doJump ? lerp(0, 100, abs(time)) : 0)) * sign(time);
+	if (controllerIn->doUseController() && leftStickSens) {
+		if (!doJump)
+			time = abs(time) > abs(controllerIn->getLStickX()) ? sign(time) * abs(controllerIn->getLStickX() * controllerIn->getLStickX()) : time;
+	} 
+	velocity.x = (lerp(0, sideMove, abs(time)) + (doJump ? lerp(0, 100, abs(time)) : 0)) * sign(time);
 
+	// JUMP
 	if (doJump < 2 && jumpButtonDown) {
-		vel.y = -g * t_h;
+		onGround = false;
+		velocity.y = -g * t_h;
 		doJump++;
-		if (goLeft && vel.x > 0 || goRight && vel.x < 0) 
-			vel.x = (lerp(0, sideMove, abs(time *= -0.5f)) + (doJump ? lerp(0, 100, abs(time)) : 0)) * sign(time);
+		if (goLeft && velocity.x > 0 || goRight && velocity.x < 0)
+			velocity.x = (lerp(0, sideMove, abs(time = -0.5 * sign(time))) + (doJump ? lerp(0, 100, abs(time)) : 0)) * sign(time);
 		else if (!goLeft && !goRight)
-			vel.x = (lerp(0, sideMove, abs(time /= 5)) + (doJump ? lerp(0, 100, abs(time)) : 0)) * sign(time);
+			velocity.x = (lerp(0, sideMove, abs(time /= 5)) + (doJump ? lerp(0, 100, abs(time)) : 0)) * sign(time);
 	}
 
-	moveBy(vel * delta + 0.5f * acc * delta * delta);
+	moveBy(velocity * delta + 0.5f * acceleration * delta * delta);
 
-	vel += (!jumpButtonPressed || vel.y < 0 ? fastFall : 1) * acc * delta;
+	velocity += (!jumpButtonPressed || velocity.y < 0 ? fastFall : 1) * acceleration * delta;
+}
+
+void Player::updateActionBuffer() {
+	for (auto &i : actionBuffer) {
+		float time = 0;
+		int count = 0;
+		i.second.down = false;
+		i.second.up = false;
+		i.second.pressed = false;
+		for (auto j : actionMapping[i.first].kButtons) {
+			i.second.down = i.second.down || keyIn->isKeyDown(j);
+			i.second.up = i.second.up || keyIn->isKeyUp(j);
+			i.second.pressed = i.second.pressed || keyIn->isKeyPressed(j);
+		}
+		for (auto j : actionMapping[i.first].mButtons) {
+			i.second.down = i.second.down || mouseIn->isButtonDown(j);
+			i.second.up = i.second.up || mouseIn->isButtonUp(j);
+			i.second.pressed = i.second.pressed || mouseIn->isButtonPressed(j);
+		}
+		for (auto j : actionMapping[i.first].cButtons) {
+			if ((int) j < (int) ControllerButton::AXIS_START) {
+				i.second.down = i.second.down || controllerIn->isButtonDown(j);
+				i.second.up = i.second.up || controllerIn->isButtonUp(j);
+				i.second.pressed = i.second.pressed || controllerIn->isButtonPressed(j);
+			} else {
+				i.second.down = i.second.down || controllerIn->isAxisDown(j);
+				i.second.up = i.second.up || controllerIn->isAxisUp(j);
+				i.second.pressed = i.second.pressed || controllerIn->isAxisPressed(j);
+			}
+		}
+	}
 }

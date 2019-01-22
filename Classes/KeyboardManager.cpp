@@ -1,4 +1,5 @@
 #include "KeyboardManager.h"
+#include "ControllerManager.h"
 
 using namespace Retry;
 
@@ -25,9 +26,11 @@ void KeyboardManager::createListener(cocos2d::EventDispatcher* dispatcher, cocos
 	Director::getInstance()->getOpenGLView()->setIMEKeyboardState(true);
 	eventListener->onKeyPressed = [](EventKeyboard::KeyCode keyCode, Event* event) {
 		KeyboardManager::getInstance()->updateKey((Retry::KeyCode) keyCode, true);
+		ControllerManager::getInstance()->setUseController(false);
 	};
 	eventListener->onKeyReleased = [](EventKeyboard::KeyCode keyCode, Event* event) {
 		KeyboardManager::getInstance()->updateKey((Retry::KeyCode) keyCode, false);
+		ControllerManager::getInstance()->setUseController(false);
 	};
 	dispatcher->addEventListenerWithSceneGraphPriority(eventListener, node);
 }
