@@ -34,9 +34,20 @@ public:
 	Sprite* getSprite() { return sprite; }
 	PhysicsBody* getBody() { return sprite->getPhysicsBody(); }
 
+	Vec2 getVelocity() { return velocity; }
+	Vec2 getAcceleration() { return acceleration; }
+
+	void setVelocity(Vec2 velocity) { this->velocity = velocity; }
+	void setVelocity(float x, float y) { this->velocity = Vec2(x, y); }
+
+	void setAcceleration(Vec2 acceleration) { this->acceleration = acceleration; }
+	void setAcceleration(float x, float y) { this->acceleration = Vec2(x, y); }
+
 
 protected:
 	Sprite* sprite;
+	Vec2 velocity;
+	Vec2 acceleration;
 
 	std::unordered_map<std::string, ActionInfo> actionBuffer;
 

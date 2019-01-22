@@ -76,7 +76,7 @@ void Player::update(float delta) {
 	static bool hasMoved = false;
 	static bool onGround = true;
 
-	static Vec2 vel = Vec2(0, 0), acc = Vec2(0, g);
+	acceleration = Vec2(0, g);
 
 	// LANDING
 	static const float groundHeight = 50;
@@ -91,7 +91,7 @@ void Player::update(float delta) {
 		onGround = true;
 	}
 	
-	float step = (!doJump || goLeft || goRight) * (delta / timeToMax) / (doJump ? (vel.y > 100 ? 5.0f : 3.0f) : 1);
+	float step = (!doJump || goLeft || goRight) * (delta / timeToMax) / (doJump ? (velocity.y > 100 ? 5.0f : 3.0f) : 1);
 
 	if (goLeft || goRight) hasMoved = true;
 
@@ -107,22 +107,22 @@ void Player::update(float delta) {
 		if (!doJump)
 			time = abs(time) > abs(controllerIn->getLStickX()) ? sign(time) * abs(controllerIn->getLStickX() * controllerIn->getLStickX()) : time;
 	} 
-	vel.x = (lerp(0, sideMove, abs(time)) + (doJump ? lerp(0, 100, abs(time)) : 0)) * sign(time);
+	velocity.x = (lerp(0, sideMove, abs(time)) + (doJump ? lerp(0, 100, abs(time)) : 0)) * sign(time);
 
 	// JUMP
 	if (doJump < 2 && jumpButtonDown) {
 		onGround = false;
-		vel.y = -g * t_h;
+		velocity.y = -g * t_h;
 		doJump++;
-		if (goLeft && vel.x > 0 || goRight && vel.x < 0) 
-			vel.x = (lerp(0, sideMove, abs(time = -0.5 * sign(time))) + (doJump ? lerp(0, 100, abs(time)) : 0)) * sign(time);
+		if (goLeft && velocity.x > 0 || goRight && velocity.x < 0)
+			velocity.x = (lerp(0, sideMove, abs(time = -0.5 * sign(time))) + (doJump ? lerp(0, 100, abs(time)) : 0)) * sign(time);
 		else if (!goLeft && !goRight)
-			vel.x = (lerp(0, sideMove, abs(time /= 5)) + (doJump ? lerp(0, 100, abs(time)) : 0)) * sign(time);
+			velocity.x = (lerp(0, sideMove, abs(time /= 5)) + (doJump ? lerp(0, 100, abs(time)) : 0)) * sign(time);
 	}
 
-	moveBy(vel * delta + 0.5f * acc * delta * delta);
+	moveBy(velocity * delta + 0.5f * acceleration * delta * delta);
 
-	vel += (!jumpButtonPressed || vel.y < 0 ? fastFall : 1) * acc * delta;
+	velocity += (!jumpButtonPressed || velocity.y < 0 ? fastFall : 1) * acceleration * delta;
 }
 
 void Player::updateActionBuffer() {
