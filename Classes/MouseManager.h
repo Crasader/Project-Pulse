@@ -4,57 +4,38 @@
 #include <ctime>
 #include "cocos2d.h"
 
-namespace Retry
-{
+namespace Retry {
 
 enum class MouseButton;
 
-class Mouse abstract
-{
+class MouseManager {
+private:
+	static MouseManager* instance;
+	MouseManager() = default;
 public:
+	static MouseManager* getInstance();
 
-	static void refresh();
+	void refresh();
 
-	static void createListener(cocos2d::EventDispatcher* dispatcher, cocos2d::Node* node);
+	void createListener(cocos2d::EventDispatcher* dispatcher, cocos2d::Node* node);
 
-	static void updateButton(MouseButton button, bool isPressed);
+	void updateButton(MouseButton button, bool isPressed);
 
-	static bool isButtonPressed(MouseButton button);
-	static bool isButtonDown(MouseButton button);
-	static bool isButtonUp(MouseButton button);
+	bool isButtonPressed(MouseButton button);
+	bool isButtonDown(MouseButton button);
+	bool isButtonUp(MouseButton button);
 
-	static float buttonPressedDuration(MouseButton button);
+	float buttonPressedDuration(MouseButton button);
 
-	static cocos2d::Vec2 getPos()
-	{
-		return position;
-	}
-	static float getX()
-	{
-		return position.x;
-	}
-	static float getY()
-	{
-		return position.y;
-	}
+	cocos2d::Vec2 getPos() { return position; }
+	float getX() { return position.x; }
+	float getY() { return position.y; }
 
-	static cocos2d::Vec2 getDeltaPos()
-	{
-		return deltaPosition;
-	}
-	static float getDeltaX()
-	{
-		return deltaPosition.x;
-	}
-	static float getDeltaY()
-	{
-		return deltaPosition.y;
-	}
+	cocos2d::Vec2 getDeltaPos() { return deltaPosition; }
+	float getDeltaX() { return deltaPosition.x; }
+	float getDeltaY() { return deltaPosition.y; }
 
-	static bool isMoving()
-	{
-		return deltaPosition != cocos2d::Vec2(0, 0);
-	}
+	bool isMoving() { return deltaPosition != cocos2d::Vec2(0, 0); }
 
 private:
 	static cocos2d::Vec2 position, deltaPosition;
@@ -66,8 +47,7 @@ private:
 	static clock_t currentTime;
 };
 
-enum class MouseButton
-{
+enum class MouseButton {
 	UNSET = -1,
 	LEFT = 0,
 	RIGHT = 1,

@@ -8,19 +8,24 @@ namespace Retry {
 
 enum class KeyCode;
 
-class Keyboard abstract {
+class KeyboardManager {
+private:
+	static KeyboardManager* instance;
+	KeyboardManager() = default;
 public:
-	static void refresh();
+	static KeyboardManager* getInstance();
 
-	static void createListener(cocos2d::EventDispatcher* dispatcher, cocos2d::Node* node);
+	void refresh();
 
-	static void updateKey(KeyCode key, bool isPressed);
+	void createListener(cocos2d::EventDispatcher* dispatcher, cocos2d::Node* node);
 
-	static bool isKeyPressed(KeyCode key);
-	static bool isKeyDown(KeyCode key);
-	static bool isKeyUp(KeyCode key);
+	void updateKey(KeyCode key, bool isPressed);
 
-	static float keyPressedDuration(KeyCode key);
+	bool isKeyPressed(KeyCode key);
+	bool isKeyDown(KeyCode key);
+	bool isKeyUp(KeyCode key);
+
+	float keyPressedDuration(KeyCode key);
 
 	//KeyCode lastKeyPressed();
 

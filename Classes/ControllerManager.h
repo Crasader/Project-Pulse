@@ -1,9 +1,8 @@
 #ifndef CONTROLLER_MANAGER
 #define CONTROLLER_MANAGER
 
-#include "cocos2d.h"
 #include <ctime>
-
+#include "cocos2d.h"
 
 namespace Retry {
 
@@ -13,51 +12,56 @@ struct ControllerInfo;
 
 enum class ControllerButton;
 
-class Controller abstract {
+class ControllerManager {
+private:
+	static ControllerManager* instance;
+	ControllerManager() = default;
 public:
-	static void refresh();
+	static ControllerManager* getInstance();
 
-	static void createListener(cocos2d::EventDispatcher* dispatcher, cocos2d::Node* node);
+	void refresh();
 
-	static void updateButton(ControllerButton key, bool isPressed, int id);
-	static void updateAxis(ControllerButton axis, float x, float dx, int id);
+	void createListener(cocos2d::EventDispatcher* dispatcher, cocos2d::Node* node);
 
-	static bool isButtonPressed(ControllerButton key, int id = 0);
-	static bool isButtonDown(ControllerButton key, int id = 0);
-	static bool isButtonUp(ControllerButton key, int id = 0);
+	void updateButton(ControllerButton key, bool isPressed, int id);
+	void updateAxis(ControllerButton axis, float x, float dx, int id);
 
-	static float buttonPressedDuration(ControllerButton key, int id = 0);
+	bool isButtonPressed(ControllerButton key, int id = 0);
+	bool isButtonDown(ControllerButton key, int id = 0);
+	bool isButtonUp(ControllerButton key, int id = 0);
 
-	static bool isAxisPressed(ControllerButton axis, int id = 0);
-	static bool isAxisDown(ControllerButton axis, int id = 0);
-	static bool isAxisUp(ControllerButton axis, int id = 0);
+	float buttonPressedDuration(ControllerButton key, int id = 0);
 
-	static cocos2d::Vec2 getLStick(int id = 0);
-	static float getLStickX(int id = 0);
-	static float getLStickY(int id = 0);
+	bool isAxisPressed(ControllerButton axis, int id = 0);
+	bool isAxisDown(ControllerButton axis, int id = 0);
+	bool isAxisUp(ControllerButton axis, int id = 0);
 
-	static cocos2d::Vec2 getDeltaLStick(int id = 0);
-	static float getDeltaLStickX(int id = 0);
-	static float getDeltaLStickY(int id = 0);
+	cocos2d::Vec2 getLStick(int id = 0);
+	float getLStickX(int id = 0);
+	float getLStickY(int id = 0);
 
-	static cocos2d::Vec2 getRStick(int id = 0);
-	static float getRStickX(int id = 0);
-	static float getRStickY(int id = 0);
+	cocos2d::Vec2 getDeltaLStick(int id = 0);
+	float getDeltaLStickX(int id = 0);
+	float getDeltaLStickY(int id = 0);
 
-	static cocos2d::Vec2 getDeltaRStick(int id = 0);
-	static float getDeltaRStickX(int id = 0);
-	static float getDeltaRStickY(int id = 0);
+	cocos2d::Vec2 getRStick(int id = 0);
+	float getRStickX(int id = 0);
+	float getRStickY(int id = 0);
 
-	static float getLTrigger(int id = 0);
-	static float getDeltaLTrigger(int id = 0);
+	cocos2d::Vec2 getDeltaRStick(int id = 0); 
+	float getDeltaRStickX(int id = 0);
+	float getDeltaRStickY(int id = 0);
 
-	static float getRTrigger(int id = 0);
-	static float getDeltaRTrigger(int id = 0);
+	float getLTrigger(int id = 0); 
+	float getDeltaLTrigger(int id = 0);
 
-	static void setDeadZone(ControllerButton key, float t, int id = 0);
+	float getRTrigger(int id = 0); 
+	float getDeltaRTrigger(int id = 0); 
 
-	static bool doUseController() { return useController; }
-	static void setUseController(bool useController) { Controller::useController = useController; }
+	void setDeadZone(ControllerButton key, float t, int id = 0);
+
+	bool doUseController() { return useController; }
+	void setUseController(bool useController) { this->useController = useController; }
 
 private:
 	static std::map<int, ControllerInfo> controllers;

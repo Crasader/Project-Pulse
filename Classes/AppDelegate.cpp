@@ -125,7 +125,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 void AppDelegate::applicationDidEnterBackground() {
 	Director::getInstance()->stopAnimation();
 
-	cocos2d::Controller::stopDiscoveryController();
+	Controller::stopDiscoveryController();
 
 #if USE_AUDIO_ENGINE
 	AudioEngine::pauseAll();
@@ -139,7 +139,7 @@ void AppDelegate::applicationDidEnterBackground() {
 void AppDelegate::applicationWillEnterForeground() {
 	Director::getInstance()->startAnimation();
 
-	cocos2d::Controller::startDiscoveryController();
+	Controller::startDiscoveryController();
 
 #if USE_AUDIO_ENGINE
 	/// Only resume ones I haven't paused manually

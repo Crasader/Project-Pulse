@@ -2,13 +2,14 @@
 
 #include "CameraManager.h"
 
-//Retry::MouseManager* Player::mouseIn = Retry::MouseManager::getInstance();
-//Retry::ControllerManager* Player::controllerIn = Retry::ControllerManager::getInstance();
+Retry::KeyboardManager* Player::keyIn = Retry::KeyboardManager::getInstance();
+Retry::MouseManager* Player::mouseIn = Retry::MouseManager::getInstance();
+Retry::ControllerManager* Player::controllerIn = Retry::ControllerManager::getInstance();
+Retry::AudioManager* Player::audio = Retry::AudioManager::getInstance();
 
 std::unordered_map<std::string, KeyMap> Player::actionMapping;
 
-Player::Player(std::string path, Vec2 pos)
-{
+Player::Player(std::string path, Vec2 pos) {
 	load(path, pos);
 
 	actionBuffer["jump"];
@@ -33,25 +34,21 @@ Player::Player(std::string path, Vec2 pos)
 	actionMapping["right"] = right;
 }
 
-float lerp(float p0, float p1, float t)
-{
+float lerp(float p0, float p1, float t) {
 	t = t < 0 ? 0 : t > 1 ? 1 : t;
 	return p1 * t + p0 * (1 - t);
 }
 
-float lerpSq(float p0, float p1, float t)
-{
+float lerpSq(float p0, float p1, float t) {
 	t = t < 0 ? 0 : t > 1 ? 1 : t;
 	return p1 * t * t + p0 * (1 - t * t);
 }
 
-int sign(float x)
-{
+int sign(float x) {
 	return x < 0 ? -1 : x > 0 ? 1 : 0;
 }
 
-void Player::update(float delta)
-{
+void Player::update(float delta) {
 	updateActionBuffer();
 
 	using namespace Retry;
@@ -62,10 +59,10 @@ void Player::update(float delta)
 	bool goLeft = isActionPressed("left"),
 		goRight = isActionPressed("right");
 
-	bool leftStickSens = Retry::Controller::isAxisPressed(ControllerButton::LEFT_STICK_LEFT) ||
-		Retry::Controller::isAxisPressed(ControllerButton::LEFT_STICK_RIGHT);
+	bool leftStickSens = controllerIn->isAxisPressed(ControllerButton::LEFT_STICK_LEFT) || 
+		                 controllerIn->isAxisPressed(ControllerButton::LEFT_STICK_RIGHT);
 
-// Side Movement Constants and Variables
+	// Side Movement Constants and Variables
 	static const float sideMove = 450;
 	static const float timeToMax = 0.1f;
 	static float time = 0;
@@ -83,43 +80,37 @@ void Player::update(float delta)
 
 	// LANDING
 	static const float groundHeight = 50;
-	if (sprite->getPosition().y < groundHeight)
-	{
+	if (sprite->getPosition().y < groundHeight) {
 
 		if (!onGround)
-			Retry::Camera::addTrauma(0.3f);
+			CameraManager::getInstance()->addTrauma(0.3f);
 
 		sprite->setPositionY(groundHeight);
 		doJump = 0;
 		hasMoved = false;
 		onGround = true;
 	}
-
+	
 	float step = (!doJump || goLeft || goRight) * (delta / timeToMax) / (doJump ? (velocity.y > 100 ? 5.0f : 3.0f) : 1);
 
 	if (goLeft || goRight) hasMoved = true;
 
 	// MOVEMENT
-	if (goLeft && !goRight)
-	{
+	if (goLeft && !goRight) {
 		time = time - step < -1 ? -1 : time - step;
-	} else if (goRight && !goLeft)
-	{
+	} else if (goRight && !goLeft) {
 		time = time + step > 1 ? 1 : time + step;
-	} else
-	{
+	} else {
 		time = abs(time) - step < 0 ? 0 : time - sign(time) * step;
 	}
-	if (Retry::Controller::doUseController() && leftStickSens)
-	{
+	if (controllerIn->doUseController() && leftStickSens) {
 		if (!doJump)
-			time = abs(time) > abs(Retry::Controller::getLStickX()) ? sign(time) * abs(Retry::Controller::getLStickX() * Retry::Controller::getLStickX()) : time;
-	}
+			time = abs(time) > abs(controllerIn->getLStickX()) ? sign(time) * abs(controllerIn->getLStickX() * controllerIn->getLStickX()) : time;
+	} 
 	velocity.x = (lerp(0, sideMove, abs(time)) + (doJump ? lerp(0, 100, abs(time)) : 0)) * sign(time);
 
 	// JUMP
-	if (doJump < 2 && jumpButtonDown)
-	{
+	if (doJump < 2 && jumpButtonDown) {
 		onGround = false;
 		velocity.y = -g * t_h;
 		doJump++;
@@ -134,39 +125,32 @@ void Player::update(float delta)
 	velocity += (!jumpButtonPressed || velocity.y < 0 ? fastFall : 1) * acceleration * delta;
 }
 
-void Player::updateActionBuffer()
-{
-	for (auto &i : actionBuffer)
-	{
+void Player::updateActionBuffer() {
+	for (auto &i : actionBuffer) {
 		float time = 0;
 		int count = 0;
 		i.second.down = false;
 		i.second.up = false;
 		i.second.pressed = false;
-		for (auto j : actionMapping[i.first].kButtons)
-		{
-			i.second.down = i.second.down || Retry::Keyboard::isKeyDown(j);
-			i.second.up = i.second.up || Retry::Keyboard::isKeyUp(j);
-			i.second.pressed = i.second.pressed || Retry::Keyboard::isKeyPressed(j);
+		for (auto j : actionMapping[i.first].kButtons) {
+			i.second.down = i.second.down || keyIn->isKeyDown(j);
+			i.second.up = i.second.up || keyIn->isKeyUp(j);
+			i.second.pressed = i.second.pressed || keyIn->isKeyPressed(j);
 		}
-		for (auto j : actionMapping[i.first].mButtons)
-		{
-			i.second.down = i.second.down || Retry::Mouse::isButtonDown(j);
-			i.second.up = i.second.up || Retry::Mouse::isButtonUp(j);
-			i.second.pressed = i.second.pressed || Retry::Mouse::isButtonPressed(j);
+		for (auto j : actionMapping[i.first].mButtons) {
+			i.second.down = i.second.down || mouseIn->isButtonDown(j);
+			i.second.up = i.second.up || mouseIn->isButtonUp(j);
+			i.second.pressed = i.second.pressed || mouseIn->isButtonPressed(j);
 		}
-		for (auto j : actionMapping[i.first].cButtons)
-		{
-			if ((int) j < (int) ControllerButton::AXIS_START)
-			{
-				i.second.down = i.second.down || Retry::Controller::isButtonDown(j);
-				i.second.up = i.second.up || Retry::Controller::isButtonUp(j);
-				i.second.pressed = i.second.pressed || Retry::Controller::isButtonPressed(j);
-			} else
-			{
-				i.second.down = i.second.down || Retry::Controller::isAxisDown(j);
-				i.second.up = i.second.up || Retry::Controller::isAxisUp(j);
-				i.second.pressed = i.second.pressed || Retry::Controller::isAxisPressed(j);
+		for (auto j : actionMapping[i.first].cButtons) {
+			if ((int) j < (int) ControllerButton::AXIS_START) {
+				i.second.down = i.second.down || controllerIn->isButtonDown(j);
+				i.second.up = i.second.up || controllerIn->isButtonUp(j);
+				i.second.pressed = i.second.pressed || controllerIn->isButtonPressed(j);
+			} else {
+				i.second.down = i.second.down || controllerIn->isAxisDown(j);
+				i.second.up = i.second.up || controllerIn->isAxisUp(j);
+				i.second.pressed = i.second.pressed || controllerIn->isAxisPressed(j);
 			}
 		}
 	}

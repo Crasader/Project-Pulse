@@ -1,77 +1,70 @@
 #include "KeyboardManager.h"
 #include "ControllerManager.h"
 
-namespace Retry
-{
+using namespace Retry;
 
-clock_t Keyboard::currentTime = 0;
+KeyboardManager* KeyboardManager::instance = 0;
 
-std::unordered_map<KeyCode, clock_t> Keyboard::keys;
-std::unordered_map<KeyCode, bool> Keyboard::keysLast;
+clock_t KeyboardManager::currentTime = 0;
 
-void Keyboard::refresh()
-{
+std::unordered_map<KeyCode, clock_t> KeyboardManager::keys;
+std::unordered_map<KeyCode, bool> KeyboardManager::keysLast;
+
+KeyboardManager* KeyboardManager::getInstance() {
+	return instance == 0 ? (instance = new KeyboardManager()) : instance;
+}
+
+void KeyboardManager::refresh() {
 	keysLast.clear();
 	currentTime = clock();
 }
 
-void Keyboard::createListener(cocos2d::EventDispatcher* dispatcher, cocos2d::Node* node)
-{
+void KeyboardManager::createListener(cocos2d::EventDispatcher* dispatcher, cocos2d::Node* node) {
 	using namespace cocos2d;
 	auto eventListener = EventListenerKeyboard::create();
 
 	Director::getInstance()->getOpenGLView()->setIMEKeyboardState(true);
 	eventListener->onKeyPressed = [](EventKeyboard::KeyCode keyCode, Event* event) {
-		Retry::Keyboard::updateKey((Retry::KeyCode) keyCode, true);
-		Retry::Controller::setUseController(false);
+		KeyboardManager::getInstance()->updateKey((Retry::KeyCode) keyCode, true);
+		ControllerManager::getInstance()->setUseController(false);
 	};
 	eventListener->onKeyReleased = [](EventKeyboard::KeyCode keyCode, Event* event) {
-		Retry::Keyboard::updateKey((Retry::KeyCode) keyCode, false);
-		Retry::Controller::setUseController(false);
+		KeyboardManager::getInstance()->updateKey((Retry::KeyCode) keyCode, false);
+		ControllerManager::getInstance()->setUseController(false);
 	};
 	dispatcher->addEventListenerWithSceneGraphPriority(eventListener, node);
 }
 
-void Keyboard::updateKey(KeyCode key, bool isPressed)
-{
-	if (keys.find(key) == keys.end())
-	{
+void KeyboardManager::updateKey(KeyCode key, bool isPressed) {
+	if (keys.find(key) == keys.end()) {
 		if (isPressed)
 			keys[key] = currentTime;
-	} else if (!isPressed)
-	{
+	} else if (!isPressed) {
 		keys.erase(key);
 	}
 	keysLast[key] = isPressed;
 }
 
-bool Keyboard::isKeyPressed(KeyCode key)
-{
+bool KeyboardManager::isKeyPressed(KeyCode key) {
 	return keys.find(key) != keys.end();
 }
 
-bool Keyboard::isKeyDown(KeyCode key)
-{
-	if (keysLast.find(key) != keysLast.end())
-	{
+bool KeyboardManager::isKeyDown(KeyCode key) {
+	if (keysLast.find(key) != keysLast.end()) {
 		return keysLast[key];
 	}
 	return false;
 }
 
-bool Keyboard::isKeyUp(KeyCode key)
-{
-	if (keysLast.find(key) != keysLast.end())
-	{
+bool KeyboardManager::isKeyUp(KeyCode key) {
+	if (keysLast.find(key) != keysLast.end()) {
 		return !keysLast[key];
 	}
 	return false;
 }
 
-float Keyboard::keyPressedDuration(KeyCode key)
-{
+float KeyboardManager::keyPressedDuration(KeyCode key) {
 	if (keys.find(key) != keys.end())
 		return float(currentTime - keys[key]) / (float) CLOCKS_PER_SEC;
 	return 0;
-}
 }
