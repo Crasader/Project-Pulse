@@ -13,7 +13,7 @@ struct ControllerInfo;
 
 enum class ControllerButton;
 
-class Controller abstract {
+class ControllerManager abstract {
 public:
 	static void refresh();
 
@@ -57,7 +57,7 @@ public:
 	static void setDeadZone(ControllerButton key, float t, int id = 0);
 
 	static bool doUseController() { return useController; }
-	static void setUseController(bool useController) { Controller::useController = useController; }
+	static void setUseController(bool useController) { ControllerManager::useController = useController; }
 
 private:
 	static std::map<int, ControllerInfo> controllers;

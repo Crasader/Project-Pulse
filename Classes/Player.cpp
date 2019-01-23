@@ -5,9 +5,12 @@
 //Retry::MouseManager* Player::mouseIn = Retry::MouseManager::getInstance();
 //Retry::ControllerManager* Player::controllerIn = Retry::ControllerManager::getInstance();
 
-std::unordered_map<std::string, KeyMap> Player::actionMapping;
+namespace Retry
+{
 
-Player::Player(std::string path, Vec2 pos)
+std::unordered_map<std::string, KeyMap> Retry::Player::actionMapping;
+
+Retry::Player::Player(std::string path, cocos2d::Vec2 pos)
 {
 	load(path, pos);
 
@@ -50,7 +53,7 @@ int sign(float x)
 	return x < 0 ? -1 : x > 0 ? 1 : 0;
 }
 
-void Player::update(float delta)
+void Retry::Player::update(float delta)
 {
 	updateActionBuffer();
 
@@ -62,8 +65,8 @@ void Player::update(float delta)
 	bool goLeft = isActionPressed("left"),
 		goRight = isActionPressed("right");
 
-	bool leftStickSens = Retry::Controller::isAxisPressed(ControllerButton::LEFT_STICK_LEFT) ||
-		Retry::Controller::isAxisPressed(ControllerButton::LEFT_STICK_RIGHT);
+	bool leftStickSens = Retry::ControllerManager::isAxisPressed(ControllerButton::LEFT_STICK_LEFT) ||
+		Retry::ControllerManager::isAxisPressed(ControllerButton::LEFT_STICK_RIGHT);
 
 // Side Movement Constants and Variables
 	static const float sideMove = 450;
@@ -79,7 +82,7 @@ void Player::update(float delta)
 	static bool hasMoved = false;
 	static bool onGround = true;
 
-	acceleration = Vec2(0, g);
+	acceleration = cocos2d::Vec2(0, g);
 
 	// LANDING
 	static const float groundHeight = 50;
@@ -110,10 +113,10 @@ void Player::update(float delta)
 	{
 		time = abs(time) - step < 0 ? 0 : time - sign(time) * step;
 	}
-	if (Retry::Controller::doUseController() && leftStickSens)
+	if (Retry::ControllerManager::doUseController() && leftStickSens)
 	{
 		if (!doJump)
-			time = abs(time) > abs(Retry::Controller::getLStickX()) ? sign(time) * abs(Retry::Controller::getLStickX() * Retry::Controller::getLStickX()) : time;
+			time = abs(time) > abs(Retry::ControllerManager::getLStickX()) ? sign(time) * abs(Retry::ControllerManager::getLStickX() * Retry::ControllerManager::getLStickX()) : time;
 	}
 	velocity.x = (lerp(0, sideMove, abs(time)) + (doJump ? lerp(0, 100, abs(time)) : 0)) * sign(time);
 
@@ -134,7 +137,7 @@ void Player::update(float delta)
 	velocity += (!jumpButtonPressed || velocity.y < 0 ? fastFall : 1) * acceleration * delta;
 }
 
-void Player::updateActionBuffer()
+void Retry::Player::updateActionBuffer()
 {
 	for (auto &i : actionBuffer)
 	{
@@ -159,15 +162,16 @@ void Player::updateActionBuffer()
 		{
 			if ((int) j < (int) ControllerButton::AXIS_START)
 			{
-				i.second.down = i.second.down || Retry::Controller::isButtonDown(j);
-				i.second.up = i.second.up || Retry::Controller::isButtonUp(j);
-				i.second.pressed = i.second.pressed || Retry::Controller::isButtonPressed(j);
+				i.second.down = i.second.down || Retry::ControllerManager::isButtonDown(j);
+				i.second.up = i.second.up || Retry::ControllerManager::isButtonUp(j);
+				i.second.pressed = i.second.pressed || Retry::ControllerManager::isButtonPressed(j);
 			} else
 			{
-				i.second.down = i.second.down || Retry::Controller::isAxisDown(j);
-				i.second.up = i.second.up || Retry::Controller::isAxisUp(j);
-				i.second.pressed = i.second.pressed || Retry::Controller::isAxisPressed(j);
+				i.second.down = i.second.down || Retry::ControllerManager::isAxisDown(j);
+				i.second.up = i.second.up || Retry::ControllerManager::isAxisUp(j);
+				i.second.pressed = i.second.pressed || Retry::ControllerManager::isAxisPressed(j);
 			}
 		}
 	}
+}
 }

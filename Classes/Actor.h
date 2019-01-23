@@ -5,8 +5,6 @@
 #include "MouseManager.h"
 #include "ControllerManager.h"
 
-using namespace cocos2d;
-
 namespace {
 struct ActionInfo {
 	float time = 0;
@@ -16,38 +14,70 @@ struct ActionInfo {
 };
 }
 
-class Actor {
+namespace Retry
+{
+
+class Actor
+{
 public:
 	Actor() = default;
-	Actor::~Actor() { delete sprite; }
+	Actor::~Actor()
+	{
+		delete sprite;
+	}
 
-	void load(std::string path, Vec2 position);
+	void load(std::string path, cocos2d::Vec2 position);
 	void kill(float delay = 0.0f);
 
-	virtual void update(float dt) {};
+	virtual void update(float dt)
+	{};
 
-	void moveBy(Vec2 movement, float duration = 0);
+	void moveBy(cocos2d::Vec2 movement, float duration = 0);
 
 	void bufferAction(std::string action);
 
 	// Getters and Setters
-	Sprite* getSprite() { return sprite; }
-	PhysicsBody* getBody() { return sprite->getPhysicsBody(); }
+	cocos2d::Sprite* getSprite()
+	{
+		return sprite;
+	}
+	cocos2d::PhysicsBody* getBody()
+	{
+		return sprite->getPhysicsBody();
+	}
 
-	Vec2 getVelocity() { return velocity; }
-	Vec2 getAcceleration() { return acceleration; }
+	cocos2d::Vec2 getVelocity()
+	{
+		return velocity;
+	}
+	cocos2d::Vec2 getAcceleration()
+	{
+		return acceleration;
+	}
 
-	void setVelocity(Vec2 velocity) { this->velocity = velocity; }
-	void setVelocity(float x, float y) { this->velocity = Vec2(x, y); }
+	void setVelocity(cocos2d::Vec2 velocity)
+	{
+		this->velocity = velocity;
+	}
+	void setVelocity(float x, float y)
+	{
+		this->velocity = cocos2d::Vec2(x, y);
+	}
 
-	void setAcceleration(Vec2 acceleration) { this->acceleration = acceleration; }
-	void setAcceleration(float x, float y) { this->acceleration = Vec2(x, y); }
+	void setAcceleration(cocos2d::Vec2 acceleration)
+	{
+		this->acceleration = acceleration;
+	}
+	void setAcceleration(float x, float y)
+	{
+		this->acceleration = cocos2d::Vec2(x, y);
+	}
 
 
 protected:
-	Sprite* sprite;
-	Vec2 velocity;
-	Vec2 acceleration;
+	cocos2d::Sprite* sprite;
+	cocos2d::Vec2 velocity;
+	cocos2d::Vec2 acceleration;
 
 	std::unordered_map<std::string, ActionInfo> actionBuffer;
 
@@ -60,3 +90,4 @@ protected:
 	float actionPressedDuration(std::string action);
 };
 
+}

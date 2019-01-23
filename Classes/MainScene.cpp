@@ -26,16 +26,14 @@
 
 #include "KeyboardManager.h"
 #include "MouseManager.h"
-#include "AudioManager.h"
+#include "AudioPlayer.h"
 #include "ControllerManager.h"
 
 #include "CameraManager.h"
 
 #include "AudioEngine.h"
 
-USING_NS_CC;
-
-Scene* MainScene::createScene()
+cocos2d::Scene* MainScene::createScene()
 {
 	return MainScene::create();
 }
@@ -58,26 +56,26 @@ bool MainScene::init()
 		return false;
 	}
 
-	player = new Player("CloseNormal.png", Vec2(1230, 50));
+	player = new Retry::Player("CloseNormal.png", cocos2d::Vec2(1230, 50));
 	player->getSprite()->setScale(1.2f);
 	this->addChild(player->getSprite(), 100);
 
-	background = Sprite::create("HelloWorld.png");
-	background->setAnchorPoint(Vec2(0.5f, 0.5f));
-	background->setPosition(Vec2(1280 / 2, 720 / 2));
+	background = cocos2d::Sprite::create("HelloWorld.png");
+	background->setAnchorPoint(cocos2d::Vec2(0.5f, 0.5f));
+	background->setPosition(cocos2d::Vec2(1280 / 2, 720 / 2));
 	this->addChild(background, 0);
 
-	cameraAnchors.push_back(Sprite::create("CloseSelected.png"));
-	cameraAnchors.back()->setAnchorPoint(Vec2(0.5, 0.5f));
-	cameraAnchors.back()->setPosition(Vec2(-500, -200));
+	cameraAnchors.push_back(cocos2d::Sprite::create("CloseSelected.png"));
+	cameraAnchors.back()->setAnchorPoint(cocos2d::Vec2(0.5, 0.5f));
+	cameraAnchors.back()->setPosition(cocos2d::Vec2(-500, -200));
 
-	cameraAnchors.push_back(Sprite::create("CloseSelected.png"));
-	cameraAnchors.back()->setAnchorPoint(Vec2(0.5, 0.5f));
-	cameraAnchors.back()->setPosition(Vec2(1800, -150));
+	cameraAnchors.push_back(cocos2d::Sprite::create("CloseSelected.png"));
+	cameraAnchors.back()->setAnchorPoint(cocos2d::Vec2(0.5, 0.5f));
+	cameraAnchors.back()->setPosition(cocos2d::Vec2(1800, -150));
 
-	cameraAnchors.push_back(Sprite::create("CloseSelected.png"));
-	cameraAnchors.back()->setAnchorPoint(Vec2(0.5, 0.5f));
-	cameraAnchors.back()->setPosition(Vec2(-300, 500));
+	cameraAnchors.push_back(cocos2d::Sprite::create("CloseSelected.png"));
+	cameraAnchors.back()->setAnchorPoint(cocos2d::Vec2(0.5, 0.5f));
+	cameraAnchors.back()->setPosition(cocos2d::Vec2(-300, 500));
 
 	//this->addChild(cameraAnchors.front());
 	//CameraManager::getInstance()->lazyFollowTarget(player->getSprite(), 0.25f);
@@ -94,7 +92,7 @@ bool MainScene::init()
 	Retry::Keyboard::createListener(_eventDispatcher, this);
 	Retry::Mouse::createListener(_eventDispatcher, this);
 	//Retry::ControllerManager::getInstance()->createListener(_eventDispatcher, this);
-	Retry::Controller::createListener(_eventDispatcher, this);
+	Retry::ControllerManager::createListener(_eventDispatcher, this);
 
 	this->scheduleUpdate();
 
@@ -107,7 +105,7 @@ bool MainScene::init()
 
 void MainScene::menuCloseCallback(Ref* pSender)
 {
-	Director::getInstance()->end();
+	cocos2d::Director::getInstance()->end();
 }
 
 void MainScene::update(float delta)
@@ -115,7 +113,7 @@ void MainScene::update(float delta)
 
 	if (Retry::Keyboard::isKeyPressed(Retry::KeyCode::ESCAPE))
 	{
-		Director::getInstance()->end();
+		cocos2d::Director::getInstance()->end();
 	}
 
 	player->update(delta);
@@ -126,16 +124,16 @@ void MainScene::update(float delta)
 		Retry::Camera::setTrauma(0.5f);
 
 	if (Retry::Keyboard::isKeyPressed(Retry::KeyCode::LEFT_ARROW))
-		cameraAnchors.front()->runAction(MoveBy::create(0, Vec2(-500 * delta, 0)));
+		cameraAnchors.front()->runAction(cocos2d::MoveBy::create(0, cocos2d::Vec2(-500 * delta, 0)));
 	if (Retry::Keyboard::isKeyPressed(Retry::KeyCode::RIGHT_ARROW))
-		cameraAnchors.front()->runAction(MoveBy::create(0, Vec2(500 * delta, 0)));
+		cameraAnchors.front()->runAction(cocos2d::MoveBy::create(0, cocos2d::Vec2(500 * delta, 0)));
 
 	//if (keyIn->isKeyPressed(KeyCode::R) || controllerIn->isAxisPressed(ControllerButton::RIGHT_TRIGGER))
 	//	CameraManager::getInstance()->lazyFollowTarget(0);
 
 	Retry::Keyboard::refresh();
 	Retry::Mouse::refresh();
-	Retry::Controller::refresh();
+	Retry::ControllerManager::refresh();
 	Retry::Camera::update(delta);
 
 }

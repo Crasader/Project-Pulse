@@ -4,20 +4,24 @@
 #include "KeyboardManager.h"
 #include "MouseManager.h"
 #include "ControllerManager.h"
-#include "AudioManager.h"
+#include "AudioPlayer.h"
 
 namespace {
 
 struct KeyMap {
-	std::vector<KeyCode> kButtons;
-	std::vector<MouseButton> mButtons;
-	std::vector<ControllerButton> cButtons;
+	std::vector<Retry::KeyCode> kButtons;
+	std::vector<Retry::MouseButton> mButtons;
+	std::vector<Retry::ControllerButton> cButtons;
 };
 }
 
-class Player : public Actor {
+namespace Retry
+{
+
+class Player : public Actor
+{
 public:
-	Player(std::string path, Vec2 pos);
+	Player(std::string path, cocos2d::Vec2 pos);
 
 	void update(float delta);
 
@@ -26,4 +30,6 @@ private:
 
 	void updateActionBuffer();
 };
+
+}
 

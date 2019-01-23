@@ -1,9 +1,16 @@
 #include "Enemy.h"
 
-Enemy::Enemy(std::string path, Vec2 pos) {
+namespace Retry
+{
+
+Enemy::Enemy(std::string path, cocos2d::Vec2 pos)
+{
 	load(path, pos);
 }
 
-void Enemy::update(float dt) {
+void Enemy::update(float dt)
+{
+
+}
 
 }

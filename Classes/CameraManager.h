@@ -7,7 +7,6 @@
 namespace Retry
 {
 
-/// CHECK OUT ABSTRACT AS A POSSIBILITY
 class Camera abstract
 {
 public:

@@ -55,11 +55,11 @@ public:
 private:
 
 	//Layer* background;
-	Layer* foreground;
+	cocos2d::Layer* foreground;
 
-	Player* player;
+	Retry::Player* player;
 
-	Sprite* background;
+	cocos2d::Sprite* background;
 
 	std::vector<cocos2d::Sprite*> cameraAnchors;
 };
