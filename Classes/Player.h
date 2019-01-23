@@ -7,7 +7,7 @@
 #include "AudioManager.h"
 
 namespace {
-using namespace Retry;
+
 struct KeyMap {
 	std::vector<KeyCode> kButtons;
 	std::vector<MouseButton> mButtons;
@@ -22,11 +22,6 @@ public:
 	void update(float delta);
 
 private:
-	static Retry::KeyboardManager* keyIn;
-	static Retry::MouseManager* mouseIn;
-	static Retry::ControllerManager* controllerIn;
-	static Retry::AudioManager* audio;
-
 	static std::unordered_map<std::string, KeyMap> actionMapping;
 
 	void updateActionBuffer();
