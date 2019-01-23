@@ -1,31 +1,57 @@
 #include "CameraManager.h"
 
-CameraManager* CameraManager::instance = 0;
+//CameraManager* CameraManager::instance = 0;
 
-PerlinNoise CameraManager::perlin = PerlinNoise(128);
+//using namespace Retry;
 
-CameraManager* CameraManager::getInstance() {
-	return instance == 0 ? instance = new CameraManager() : instance;
-}
+namespace Retry
+{
 
-float normalizeInRange(float x, float a, float b) {
+PerlinNoise Camera::perlin = PerlinNoise(128);
+cocos2d::Camera* Camera::camera;
+
+char Camera::targetingMask;
+cocos2d::Node* Camera::followTarget;
+std::vector<std::pair<cocos2d::Node*, cocos2d::Vec2>> Camera::focusTargets;
+float Camera::timeToTarget;
+
+cocos2d::Vec2 Camera::position;
+cocos2d::Vec2 Camera::offset;
+float Camera::angle;
+float Camera::trauma;
+
+float Camera::totalTime;
+
+const cocos2d::Vec2 Camera::maxOffset = cocos2d::Vec2(200, 200);
+const float Camera::maxAngle = 20;
+
+//CameraManager* CameraManager::getInstance() {
+//	return instance == 0 ? instance = new CameraManager() : instance;
+//}
+
+float normalizeInRange(float x, float a, float b)
+{
 	float y = (x - a) / (b - a);
 	return y < 0 ? 0 : y > 1 ? 1 : y;
 }
 
-void CameraManager::update(float delta) {
+void Camera::update(float delta)
+{
 	static PerlinNoise p1 = PerlinNoise(126), p2 = PerlinNoise(127), p3 = PerlinNoise(128);
 
 	angle = maxAngle * trauma * trauma * (p1.noise(totalTime, totalTime, 0) * 2 - 1);
 	offset.x = maxOffset.x * trauma * trauma * (p2.noise(totalTime, totalTime, 0) * 2 - 1);
 	offset.y = maxOffset.y * trauma * trauma * (p3.noise(totalTime, totalTime, 0) * 2 - 1);
 
-	if (targetingMask & 0b10) {
+	if (targetingMask & 0b10)
+	{
 		moveBy((followTarget->getPosition() - position) * delta / timeToTarget);
-	} else if (targetingMask & 0b100) {
+	} else if (targetingMask & 0b100)
+	{
 		float totalInfluence = 2.f;
 		cocos2d::Vec2 posToAvg = followTarget->getPosition() * 2.f;
-		for (auto i : focusTargets) {
+		for (auto i : focusTargets)
+		{
 			float influence = 1 - normalizeInRange((followTarget->getPosition() - i.first->getPosition()).length(), i.second.x, i.second.y);
 			posToAvg += i.first->getPosition() * influence;
 			totalInfluence += influence;
@@ -63,16 +89,19 @@ void CameraManager::update(float delta) {
 	totalTime += delta * 10;
 }
 
-void CameraManager::moveBy(cocos2d::Vec2 position) {
-	this->position += position;
+void Camera::moveBy(cocos2d::Vec2 position)
+{
+	Camera::position += position;
 }
 
-void CameraManager::lazyFollowTarget(cocos2d::Node* target, float timeToReach) {
+void Camera::lazyFollowTarget(cocos2d::Node* target, float timeToReach)
+{
 	targetingMask = int(!!(followTarget = target)) << 1;
 	timeToTarget = (timeToReach + 0.01f + abs(timeToReach - 0.01f)) / 2;
 }
 
-void CameraManager::addTarget(cocos2d::Node * target, float nearThreshHold, float farThreshHold) {
+void Camera::addTarget(cocos2d::Node * target, float nearThreshHold, float farThreshHold)
+{
 	for (auto i : focusTargets) if (i.first == target) return;
 
 	targetingMask = 0b100;
@@ -80,15 +109,18 @@ void CameraManager::addTarget(cocos2d::Node * target, float nearThreshHold, floa
 	focusTargets.push_back(std::make_pair(target, Vec2(nearThreshHold, farThreshHold)));
 }
 
-void CameraManager::setTimeToTarget(float f) {
+void Camera::setTimeToTarget(float f)
+{
 	timeToTarget = f;
 }
 
-void CameraManager::setCamera(cocos2d::Camera * camera) {
-	this->camera = camera;
-	this->position = camera->getPosition();
-	this->angle = camera->getRotation();
+void Camera::setCamera(cocos2d::Camera * camera)
+{
+	Camera::camera = camera;
+	Camera::position = camera->getPosition();
+	Camera::angle = camera->getRotation();
 
 	camera->getParent()->setAnchorPoint(cocos2d::Vec2(0, 0));
 }
 
+}

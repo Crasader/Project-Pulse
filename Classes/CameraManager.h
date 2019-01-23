@@ -4,57 +4,73 @@
 #include "cocos2d.h"
 #include "PerlinNoise.h"
 
-class CameraManager {
-private:
-	CameraManager() = default;
-	static CameraManager* instance;
+namespace Retry
+{
+
+/// CHECK OUT ABSTRACT AS A POSSIBILITY
+class Camera abstract
+{
 public:
-	static CameraManager* getInstance();
+	static void update(float delta);
 
-	void update(float delta);
+	static void moveBy(cocos2d::Vec2 position);
 
-	void moveBy(cocos2d::Vec2 position);
+	static void lazyFollowTarget(cocos2d::Node* target, float timeToReach = 0.5f);
+	static void addTarget(cocos2d::Node* target, float nearThreshHold = 1280 / 2, float farThreshHold = 1280 * 3 / 4);
 
-	void lazyFollowTarget(cocos2d::Node* target, float timeToReach = 0.5f);
-	void addTarget(cocos2d::Node* target, float nearThreshHold = 1280 / 2, float farThreshHold = 1280 * 3 / 4);
+	static void setTimeToTarget(float f);
+	static void doLazyFollow()
+	{
+		Camera::targetingMask = 1;
+	}
+	static void doFocusFollow()
+	{
+		Camera::targetingMask = 2;
+	}
 
-	void setTimeToTarget(float f);
-	void doLazyFollow() { targetingMask = 1; }
-	void doFocusFollow() { targetingMask = 2; }
+	static cocos2d::Vec2 getPosition()
+	{
+		return Camera::position;
+	}
 
-	cocos2d::Vec2 getPosition() const { return position; }
+	static cocos2d::Camera* getCamera()
+	{
+		return Camera::camera;
+	}
+	static void setCamera(cocos2d::Camera* camera);
 
-	cocos2d::Camera* getCamera() { return camera; }
-	void setCamera(cocos2d::Camera* camera);
-
-	void setTrauma(float trauma) { this->trauma = trauma < 0 ? 0 : trauma > 1 ? 1 : trauma; }
-	void addTrauma(float trauma) {
-		this->trauma = this->trauma + trauma < 0 ? 0 : this->trauma + trauma > 1 ? 1 : this->trauma + trauma;
+	static void setTrauma(float trauma)
+	{
+		Camera::trauma = trauma < 0 ? 0 : trauma > 1 ? 1 : trauma;
+	}
+	static void addTrauma(float trauma)
+	{
+		Camera::trauma = Camera::trauma + trauma < 0 ? 0 : Camera::trauma + trauma > 1 ? 1 : Camera::trauma + trauma;
 	}
 
 
 private:
-	cocos2d::Camera* camera;
+	static cocos2d::Camera* camera;
 
 	static PerlinNoise perlin;
 
-	char targetingMask;
-	cocos2d::Node* followTarget;
-	std::vector<std::pair<cocos2d::Node*, cocos2d::Vec2>> focusTargets;
-	float timeToTarget;
+	static char targetingMask;
+	static cocos2d::Node* followTarget;
+	static std::vector<std::pair<cocos2d::Node*, cocos2d::Vec2>> focusTargets;
+	static float timeToTarget;
 
 
-	cocos2d::Vec2 position;
-	cocos2d::Vec2 offset;
-	float angle;
-	float trauma;
+	static cocos2d::Vec2 position;
+	static cocos2d::Vec2 offset;
+	static float angle;
+	static float trauma;
 
-	float totalTime;
+	static float totalTime;
 
-	const cocos2d::Vec2 maxOffset = cocos2d::Vec2(200, 200);
-	const float maxAngle = 20;
+	static const cocos2d::Vec2 maxOffset;
+	static const float maxAngle;
 };
-
+}
 
 
 #endif

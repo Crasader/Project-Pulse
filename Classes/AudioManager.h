@@ -1,54 +1,52 @@
 #ifndef AUDIO_MANAGER
 #define AUDIO_MANAGER
 
-#include "cocos2d.h"
-#include "AudioEngine.h"
+#include <string>
+#include <unordered_map>
 
-namespace Retry {
+namespace Retry 
+{
 
-namespace {
-struct AudioInfo {
+struct AudioInfo
+{
 	int id;
 	float volume;
 };
-}
-using namespace cocos2d;
-using namespace experimental;
 
-class AudioManager {
-private:
-	static AudioManager* instance;
-	AudioManager() = default;
+//using namespace cocos2d;
+//using namespace experimental;
+
+class Audio abstract
+{
 public:
-	static AudioManager* getInstance();
 
-	void setMasterVolume(float vol);
-	void muteAll();
-	void unmuteAll();
+	static void setMasterVolume(float vol);
+	static void muteAll();
+	static void unmuteAll();
 
-	void playMusic(std::string path, bool repeat = true, float vol = 1.0f);
-	void stopMusic();
-	void pauseMusic();
-	void resumeMusic();
-	void setMusicVolume(float vol);
+	static void playMusic(std::string path, bool repeat = true, float vol = 1.0f);
+	static void stopMusic();
+	static void pauseMusic();
+	static void resumeMusic();
+	static void setMusicVolume(float vol);
 
-	unsigned int playEffect(std::string path, bool repeat = false, float vol = 1.0f);
+	static unsigned int playEffect(std::string path, bool repeat = false, float vol = 1.0f);
 
-	void stopEffect(std::string path, bool stopAll = false);
-	void stopEffect(std::string path, int index);
+	static void stopEffect(std::string path, bool stopAll = false);
+	static void stopEffect(std::string path, int index);
 
-	void pauseEffect(std::string path, bool pauseAll = false);
-	void pauseEffect(std::string path, int index);
+	static void pauseEffect(std::string path, bool pauseAll = false);
+	static void pauseEffect(std::string path, int index);
 
-	void resumeEffect(std::string path, bool resumeAll = false);
-	void resumeEffect(std::string path, int index);
+	static void resumeEffect(std::string path, bool resumeAll = false);
+	static void resumeEffect(std::string path, int index);
 
-	void setEffectVolume(std::string path, float vol, bool affectAll = false);
-	void setEffectVolume(std::string path, float vol, int index);
+	static void setEffectVolume(std::string path, float vol, bool affectAll = false);
+	static void setEffectVolume(std::string path, float vol, int index);
 
-	void stopAllEffects();
-	void pauseAllEffects();
-	void resumeAllEffects();
+	static void stopAllEffects();
+	static void pauseAllEffects();
+	static void resumeAllEffects();
 
 private:
 	static AudioInfo music;

@@ -31,23 +31,30 @@
 
 #include "CameraManager.h"
 
+#include "AudioEngine.h"
+
 USING_NS_CC;
 
-Scene* MainScene::createScene() {
+Scene* MainScene::createScene()
+{
 	return MainScene::create();
 }
 
-void MainScene::onExit() {
+void MainScene::onExit()
+{
 	Scene::onExit();
 }
 
-void MainScene::onEnter() {
-	experimental::AudioEngine::lazyInit();
+void MainScene::onEnter()
+{
+	cocos2d::experimental::AudioEngine::lazyInit();
 	Scene::onEnter();
 }
 
-bool MainScene::init() {
-	if (!Scene::init()) {
+bool MainScene::init()
+{
+	if (!Scene::init())
+	{
 		return false;
 	}
 
@@ -79,38 +86,35 @@ bool MainScene::init() {
 
 	for (auto i : cameraAnchors)
 		this->addChild(i);
-	CameraManager::getInstance()->lazyFollowTarget(player->getSprite(), 0.25f);
+	Retry::Camera::lazyFollowTarget(player->getSprite(), 0.25f);
 	for (auto i : cameraAnchors)
-		CameraManager::getInstance()->addTarget(i);
+		Retry::Camera::addTarget(i);
 
 
-	Retry::KeyboardManager::getInstance()->createListener(_eventDispatcher, this);
-	Retry::MouseManager::getInstance()->createListener(_eventDispatcher, this);
-	Retry::ControllerManager::getInstance()->createListener(_eventDispatcher, this);
+	Retry::Keyboard::createListener(_eventDispatcher, this);
+	Retry::Mouse::createListener(_eventDispatcher, this);
+	//Retry::ControllerManager::getInstance()->createListener(_eventDispatcher, this);
+	Retry::Controller::createListener(_eventDispatcher, this);
 
 	this->scheduleUpdate();
 
-	CameraManager::getInstance()->setCamera(this->getDefaultCamera());
+	Retry::Camera::setCamera(this->getDefaultCamera());
 
 	//this->setScale(0.25);
 
 	return true;
 }
 
-void MainScene::menuCloseCallback(Ref* pSender) {
+void MainScene::menuCloseCallback(Ref* pSender)
+{
 	Director::getInstance()->end();
 }
 
-void MainScene::update(float delta) {
+void MainScene::update(float delta)
+{
 
-	using namespace Retry;
-	static auto keyIn = KeyboardManager::getInstance();
-	static auto mouseIn = MouseManager::getInstance();
-	static auto controllerIn = ControllerManager::getInstance();
-	static auto audio = AudioManager::getInstance();
-
-
-	if (keyIn->isKeyPressed(KeyCode::ESCAPE)) {
+	if (Retry::Keyboard::isKeyPressed(Retry::KeyCode::ESCAPE))
+	{
 		Director::getInstance()->end();
 	}
 
@@ -118,20 +122,20 @@ void MainScene::update(float delta) {
 
 	//CameraManager::getInstance()->moveBy((player->getSprite()->getPosition() - CameraManager::getInstance()->getPosition()) * delta * 4);
 
-	if (keyIn->isKeyPressed(KeyCode::E))
-		CameraManager::getInstance()->setTrauma(0.5f);
+	if (Retry::Keyboard::isKeyPressed(Retry::KeyCode::E))
+		Retry::Camera::setTrauma(0.5f);
 
-	if (keyIn->isKeyPressed(KeyCode::LEFT_ARROW))
+	if (Retry::Keyboard::isKeyPressed(Retry::KeyCode::LEFT_ARROW))
 		cameraAnchors.front()->runAction(MoveBy::create(0, Vec2(-500 * delta, 0)));
-	if (keyIn->isKeyPressed(KeyCode::RIGHT_ARROW))
+	if (Retry::Keyboard::isKeyPressed(Retry::KeyCode::RIGHT_ARROW))
 		cameraAnchors.front()->runAction(MoveBy::create(0, Vec2(500 * delta, 0)));
 
 	//if (keyIn->isKeyPressed(KeyCode::R) || controllerIn->isAxisPressed(ControllerButton::RIGHT_TRIGGER))
 	//	CameraManager::getInstance()->lazyFollowTarget(0);
 
-	keyIn->refresh();
-	mouseIn->refresh();
-	controllerIn->refresh();
-	CameraManager::getInstance()->update(delta);
+	Retry::Keyboard::refresh();
+	Retry::Mouse::refresh();
+	Retry::Controller::refresh();
+	Retry::Camera::update(delta);
 
 }
