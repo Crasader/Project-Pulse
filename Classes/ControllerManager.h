@@ -72,7 +72,7 @@ enum class ControllerButton {
 	B,
 	X,
 	Y,
-	LEFT_BUMBER,
+	LEFT_BUMPER,
 	RIGHT_BUMPER,
 	SELECT,
 	START,

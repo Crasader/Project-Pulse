@@ -63,7 +63,7 @@
     <ClCompile Include="..\Classes\AudioPlayer.cpp">
       <Filter>src\managers</Filter>
     </ClCompile>
-    <ClCompile Include="MenuScene.cpp">
+    <ClCompile Include="..\Classes\MenuScene.cpp">
       <Filter>src\scenes</Filter>
     </ClCompile>
   </ItemGroup>
@@ -104,7 +104,7 @@
     <ClInclude Include="..\Classes\AudioPlayer.h">
       <Filter>src\managers</Filter>
     </ClInclude>
-    <ClInclude Include="MenuScene.h">
+    <ClInclude Include="..\Classes\MenuScene.h">
       <Filter>src\scenes</Filter>
     </ClInclude>
   </ItemGroup>
