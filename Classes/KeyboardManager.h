@@ -10,7 +10,7 @@ enum class KeyCode;
 
 class Keyboard abstract {
 public:
-	static void refresh();
+	static void refresh(float delta);
 
 	static void createListener(cocos2d::EventDispatcher* dispatcher, cocos2d::Node* node);
 

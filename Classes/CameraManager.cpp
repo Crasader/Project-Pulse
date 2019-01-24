@@ -123,4 +123,12 @@ void Camera::setCamera(cocos2d::Camera * camera)
 	camera->getParent()->setAnchorPoint(cocos2d::Vec2(0, 0));
 }
 
+void Camera::transformUI(cocos2d::Node* ui, cocos2d::Vec2 screenPos)
+{
+	screenPos -= cocos2d::Vec2(cocos2d::Director::getInstance()->getVisibleSize() / 2);
+	auto newScreenPos = screenPos.rotateByAngle(cocos2d::Vec2(0, 0), -angle * 3.1415f / 180.f);
+	ui->setPosition((Camera::camera->getPosition() + newScreenPos) / camera->getParent()->getScale());
+	ui->setRotation(Camera::angle);
+}
+
 }

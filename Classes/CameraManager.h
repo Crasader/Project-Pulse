@@ -32,6 +32,8 @@ public:
 		return Camera::position;
 	}
 
+	static void transformUI(cocos2d::Node* ui, cocos2d::Vec2 screenPos);
+
 	static cocos2d::Camera* getCamera()
 	{
 		return Camera::camera;

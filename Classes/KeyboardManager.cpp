@@ -9,7 +9,7 @@ clock_t Keyboard::currentTime = 0;
 std::unordered_map<KeyCode, clock_t> Keyboard::keys;
 std::unordered_map<KeyCode, bool> Keyboard::keysLast;
 
-void Keyboard::refresh()
+void Keyboard::refresh(float delta)
 {
 	keysLast.clear();
 	currentTime = clock();
@@ -17,19 +17,20 @@ void Keyboard::refresh()
 
 void Keyboard::createListener(cocos2d::EventDispatcher* dispatcher, cocos2d::Node* node)
 {
-	using namespace cocos2d;
-	auto eventListener = EventListenerKeyboard::create();
+	auto eventListener = cocos2d::EventListenerKeyboard::create();
 
-	Director::getInstance()->getOpenGLView()->setIMEKeyboardState(true);
-	eventListener->onKeyPressed = [](EventKeyboard::KeyCode keyCode, Event* event) {
+	cocos2d::Director::getInstance()->getOpenGLView()->setIMEKeyboardState(true);
+	eventListener->onKeyPressed = [](cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event) {
 		Retry::Keyboard::updateKey((Retry::KeyCode) keyCode, true);
-		Retry::ControllerManager::setUseController(false);
+		Retry::Controller::setUseController(false);
 	};
-	eventListener->onKeyReleased = [](EventKeyboard::KeyCode keyCode, Event* event) {
+	eventListener->onKeyReleased = [](cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event) {
 		Retry::Keyboard::updateKey((Retry::KeyCode) keyCode, false);
-		Retry::ControllerManager::setUseController(false);
+		Retry::Controller::setUseController(false);
 	};
 	dispatcher->addEventListenerWithSceneGraphPriority(eventListener, node);
+
+	node->schedule(refresh, "KeyboardManager");
 }
 
 void Keyboard::updateKey(KeyCode key, bool isPressed)

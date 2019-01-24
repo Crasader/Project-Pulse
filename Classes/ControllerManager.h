@@ -13,9 +13,9 @@ struct ControllerInfo;
 
 enum class ControllerButton;
 
-class ControllerManager abstract {
+class Controller abstract {
 public:
-	static void refresh();
+	static void refresh(float delta);
 
 	static void createListener(cocos2d::EventDispatcher* dispatcher, cocos2d::Node* node);
 
@@ -57,7 +57,7 @@ public:
 	static void setDeadZone(ControllerButton key, float t, int id = 0);
 
 	static bool doUseController() { return useController; }
-	static void setUseController(bool useController) { ControllerManager::useController = useController; }
+	static void setUseController(bool useController) { Controller::useController = useController; }
 
 private:
 	static std::map<int, ControllerInfo> controllers;

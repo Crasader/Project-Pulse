@@ -15,7 +15,7 @@ std::unordered_map<MouseButton, bool> Mouse::buttonsLast;
 
 clock_t Mouse::currentTime = 0;
 
-void Mouse::refresh()
+void Mouse::refresh(float delta)
 {
 	buttonsLast.clear();
 	currentTime = clock();
@@ -24,28 +24,28 @@ void Mouse::refresh()
 
 void Mouse::createListener(cocos2d::EventDispatcher* dispatcher, cocos2d::Node* node)
 {
-	using namespace cocos2d;
-	auto eventListener = EventListenerMouse::create();
+	auto eventListener = cocos2d::EventListenerMouse::create();
 
-	eventListener->onMouseDown = [](Event* event) {
-		Mouse::updateButton((Retry::MouseButton) ((EventMouse*) event)->getMouseButton(), true);
+	eventListener->onMouseDown = [](cocos2d::Event* event) {
+		Mouse::updateButton((Retry::MouseButton) ((cocos2d::EventMouse*) event)->getMouseButton(), true);
 	};
-	eventListener->onMouseUp = [](Event* event) {
-		Mouse::updateButton((Retry::MouseButton) ((EventMouse*) event)->getMouseButton(), false);
+	eventListener->onMouseUp = [](cocos2d::Event* event) {
+		Mouse::updateButton((Retry::MouseButton) ((cocos2d::EventMouse*) event)->getMouseButton(), false);
 	};
-	eventListener->onMouseMove = [](Event* event) {
-		EventMouse* e = (EventMouse*) event;
+	eventListener->onMouseMove = [](cocos2d::Event* event) {
+		cocos2d::EventMouse* e = (cocos2d::EventMouse*) event;
 		deltaPosition.x = e->getCursorX() - position.x;
 		deltaPosition.y = e->getCursorY() - position.y;
 		position.x = e->getCursorX();
 		position.y = e->getCursorY();
 	};
-	eventListener->onMouseScroll = [](Event* event) {
-		scroll = ((EventMouse*) event)->getScrollY();
+	eventListener->onMouseScroll = [](cocos2d::Event* event) {
+		scroll = ((cocos2d::EventMouse*) event)->getScrollY();
 	};
 
 	dispatcher->addEventListenerWithSceneGraphPriority(eventListener, node);
-	//return eventListener;
+
+	node->schedule(refresh, "MouseManager");
 }
 
 void Mouse::updateButton(MouseButton button, bool isPressed)

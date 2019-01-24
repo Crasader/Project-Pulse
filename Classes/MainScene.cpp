@@ -23,6 +23,7 @@
  ****************************************************************************/
 
 #include "MainScene.h"
+#include "MenuScene.h"
 
 #include "KeyboardManager.h"
 #include "MouseManager.h"
@@ -33,8 +34,12 @@
 
 #include "AudioEngine.h"
 
+#include "ui/CocosGUI.h"
+
 cocos2d::Scene* MainScene::createScene()
 {
+	auto scene = MainScene::create();
+
 	return MainScene::create();
 }
 
@@ -45,7 +50,6 @@ void MainScene::onExit()
 
 void MainScene::onEnter()
 {
-	cocos2d::experimental::AudioEngine::lazyInit();
 	Scene::onEnter();
 }
 
@@ -56,31 +60,25 @@ bool MainScene::init()
 		return false;
 	}
 
-	player = new Retry::Player("CloseNormal.png", cocos2d::Vec2(1230, 50));
-	player->getSprite()->setScale(1.2f);
-	this->addChild(player->getSprite(), 100);
+	initPlayer(cocos2d::Vec2(1230, 50));
 
-	background = cocos2d::Sprite::create("HelloWorld.png");
-	background->setAnchorPoint(cocos2d::Vec2(0.5f, 0.5f));
-	background->setPosition(cocos2d::Vec2(1280 / 2, 720 / 2));
-	this->addChild(background, 0);
+	auto cobble = cocos2d::Sprite::create("cobblestone.png");
+	auto cSize = cobble->getContentSize();
+	auto sSize = cocos2d::Director::getInstance()->getVisibleSize();
 
-	cameraAnchors.push_back(cocos2d::Sprite::create("CloseSelected.png"));
-	cameraAnchors.back()->setAnchorPoint(cocos2d::Vec2(0.5, 0.5f));
-	cameraAnchors.back()->setPosition(cocos2d::Vec2(-500, -200));
 
-	cameraAnchors.push_back(cocos2d::Sprite::create("CloseSelected.png"));
-	cameraAnchors.back()->setAnchorPoint(cocos2d::Vec2(0.5, 0.5f));
-	cameraAnchors.back()->setPosition(cocos2d::Vec2(1800, -150));
-
-	cameraAnchors.push_back(cocos2d::Sprite::create("CloseSelected.png"));
-	cameraAnchors.back()->setAnchorPoint(cocos2d::Vec2(0.5, 0.5f));
-	cameraAnchors.back()->setPosition(cocos2d::Vec2(-300, 500));
-
-	//this->addChild(cameraAnchors.front());
-	//CameraManager::getInstance()->lazyFollowTarget(player->getSprite(), 0.25f);
-	////for (auto i : cameraAnchors)
-	//CameraManager::getInstance()->addTarget(cameraAnchors.front());
+	for (int i = 0; i < (int) sSize.width / (int) cSize.width + 2; i++)
+	{
+		for (int j = 0; j < (int) sSize.height / (int) cSize.height + 2; j++)
+		{
+			auto newCobble = cocos2d::Sprite::create("cobblestone.png");
+			newCobble->setAnchorPoint(cocos2d::Vec2(0, 0));
+			newCobble->setPosition(i * cSize.width, j * cSize.height);
+			newCobble->setColor(cocos2d::Color3B(127, 127, 127));
+			this->addChild(newCobble);
+			background.push_back(newCobble);
+		}
+	}
 
 	for (auto i : cameraAnchors)
 		this->addChild(i);
@@ -91,14 +89,32 @@ bool MainScene::init()
 
 	Retry::Keyboard::createListener(_eventDispatcher, this);
 	Retry::Mouse::createListener(_eventDispatcher, this);
-	//Retry::ControllerManager::getInstance()->createListener(_eventDispatcher, this);
-	Retry::ControllerManager::createListener(_eventDispatcher, this);
+	Retry::Controller::createListener(_eventDispatcher, this);
 
 	this->scheduleUpdate();
 
 	Retry::Camera::setCamera(this->getDefaultCamera());
 
+	//this->schedule([=](float delta) { player->update(delta); }, "Player");
+
 	//this->setScale(0.25);
+
+	auto button = cocos2d::ui::Button::create("CloseNormal.png", "CloseSelected.png", "CloseNormal.png");
+
+	button->addClickEventListener([&](Ref* sender) {
+		static bool isPaused = false;
+
+		if (!isPaused) this->unscheduleUpdate();
+		else           this->scheduleUpdate();
+		isPaused = !isPaused;
+	});
+
+	guiPos[button] = cocos2d::Vec2(1180, 100);
+	//button->setPosition(cocos2d::Vec2(500, 200));
+
+	this->addChild(button, 100);
+
+
 
 	return true;
 }
@@ -110,30 +126,41 @@ void MainScene::menuCloseCallback(Ref* pSender)
 
 void MainScene::update(float delta)
 {
-
-	if (Retry::Keyboard::isKeyPressed(Retry::KeyCode::ESCAPE))
+	if (Retry::Keyboard::isKeyDown(Retry::KeyCode::ESCAPE) || Retry::Controller::isButtonDown(Retry::ControllerButton::START))
 	{
-		cocos2d::Director::getInstance()->end();
+		cocos2d::Director::getInstance()->replaceScene(MenuScene::createScene());
 	}
-
-	player->update(delta);
-
-	//CameraManager::getInstance()->moveBy((player->getSprite()->getPosition() - CameraManager::getInstance()->getPosition()) * delta * 4);
 
 	if (Retry::Keyboard::isKeyPressed(Retry::KeyCode::E))
 		Retry::Camera::setTrauma(0.5f);
 
-	if (Retry::Keyboard::isKeyPressed(Retry::KeyCode::LEFT_ARROW))
-		cameraAnchors.front()->runAction(cocos2d::MoveBy::create(0, cocos2d::Vec2(-500 * delta, 0)));
-	if (Retry::Keyboard::isKeyPressed(Retry::KeyCode::RIGHT_ARROW))
-		cameraAnchors.front()->runAction(cocos2d::MoveBy::create(0, cocos2d::Vec2(500 * delta, 0)));
-
-	//if (keyIn->isKeyPressed(KeyCode::R) || controllerIn->isAxisPressed(ControllerButton::RIGHT_TRIGGER))
-	//	CameraManager::getInstance()->lazyFollowTarget(0);
-
-	Retry::Keyboard::refresh();
-	Retry::Mouse::refresh();
-	Retry::ControllerManager::refresh();
+	for (auto i : actorList) i->update(delta);
 	Retry::Camera::update(delta);
 
+	static auto cSize = background.front()->getContentSize();
+	static auto sSize = cocos2d::Director::getInstance()->getVisibleSize();
+	for (int i = 0; i < (int) sSize.width / (int) cSize.width + 2; i++)
+	{
+		for (int j = 0; j < (int) sSize.height / (int) cSize.height + 2; j++)
+		{
+			int index = i + j * ((int) sSize.width / (int) cSize.width + 2);
+			auto camPos = Retry::Camera::getPosition();
+			background[index]->setPosition(camPos - sSize / 2 + cocos2d::Vec2((i - 1) * cSize.width, j * cSize.height) - cocos2d::Vec2((int) camPos.x % (int) cSize.width, (int) camPos.y % (int) cSize.height) + cocos2d::Vec2(10, 10));
+		}
+	}
+
+	transformUINodes();
+}
+
+void MainScene::initPlayer(cocos2d::Vec2 position)
+{
+	player = new Retry::Player("CloseNormal.png", position);
+	player->getSprite()->setScale(1.2f);
+	this->addChild(player->getSprite(), 100);
+	actorList.push_back(player);
+}
+
+void MainScene::transformUINodes()
+{
+	for (auto i : guiPos) Retry::Camera::transformUI(i.first, i.second);
 }

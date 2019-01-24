@@ -65,8 +65,8 @@ void Retry::Player::update(float delta)
 	bool goLeft = isActionPressed("left"),
 		goRight = isActionPressed("right");
 
-	bool leftStickSens = Retry::ControllerManager::isAxisPressed(ControllerButton::LEFT_STICK_LEFT) ||
-		Retry::ControllerManager::isAxisPressed(ControllerButton::LEFT_STICK_RIGHT);
+	bool leftStickSens = Retry::Controller::isAxisPressed(ControllerButton::LEFT_STICK_LEFT) ||
+		Retry::Controller::isAxisPressed(ControllerButton::LEFT_STICK_RIGHT);
 
 // Side Movement Constants and Variables
 	static const float sideMove = 450;
@@ -113,10 +113,10 @@ void Retry::Player::update(float delta)
 	{
 		time = abs(time) - step < 0 ? 0 : time - sign(time) * step;
 	}
-	if (Retry::ControllerManager::doUseController() && leftStickSens)
+	if (Retry::Controller::doUseController() && leftStickSens)
 	{
 		if (!doJump)
-			time = abs(time) > abs(Retry::ControllerManager::getLStickX()) ? sign(time) * abs(Retry::ControllerManager::getLStickX() * Retry::ControllerManager::getLStickX()) : time;
+			time = abs(time) > abs(Retry::Controller::getLStickX()) ? sign(time) * abs(Retry::Controller::getLStickX() * Retry::Controller::getLStickX()) : time;
 	}
 	velocity.x = (lerp(0, sideMove, abs(time)) + (doJump ? lerp(0, 100, abs(time)) : 0)) * sign(time);
 
@@ -162,14 +162,14 @@ void Retry::Player::updateActionBuffer()
 		{
 			if ((int) j < (int) ControllerButton::AXIS_START)
 			{
-				i.second.down = i.second.down || Retry::ControllerManager::isButtonDown(j);
-				i.second.up = i.second.up || Retry::ControllerManager::isButtonUp(j);
-				i.second.pressed = i.second.pressed || Retry::ControllerManager::isButtonPressed(j);
+				i.second.down = i.second.down || Retry::Controller::isButtonDown(j);
+				i.second.up = i.second.up || Retry::Controller::isButtonUp(j);
+				i.second.pressed = i.second.pressed || Retry::Controller::isButtonPressed(j);
 			} else
 			{
-				i.second.down = i.second.down || Retry::ControllerManager::isAxisDown(j);
-				i.second.up = i.second.up || Retry::ControllerManager::isAxisUp(j);
-				i.second.pressed = i.second.pressed || Retry::ControllerManager::isAxisPressed(j);
+				i.second.down = i.second.down || Retry::Controller::isAxisDown(j);
+				i.second.up = i.second.up || Retry::Controller::isAxisUp(j);
+				i.second.pressed = i.second.pressed || Retry::Controller::isAxisPressed(j);
 			}
 		}
 	}

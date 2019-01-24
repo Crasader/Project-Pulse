@@ -25,6 +25,8 @@
 #ifndef __HELLOWORLD_SCENE_H__
 #define __HELLOWORLD_SCENE_H__
 
+#include <map>
+
 #include "cocos2d.h"
 
 #include "Player.h"
@@ -44,24 +46,20 @@ public:
 
 	void update(float delta);
 
-	//void onConnected(Controller* controller, Event* event);
-	//void onDisconnected(Controller* controller, Event* event);
-	//void onKeyDown(Controller* controller, int key, Event* event);
-	//void onKeyUp(Controller* controller, int key, Event* event);
-	//void onKeyRepeat(Controller* controller, int key, Event* event);
-	//void onAxisEvent(Controller* controller, int key, Event* event);
-
+	void transformUINodes();
 
 private:
-
-	//Layer* background;
-	cocos2d::Layer* foreground;
-
+	void initPlayer(cocos2d::Vec2 position);
+	
 	Retry::Player* player;
 
-	cocos2d::Sprite* background;
+	std::vector<Retry::Actor*> actorList;
+
+	std::vector<cocos2d::Sprite*> background;
 
 	std::vector<cocos2d::Sprite*> cameraAnchors;
+
+	std::unordered_map<cocos2d::Node*, cocos2d::Vec2> guiPos;
 };
 
 #endif // __HELLOWORLD_SCENE_H__

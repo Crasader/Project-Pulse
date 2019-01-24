@@ -3,94 +3,119 @@
 namespace Retry
 {
 
-std::map<int, ControllerInfo> ControllerManager::controllers;
+std::map<int, ControllerInfo> Controller::controllers;
 
-clock_t ControllerManager::currentTime = 0;
+clock_t Controller::currentTime = 0;
 
-bool ControllerManager::useController = false;
+bool Controller::useController = false;
 
-void ControllerManager::refresh()
+void Controller::refresh(float delta)
 {
 	for (auto &i : controllers)
+	{
 		i.second.buttonsLast.clear();
-	currentTime = clock();
-	for (auto &i : controllers)
 		for (auto &j : i.second.axes)
 			j.second = 0;
+	}
+	currentTime = clock();		
 }
 
-void ControllerManager::createListener(cocos2d::EventDispatcher* dispatcher, cocos2d::Node* node)
+void Controller::createListener(cocos2d::EventDispatcher* dispatcher, cocos2d::Node* node)
 {
-	using namespace cocos2d;
-	auto eventListener = EventListenerController::create();
+	auto eventListener = cocos2d::EventListenerController::create();
 
-	eventListener->onConnected = [](cocos2d::Controller* controller, Event* event) {
+	eventListener->onConnected = [](cocos2d::Controller* controller, cocos2d::Event* event) {
+		//if (controllers.find(controller->getDeviceId()) == controllers.end())
+		//{
+		//	controllers[controller->getDeviceId()] = ControllerInfo(controller->getDeviceId(), controller->getDeviceName());
+		//}
+		CCLOG("Connected controller: %s, With ID: %d", controller->getDeviceName().c_str(), controller->getDeviceId());
+	};
+	eventListener->onDisconnected = [](cocos2d::Controller* controller, cocos2d::Event* event) {
+		//if (controllers.find(controller->getDeviceId()) != controllers.end())
+		//{
+		//	controllers.erase(controller->getDeviceId());
+		//}
+		CCLOG("Disconnected controller: %s, With ID: %d", controller->getDeviceName().c_str(), controller->getDeviceId());
+	};
+	eventListener->onKeyDown = [](cocos2d::Controller* controller, int key, cocos2d::Event* event) {
 		if (controllers.find(controller->getDeviceId()) == controllers.end())
 		{
 			controllers[controller->getDeviceId()] = ControllerInfo(controller->getDeviceId(), controller->getDeviceName());
 		}
-		//CCLOG("Connected controller: %s, With ID: %d", controller->getDeviceName().c_str(), controller->getDeviceId());
+		Controller::updateButton((Retry::ControllerButton) key, true, controller->getDeviceId());
+		Controller::setUseController(true);
 	};
-	eventListener->onDisconnected = [](cocos2d::Controller* controller, Event* event) {
-		if (controllers.find(controller->getDeviceId()) != controllers.end())
+	eventListener->onKeyUp = [](cocos2d::Controller* controller, int key, cocos2d::Event* event) {
+		if (controllers.find(controller->getDeviceId()) == controllers.end())
 		{
-			controllers.erase(controller->getDeviceId());
+			controllers[controller->getDeviceId()] = ControllerInfo(controller->getDeviceId(), controller->getDeviceName());
 		}
-		//CCLOG("Disconnected controller: %s, With ID: %d", controller->getDeviceName().c_str(), controller->getDeviceId());
+		Controller::updateButton((Retry::ControllerButton) key, false, controller->getDeviceId());
+		Controller::setUseController(true);
 	};
-	eventListener->onKeyDown = [](cocos2d::Controller* controller, int key, Event* event) {
-		ControllerManager::updateButton((Retry::ControllerButton) key, true, controller->getDeviceId());
-		ControllerManager::setUseController(true);
-	};
-	eventListener->onKeyUp = [](cocos2d::Controller* controller, int key, Event* event) {
-		ControllerManager::updateButton((Retry::ControllerButton) key, false, controller->getDeviceId());
-		ControllerManager::setUseController(true);
-	};
-	eventListener->onKeyRepeat = [](cocos2d::Controller* controller, int key, Event* event) {
+	eventListener->onKeyRepeat = [](cocos2d::Controller* controller, int key, cocos2d::Event* event) {
 
 	};
-	eventListener->onAxisEvent = [](cocos2d::Controller* controller, int key, Event* event) {
-		ControllerManager::setUseController(true);
+	eventListener->onAxisEvent = [](cocos2d::Controller* controller, int key, cocos2d::Event* event) {
+		if (controllers.find(controller->getDeviceId()) == controllers.end())
+		{
+			controllers[controller->getDeviceId()] = ControllerInfo(controller->getDeviceId(), controller->getDeviceName());
+		}
+		Controller::setUseController(true);
 		if (controllers.find(controller->getDeviceId()) != controllers.end())
 		{
 			auto c = &controllers[controller->getDeviceId()];
-			float newValue = controller->getKeyStatus(((EventController*) event)->getKeyCode()).value;
+			//auto code = ((cocos2d::EventController*) event)->getKeyCode();
+			float newValue = controller->getKeyStatus(key).value;
 			switch (key)
 			{
+			case 1000:
+				key = 0;
 			case 0: // Left Stick X Axis
 				c->deltaLeftStick.x = newValue - c->leftStick.x;
 				c->leftStick.x = newValue;
-				ControllerManager::updateAxis((Retry::ControllerButton) (key + (int) ControllerButton::AXIS_START),
+				Controller::updateAxis((Retry::ControllerButton) (key + (int) ControllerButton::AXIS_START),
 													  c->leftStick.x, c->deltaLeftStick.x, controller->getDeviceId());
 				break;
+			case 1001:
+				key = 1;
 			case 1: // Left Stick Y Axis
 				c->deltaLeftStick.y = newValue - c->leftStick.y;
 				c->leftStick.y = newValue;
-				ControllerManager::updateAxis((Retry::ControllerButton) (key + (int) ControllerButton::AXIS_START),
+				Controller::updateAxis((Retry::ControllerButton) (key + (int) ControllerButton::AXIS_START),
 													  c->leftStick.y, c->deltaLeftStick.y, controller->getDeviceId());
 				break;
+			case 1003:
+				key = 2;
 			case 2: // Right Stick X Axis
 				c->deltaRightStick.x = newValue - c->rightStick.x;
 				c->rightStick.x = newValue;
-				ControllerManager::updateAxis((Retry::ControllerButton) (key + (int) ControllerButton::AXIS_START),
+				Controller::updateAxis((Retry::ControllerButton) (key + (int) ControllerButton::AXIS_START),
 													  c->rightStick.x, c->deltaRightStick.x, controller->getDeviceId());
 				break;
+			case 1002:
+				key = 3;
 			case 3: // Right Stick Y Axis
 				c->deltaRightStick.y = newValue - c->rightStick.y;
 				c->rightStick.y = newValue;
-				ControllerManager::updateAxis((Retry::ControllerButton) (key + (int) ControllerButton::AXIS_START),
+				Controller::updateAxis((Retry::ControllerButton) (key + (int) ControllerButton::AXIS_START),
 													  c->rightStick.y, c->deltaRightStick.y, controller->getDeviceId());
 				break;
+			case 1017:
+				key = 4;
 			case 4: // Left Trigger
 				c->deltaLeftTrigger = newValue - c->leftTrigger;
 				c->leftTrigger = newValue;
-				ControllerManager::updateAxis((Retry::ControllerButton) (key + (int) ControllerButton::AXIS_START),
+				Controller::updateAxis((Retry::ControllerButton) (key + (int) ControllerButton::AXIS_START),
 													  c->leftTrigger, c->deltaLeftTrigger, controller->getDeviceId());
 				break;
+			case 1018:
+				key = 5;
 			case 5: // Right Trigger
 				c->deltaRightTrigger = newValue - c->rightTrigger;
 				c->rightTrigger = newValue;
-				ControllerManager::updateAxis((Retry::ControllerButton) (key + (int) ControllerButton::AXIS_START),
+				Controller::updateAxis((Retry::ControllerButton) (key + (int) ControllerButton::AXIS_START),
 													  c->rightTrigger, c->deltaRightTrigger, controller->getDeviceId());
 				break;
 			}
@@ -98,11 +123,14 @@ void ControllerManager::createListener(cocos2d::EventDispatcher* dispatcher, coc
 	};
 	dispatcher->addEventListenerWithSceneGraphPriority(eventListener, node);
 
-	// Start discovering controllers
 	cocos2d::Controller::startDiscoveryController();
+
+	//cocos2d::Controller::
+
+	node->schedule(refresh, "ControllerManager");
 }
 
-void ControllerManager::updateButton(ControllerButton key, bool isPressed, int id)
+void Controller::updateButton(ControllerButton key, bool isPressed, int id)
 {
 	auto bCurr = &controllers[id].buttons;
 	if (bCurr->find(key) == bCurr->end())
@@ -116,22 +144,22 @@ void ControllerManager::updateButton(ControllerButton key, bool isPressed, int i
 	controllers[id].buttonsLast[key] = isPressed;
 }
 
-void ControllerManager::updateAxis(ControllerButton axis, float x, float dx, int id)
+void Controller::updateAxis(ControllerButton axis, float x, float dx, int id)
 {
 	if (controllers.find(id) != controllers.end())
 	{
 		auto c = &controllers[id];
 
 		auto newAxis = axis;
-		switch (axis)
+		switch ((int) axis)
 		{
-		case ControllerButton::LEFT_STICK_X:
+		case (int) ControllerButton::LEFT_STICK_X:
 			newAxis = x < 0 ? ControllerButton::LEFT_STICK_LEFT : ControllerButton::LEFT_STICK_RIGHT; break;
-		case ControllerButton::LEFT_STICK_Y:
+		case (int) ControllerButton::LEFT_STICK_Y:
 			newAxis = x < 0 ? ControllerButton::LEFT_STICK_DOWN : ControllerButton::LEFT_STICK_UP; break;
-		case ControllerButton::RIGHT_STICK_X:
+		case (int) ControllerButton::RIGHT_STICK_X:
 			newAxis = x < 0 ? ControllerButton::RIGHT_STICK_LEFT : ControllerButton::RIGHT_STICK_RIGHT; break;
-		case ControllerButton::RIGHT_STICK_Y:
+		case (int) ControllerButton::RIGHT_STICK_Y:
 			newAxis = x < 0 ? ControllerButton::RIGHT_STICK_DOWN : ControllerButton::RIGHT_STICK_UP; break;
 		}
 
@@ -161,14 +189,14 @@ void ControllerManager::updateAxis(ControllerButton axis, float x, float dx, int
 	}
 }
 
-bool ControllerManager::isButtonPressed(ControllerButton key, int id)
+bool Controller::isButtonPressed(ControllerButton key, int id)
 {
 	if (controllers.find(id) != controllers.end())
 		return controllers[id].buttons.find(key) != controllers[id].buttons.end();
 	return false;
 }
 
-bool ControllerManager::isButtonDown(ControllerButton key, int id)
+bool Controller::isButtonDown(ControllerButton key, int id)
 {
 	if (controllers.find(id) != controllers.end())
 	{
@@ -179,7 +207,7 @@ bool ControllerManager::isButtonDown(ControllerButton key, int id)
 	return false;
 }
 
-bool ControllerManager::isButtonUp(ControllerButton key, int id)
+bool Controller::isButtonUp(ControllerButton key, int id)
 {
 	if (controllers.find(id) != controllers.end())
 	{
@@ -190,7 +218,7 @@ bool ControllerManager::isButtonUp(ControllerButton key, int id)
 	return false;
 }
 
-float ControllerManager::buttonPressedDuration(ControllerButton key, int id)
+float Controller::buttonPressedDuration(ControllerButton key, int id)
 {
 	if (controllers.find(id) != controllers.end())
 	{
@@ -201,102 +229,102 @@ float ControllerManager::buttonPressedDuration(ControllerButton key, int id)
 	return 0;
 }
 
-bool ControllerManager::isAxisPressed(ControllerButton axis, int id)
+bool Controller::isAxisPressed(ControllerButton axis, int id)
 {
 	return controllers[id].axes[axis] & 0b1;
 }
 
-bool ControllerManager::isAxisDown(ControllerButton axis, int id)
+bool Controller::isAxisDown(ControllerButton axis, int id)
 {
 	return controllers[id].axes[axis] & 0b10;
 }
 
-bool ControllerManager::isAxisUp(ControllerButton axis, int id)
+bool Controller::isAxisUp(ControllerButton axis, int id)
 {
 	return controllers[id].axes[axis] & 0b100;
 }
 
-cocos2d::Vec2 ControllerManager::getLStick(int id)
+cocos2d::Vec2 Controller::getLStick(int id)
 {
 	return controllers[id].leftStick;
 }
 
-float ControllerManager::getLStickX(int id)
+float Controller::getLStickX(int id)
 {
 	return controllers[id].leftStick.x;
 }
 
-float ControllerManager::getLStickY(int id)
+float Controller::getLStickY(int id)
 {
 	return controllers[id].leftStick.y;
 }
 
-cocos2d::Vec2 ControllerManager::getDeltaLStick(int id)
+cocos2d::Vec2 Controller::getDeltaLStick(int id)
 {
 	return controllers[id].deltaLeftStick;
 }
 
-float ControllerManager::getDeltaLStickX(int id)
+float Controller::getDeltaLStickX(int id)
 {
 	return controllers[id].deltaLeftStick.x;
 }
 
-float ControllerManager::getDeltaLStickY(int id)
+float Controller::getDeltaLStickY(int id)
 {
 	return controllers[id].deltaLeftStick.y;
 }
 
-cocos2d::Vec2  ControllerManager::getRStick(int id)
+cocos2d::Vec2  Controller::getRStick(int id)
 {
 	return controllers[id].rightStick;
 }
 
-float ControllerManager::getRStickX(int id)
+float Controller::getRStickX(int id)
 {
 	return controllers[id].rightStick.x;
 }
 
-float ControllerManager::getRStickY(int id)
+float Controller::getRStickY(int id)
 {
 	return controllers[id].rightStick.y;
 }
 
-cocos2d::Vec2  ControllerManager::getDeltaRStick(int id)
+cocos2d::Vec2  Controller::getDeltaRStick(int id)
 {
 	return controllers[id].deltaRightStick;
 }
 
-float ControllerManager::getDeltaRStickX(int id)
+float Controller::getDeltaRStickX(int id)
 {
 	return controllers[id].deltaRightStick.x;
 }
 
-float ControllerManager::getDeltaRStickY(int id)
+float Controller::getDeltaRStickY(int id)
 {
 	return controllers[id].deltaRightStick.y;
 }
 
-float ControllerManager::getLTrigger(int id)
+float Controller::getLTrigger(int id)
 {
 	return controllers[id].leftTrigger;
 }
 
-float ControllerManager::getDeltaLTrigger(int id)
+float Controller::getDeltaLTrigger(int id)
 {
 	return controllers[id].deltaLeftTrigger;
 }
 
-float ControllerManager::getRTrigger(int id)
+float Controller::getRTrigger(int id)
 {
 	return controllers[id].rightTrigger;
 }
 
-float ControllerManager::getDeltaRTrigger(int id)
+float Controller::getDeltaRTrigger(int id)
 {
 	return controllers[id].deltaRightTrigger;
 }
 
-void ControllerManager::setDeadZone(ControllerButton key, float t, int id)
+void Controller::setDeadZone(ControllerButton key, float t, int id)
 {
 	t = t < 0 ? 0 : t > 1.0f ? 1.0f : t;
 	controllers[id].sensitivity[(int) key - (int) ControllerButton::AXIS_START] = t;

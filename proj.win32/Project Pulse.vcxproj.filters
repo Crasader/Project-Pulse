@@ -42,9 +42,6 @@
     <ClCompile Include="..\Classes\AppDelegate.cpp">
       <Filter>src\main</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\AudioManager.cpp">
-      <Filter>src\managers</Filter>
-    </ClCompile>
     <ClCompile Include="..\Classes\CameraManager.cpp">
       <Filter>src\managers</Filter>
     </ClCompile>
@@ -63,6 +60,12 @@
     <ClCompile Include="..\Classes\PerlinNoise.cpp">
       <Filter>src\utilities</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\AudioPlayer.cpp">
+      <Filter>src\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuScene.cpp">
+      <Filter>src\scenes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -79,9 +82,6 @@
     </ClInclude>
     <ClInclude Include="..\Classes\AppDelegate.h">
       <Filter>src\main</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\AudioManager.h">
-      <Filter>src\managers</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\CameraManager.h">
       <Filter>src\managers</Filter>
@@ -100,6 +100,12 @@
     </ClInclude>
     <ClInclude Include="..\Classes\PerlinNoise.h">
       <Filter>src\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\AudioPlayer.h">
+      <Filter>src\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="MenuScene.h">
+      <Filter>src\scenes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

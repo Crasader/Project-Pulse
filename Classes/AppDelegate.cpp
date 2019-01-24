@@ -24,6 +24,7 @@
 
 #include "AppDelegate.h"
 #include "MainScene.h"
+#include "MenuScene.h"
 
  #define USE_AUDIO_ENGINE 1
  //#define USE_SIMPLE_AUDIO_ENGINE 1
@@ -89,7 +90,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	director->setDisplayStats(true);
 
 	// set FPS. the default value is 1.0/60 if you don't call this
-	director->setAnimationInterval(1.0f / 60);
+	director->setAnimationInterval(1.0f / 1000);
 
 	// Set the design resolution
 	glview->setDesignResolutionSize(designResolutionSize.width, designResolutionSize.height, ResolutionPolicy::NO_BORDER);
@@ -109,11 +110,14 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
 	register_all_packages();
 
+
+	cocos2d::experimental::AudioEngine::lazyInit();
+
 	//dynamic_cast<GLViewImpl*>(director->getOpenGLView())->setFullscreen();
 	//glview->setDesignResolutionSize(glview->getFrameSize().width, glview->getFrameSize().height, ResolutionPolicy::NO_BORDER);
 
 	// create a scene. it's an autorelease object
-	auto scene = MainScene::createScene();
+	auto scene = MenuScene::createScene();
 
 	// run
 	director->runWithScene(scene);
@@ -125,7 +129,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 void AppDelegate::applicationDidEnterBackground() {
 	Director::getInstance()->stopAnimation();
 
-	cocos2d::Controller::stopDiscoveryController();
+	cocos2d::Controller::startDiscoveryController();
 
 #if USE_AUDIO_ENGINE
 	AudioEngine::pauseAll();
