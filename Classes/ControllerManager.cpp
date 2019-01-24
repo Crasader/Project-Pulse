@@ -31,14 +31,12 @@ void Controller::createListener(cocos2d::EventDispatcher* dispatcher, cocos2d::N
 		{
 			controllers[controller->getDeviceId()] = ControllerInfo(controller->getDeviceId(), controller->getDeviceName());
 		}
-		CCLOG("Connected controller: %s, With ID: %d", controller->getDeviceName().c_str(), controller->getDeviceId());
 	};
 	eventListener->onDisconnected = [](cocos2d::Controller* controller, cocos2d::Event* event) {
 		if (controllers.find(controller->getDeviceId()) != controllers.end())
 		{
 			controllers.erase(controller->getDeviceId());
 		}
-		CCLOG("Disconnected controller: %s, With ID: %d", controller->getDeviceName().c_str(), controller->getDeviceId());
 	};
 	eventListener->onKeyDown = [](cocos2d::Controller* controller, int key, cocos2d::Event* event) {
 		key = keyCodeConvert(key);
@@ -116,8 +114,6 @@ void Controller::createListener(cocos2d::EventDispatcher* dispatcher, cocos2d::N
 	dispatcher->addEventListenerWithSceneGraphPriority(eventListener, node);
 
 	cocos2d::Controller::startDiscoveryController();
-
-	//cocos2d::Controller::
 
 	node->schedule(refresh, "ControllerManager");
 }

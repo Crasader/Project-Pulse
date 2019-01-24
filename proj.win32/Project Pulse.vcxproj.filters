@@ -25,6 +25,9 @@
     <Filter Include="src\utilities">
       <UniqueIdentifier>{f72efda9-644f-4d8e-b577-2f34dfe38b88}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\entities\collision">
+      <UniqueIdentifier>{b68b17dd-b528-4efd-adca-d011c49252b5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -66,6 +69,9 @@
     <ClCompile Include="..\Classes\MenuScene.cpp">
       <Filter>src\scenes</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\CollisionBody.cpp">
+      <Filter>src\entities\collision</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -106,6 +112,9 @@
     </ClInclude>
     <ClInclude Include="..\Classes\MenuScene.h">
       <Filter>src\scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\CollisionBody.h">
+      <Filter>src\entities\collision</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
