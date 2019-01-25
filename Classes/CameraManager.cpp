@@ -1,9 +1,5 @@
 #include "CameraManager.h"
 
-//CameraManager* CameraManager::instance = 0;
-
-//using namespace Retry;
-
 namespace Retry
 {
 
@@ -25,14 +21,10 @@ float Camera::totalTime;
 const cocos2d::Vec2 Camera::maxOffset = cocos2d::Vec2(200, 200);
 const float Camera::maxAngle = 20;
 
-//CameraManager* CameraManager::getInstance() {
-//	return instance == 0 ? instance = new CameraManager() : instance;
-//}
-
 float normalizeInRange(float x, float a, float b)
 {
 	float y = (x - a) / (b - a);
-	return y < 0 ? 0 : y > 1 ? 1 : y;
+	return clamp(y, 0, 1);
 }
 
 void Camera::update(float delta)
@@ -45,7 +37,10 @@ void Camera::update(float delta)
 
 	if (targetingMask & 0b10)
 	{
-		moveBy((followTarget->getPosition() - position) * delta / timeToTarget);
+		// MAKE ACTUAL SIZE
+		float targetOffsetX = (cocos2d::Vec2(0.5f, 0.5f) - followTarget->getAnchorPoint()).x * followTarget->getContentSize().width;
+		float targetOffsetY = (cocos2d::Vec2(0.5f, 0.5f) - followTarget->getAnchorPoint()).y * followTarget->getContentSize().height;
+		moveBy((followTarget->getPosition() + cocos2d::Vec2(targetOffsetX, targetOffsetY) - position) * delta / timeToTarget);
 	} else if (targetingMask & 0b100)
 	{
 		float totalInfluence = 2.f;
@@ -123,11 +118,9 @@ void Camera::setCamera(cocos2d::Camera * camera)
 	camera->getParent()->setAnchorPoint(cocos2d::Vec2(0, 0));
 }
 
-void Camera::transformUI(cocos2d::Node* ui, cocos2d::Vec2 screenPos)
+void Camera::transformUI(cocos2d::Node* ui)
 {
-	screenPos -= cocos2d::Vec2(cocos2d::Director::getInstance()->getVisibleSize() / 2);
-	auto newScreenPos = screenPos.rotateByAngle(cocos2d::Vec2(0, 0), -angle * 3.1415f / 180.f);
-	ui->setPosition((Camera::camera->getPosition() + newScreenPos) / camera->getParent()->getScale());
+	ui->setPosition((Camera::position + Camera::offset) / camera->getParent()->getScale());
 	ui->setRotation(Camera::angle);
 }
 

@@ -1,4 +1,5 @@
 #include "ControllerManager.h"
+#include "Algorithms.h"
 
 namespace { int keyCodeConvert(int codeToConvert); }
 
@@ -314,7 +315,7 @@ float Controller::getDeltaRTrigger(int id)
 
 void Controller::setDeadZone(ControllerButton key, float t, int id)
 {
-	t = t < 0 ? 0 : t > 1.0f ? 1.0f : t;
+	t = Retry::clamp(t, 0, 1);
 	controllers[id].sensitivity[(int) key - (int) ControllerButton::AXIS_START] = t;
 }
 
@@ -339,21 +340,21 @@ int keyCodeConvert(int codeToConvert)
 		return (int) Retry::ControllerButton::SELECT;
 	case cocos2d::Controller::Key::BUTTON_START:
 		return (int) Retry::ControllerButton::START;
-	case cocos2d::Controller::Key::BUTTON_DPAD_LEFT:
-		return (int) Retry::ControllerButton::DPAD_LEFT;
-	case cocos2d::Controller::Key::BUTTON_DPAD_RIGHT:
-		return (int) Retry::ControllerButton::DPAD_RIGHT;
-	case cocos2d::Controller::Key::BUTTON_DPAD_DOWN:
-		return (int) Retry::ControllerButton::DPAD_DOWN;
-	case cocos2d::Controller::Key::BUTTON_DPAD_UP:
+	case 1020:
 		return (int) Retry::ControllerButton::DPAD_UP;
+	case 1013:
+		return (int) Retry::ControllerButton::DPAD_DOWN;
+	case 1010:
+		return (int) Retry::ControllerButton::DPAD_LEFT;
+	case 1012:
+		return (int) Retry::ControllerButton::DPAD_RIGHT;
 	case cocos2d::Controller::Key::BUTTON_LEFT_SHOULDER:
 		return (int) Retry::ControllerButton::LEFT_BUMPER;
 	case cocos2d::Controller::Key::BUTTON_RIGHT_SHOULDER:
 		return (int) Retry::ControllerButton::RIGHT_BUMPER;
-	case cocos2d::Controller::Key::BUTTON_LEFT_THUMBSTICK:
-		return (int) Retry::ControllerButton::LEFT_STICK;
-	case cocos2d::Controller::Key::BUTTON_RIGHT_THUMBSTICK:
+	//case 8:
+	//	return (int) Retry::ControllerButton::LEFT_STICK;
+	case 1019:
 		return (int) Retry::ControllerButton::RIGHT_STICK;
 	case cocos2d::Controller::Key::AXIS_LEFT_TRIGGER:
 		return (int) Retry::ControllerButton::LEFT_TRIGGER;

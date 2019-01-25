@@ -36,11 +36,13 @@
 
 #include "ui/CocosGUI.h"
 
+using cocos2d::Vec2;
+
 cocos2d::Scene* MainScene::createScene()
 {
 	auto scene = MainScene::create();
 
-	return MainScene::create();
+	return scene;
 }
 
 void MainScene::onExit()
@@ -60,19 +62,21 @@ bool MainScene::init()
 		return false;
 	}
 
-	initPlayer(cocos2d::Vec2(1230, 50));
+	gui = cocos2d::Node::create();
+
+	initPlayer(Vec2(1230, 50));
 
 	auto cobble = cocos2d::Sprite::create("cobblestone.png");
 	auto cSize = cobble->getContentSize();
 	auto sSize = cocos2d::Director::getInstance()->getVisibleSize();
 
 
-	for (int i = 0; i < (int) sSize.width / (int) cSize.width + 2; i++)
+	for (int i = 0; i < (int) sSize.width / (int) cSize.width + 3; i++)
 	{
-		for (int j = 0; j < (int) sSize.height / (int) cSize.height + 2; j++)
+		for (int j = 0; j < (int) sSize.height / (int) cSize.height + 3; j++)
 		{
 			auto newCobble = cocos2d::Sprite::create("cobblestone.png");
-			newCobble->setAnchorPoint(cocos2d::Vec2(0, 0));
+			newCobble->setAnchorPoint(Vec2(0, 0));
 			newCobble->setPosition(i * cSize.width, j * cSize.height);
 			newCobble->setColor(cocos2d::Color3B(127, 127, 127));
 			this->addChild(newCobble);
@@ -95,13 +99,9 @@ bool MainScene::init()
 
 	Retry::Camera::setCamera(this->getDefaultCamera());
 
-	//this->schedule([=](float delta) { player->update(delta); }, "Player");
+	auto button = cocos2d::MenuItemImage::create("CloseNormal.png", "CloseSelected.png", "CloseNormal.png");
 
-	//this->setScale(0.25);
-
-	auto button = cocos2d::ui::Button::create("CloseNormal.png", "CloseSelected.png", "CloseNormal.png");
-
-	button->addClickEventListener([&](Ref* sender) {
+	button->setCallback([&](Ref* sender) {
 		static bool isPaused = false;
 
 		if (!isPaused) this->unscheduleUpdate();
@@ -109,12 +109,30 @@ bool MainScene::init()
 		isPaused = !isPaused;
 	});
 
-	guiPos[button] = cocos2d::Vec2(1180, 100);
-	//button->setPosition(cocos2d::Vec2(500, 200));
+	button->setPosition(Vec2(200, 200));
 
-	this->addChild(button, 100);
+	auto b = cocos2d::MenuItemImage::create("CloseNormal.png", "CloseSelected.png", "CloseNormal.png");
 
+	b->setCallback([&](Ref* sender) {
+		static bool isPaused = false;
 
+		if (!isPaused) this->unscheduleUpdate();
+		else           this->scheduleUpdate();
+		isPaused = !isPaused;
+	});
+
+	b->setPosition(Vec2(200, 400));
+
+	auto menu = cocos2d::Menu::create(button, b, NULL);
+	menu->setPosition(cocos2d::Vec2(0, 0));
+
+	gui->addChild(menu);
+	for (auto i : gui->getChildren())
+		i->setPosition(i->getPosition() - cocos2d::Director::getInstance()->getVisibleSize() / 2);
+
+	this->addChild(gui, 100);
+
+	Retry::Camera::setPosition(player->getSprite()->getPosition());
 
 	return true;
 }
@@ -137,30 +155,54 @@ void MainScene::update(float delta)
 	for (auto i : actorList) i->update(delta);
 	Retry::Camera::update(delta);
 
-	static auto cSize = background.front()->getContentSize();
-	static auto sSize = cocos2d::Director::getInstance()->getVisibleSize();
-	for (int i = 0; i < (int) sSize.width / (int) cSize.width + 2; i++)
+	static bool doFull = false;
+	if (Retry::Keyboard::isKeyDown(Retry::KeyCode::F11))
 	{
-		for (int j = 0; j < (int) sSize.height / (int) cSize.height + 2; j++)
-		{
-			int index = i + j * ((int) sSize.width / (int) cSize.width + 2);
-			auto camPos = Retry::Camera::getPosition();
-			background[index]->setPosition(camPos - sSize / 2 + cocos2d::Vec2((i - 1) * cSize.width, j * cSize.height) - cocos2d::Vec2((int) camPos.x % (int) cSize.width, (int) camPos.y % (int) cSize.height) + cocos2d::Vec2(10, 10));
-		}
+		if (!(doFull = !doFull))
+			dynamic_cast<cocos2d::GLViewImpl*>(cocos2d::Director::getInstance()->getOpenGLView())->setWindowed(1280, 720);
+		else
+			dynamic_cast<cocos2d::GLViewImpl*>(cocos2d::Director::getInstance()->getOpenGLView())->setFullscreen();
 	}
+
+	updateBackground();
 
 	transformUINodes();
 }
 
 void MainScene::initPlayer(cocos2d::Vec2 position)
 {
-	player = new Retry::Player("CloseNormal.png", position);
-	player->getSprite()->setScale(1.2f);
+	player = new Retry::Player("sonic.png", position);
+	player->getSprite()->setAnchorPoint(cocos2d::Vec2(0.5, 0));
+	player->getSprite()->setScale(3);
+
+	player->initAnimation("run", "sonic.png", cocos2d::Vec2(0, 0), cocos2d::Vec2(48, 48), 6);
+	player->initAnimation("idle", "sonic.png", cocos2d::Vec2(6, 0), cocos2d::Vec2(48, 48), 1);
+	player->initAnimation("jump", "sonic.png", cocos2d::Vec2(0, 3), cocos2d::Vec2(48, 48), 5);
+	player->runAnimation("run", 0.15f);
+
 	this->addChild(player->getSprite(), 100);
 	actorList.push_back(player);
 }
 
 void MainScene::transformUINodes()
 {
-	for (auto i : guiPos) Retry::Camera::transformUI(i.first, i.second);
+	Retry::Camera::transformUI(gui);
+	//for (auto i : gui->getChildren())
+	//i->setScale(1920.f / cocos2d::Director::getInstance()->getOpenGLView()->getFrameSize().width);
+
+}
+
+void MainScene::updateBackground()
+{
+	static auto cSize = background.front()->getContentSize();
+	static auto sSize = cocos2d::Director::getInstance()->getVisibleSize();
+	for (int i = 0; i < (int) sSize.width / (int) cSize.width + 3; i++)
+	{
+		for (int j = 0; j < (int) sSize.height / (int) cSize.height + 3; j++)
+		{
+			int index = i + j * ((int) sSize.width / (int) cSize.width + 3);
+			auto camPos = Retry::Camera::getPosition();
+			background[index]->setPosition(camPos - sSize / 2 + cocos2d::Vec2((i - 1) * cSize.width, j * cSize.height) - cocos2d::Vec2((int) camPos.x % (int) cSize.width, (int) camPos.y % (int) cSize.height) + cocos2d::Vec2(10, 10));
+		}
+	}
 }

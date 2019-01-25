@@ -66,11 +66,14 @@
     <ClCompile Include="..\Classes\AudioPlayer.cpp">
       <Filter>src\managers</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\CollisionBody.cpp">
+      <Filter>src\entities\collision</Filter>
+    </ClCompile>
     <ClCompile Include="..\Classes\MenuScene.cpp">
       <Filter>src\scenes</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\CollisionBody.cpp">
-      <Filter>src\entities\collision</Filter>
+    <ClCompile Include="..\Classes\Algorithms.cpp">
+      <Filter>src\utilities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -110,11 +113,14 @@
     <ClInclude Include="..\Classes\AudioPlayer.h">
       <Filter>src\managers</Filter>
     </ClInclude>
+    <ClInclude Include="..\Classes\CollisionBody.h">
+      <Filter>src\entities\collision</Filter>
+    </ClInclude>
     <ClInclude Include="..\Classes\MenuScene.h">
       <Filter>src\scenes</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\CollisionBody.h">
-      <Filter>src\entities\collision</Filter>
+    <ClInclude Include="..\Classes\Algorithms.h">
+      <Filter>src\utilities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

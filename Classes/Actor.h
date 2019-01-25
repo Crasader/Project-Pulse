@@ -32,7 +32,7 @@ public:
 	virtual void update(float dt)
 	{};
 
-	void moveBy(cocos2d::Vec2 movement, float duration = 0);
+	void moveBy(cocos2d::Vec2 movement);
 
 	void bufferAction(std::string action);
 
@@ -46,6 +46,10 @@ public:
 		return sprite->getPhysicsBody();
 	}
 
+	cocos2d::Vec2 getPosition()
+	{
+		return position;
+	}
 	cocos2d::Vec2 getVelocity()
 	{
 		return velocity;
@@ -55,6 +59,11 @@ public:
 		return acceleration;
 	}
 
+	void setPosition(cocos2d::Vec2 position)
+	{
+		this->position = position;
+		sprite->setPosition(position);
+	}
 	void setVelocity(cocos2d::Vec2 velocity)
 	{
 		this->velocity = velocity;
@@ -73,13 +82,23 @@ public:
 		this->acceleration = cocos2d::Vec2(x, y);
 	}
 
+	void initAnimation(std::string action, std::string file, cocos2d::Vec2 startCell, cocos2d::Vec2 frameSize, int numFrames);
+	void runAnimation(std::string action, float totalTime = -1);
 
 protected:
 	cocos2d::Sprite* sprite;
+	cocos2d::Vec2 position;
 	cocos2d::Vec2 velocity;
 	cocos2d::Vec2 acceleration;
 
 	std::unordered_map<std::string, ActionInfo> actionBuffer;
+
+	//std::unordered_map<std::string, std::vector<cocos2d::PolygonInfo>> animations;
+	std::unordered_map<std::string, cocos2d::Animation*> animations;
+	//cocos2d::Animate* currentAnimation = nullptr;
+
+	float animTime, totalTime;
+	std::string currentAction;
 
 	virtual void updateActionBuffer();
 

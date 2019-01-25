@@ -50,6 +50,7 @@ public:
 
 private:
 	void initPlayer(cocos2d::Vec2 position);
+	void updateBackground();
 	
 	Retry::Player* player;
 
@@ -59,7 +60,7 @@ private:
 
 	std::vector<cocos2d::Sprite*> cameraAnchors;
 
-	std::unordered_map<cocos2d::Node*, cocos2d::Vec2> guiPos;
+	cocos2d::Node* gui;
 };
 
 #endif // __HELLOWORLD_SCENE_H__

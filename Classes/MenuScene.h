@@ -20,8 +20,9 @@ public:
 	void update(float delta);
 
 private:
-
 	cocos2d::Sprite* background;
+
+	cocos2d::Node* gui;
 };
 
 #endif

@@ -2,6 +2,8 @@
 
 #include "CameraManager.h"
 
+#include "Algorithms.h"
+
 //Retry::MouseManager* Player::mouseIn = Retry::MouseManager::getInstance();
 //Retry::ControllerManager* Player::controllerIn = Retry::ControllerManager::getInstance();
 
@@ -34,17 +36,19 @@ Retry::Player::Player(std::string path, cocos2d::Vec2 pos)
 	actionMapping["jump"] = jump;
 	actionMapping["left"] = left;
 	actionMapping["right"] = right;
+
+
 }
 
 float lerp(float p0, float p1, float t)
 {
-	t = t < 0 ? 0 : t > 1 ? 1 : t;
+	t = clamp(t, 0, 1);
 	return p1 * t + p0 * (1 - t);
 }
 
 float lerpSq(float p0, float p1, float t)
 {
-	t = t < 0 ? 0 : t > 1 ? 1 : t;
+	t = clamp(t, 0, 1);
 	return p1 * t * t + p0 * (1 - t * t);
 }
 
@@ -69,15 +73,16 @@ void Retry::Player::update(float delta)
 		Retry::Controller::isAxisPressed(ControllerButton::LEFT_STICK_RIGHT);
 
 // Side Movement Constants and Variables
-	static const float sideMove = 450;
+	static const float animMoveTime = 0.12f * 450.f;
+	static const float sideMove = 700;
 	static const float timeToMax = 0.1f;
 	static float time = 0;
 
 	// Jumping Constants and Variables
-	static const float h = 200;
+	static const float h = 400;
 	static const float t_h = 0.5f;
 	static const float g = (-2 * h) / (t_h * t_h);
-	static const float fastFall = 2.5f;
+	static const float fastFall = 2.f;
 	static int doJump = 0;
 	static bool hasMoved = false;
 	static bool onGround = true;
@@ -86,13 +91,12 @@ void Retry::Player::update(float delta)
 
 	// LANDING
 	static const float groundHeight = 50;
-	if (sprite->getPosition().y < groundHeight)
+	if (position.y < groundHeight)
 	{
-
 		if (!onGround)
 			Retry::Camera::addTrauma(0.3f);
 
-		sprite->setPositionY(groundHeight);
+		position.y = groundHeight;
 		doJump = 0;
 		hasMoved = false;
 		onGround = true;
@@ -132,9 +136,28 @@ void Retry::Player::update(float delta)
 			velocity.x = (lerp(0, sideMove, abs(time /= 5)) + (doJump ? lerp(0, 100, abs(time)) : 0)) * sign(time);
 	}
 
-	moveBy(velocity * delta + 0.5f * acceleration * delta * delta);
+	auto v = velocity * delta + 0.5f * acceleration * delta * delta;
+	
+	// Animation Stuff
+	if (time != 0) sprite->setFlippedX(time < 0);
+	if (onGround)
+	{
+		if (time != 0)
+		{
+			runAnimation("run", animMoveTime / sideMove);
+		} else
+		{
+			runAnimation("idle", 0.15f);
+		}
+	} else
+	{
+		runAnimation("jump", 0.05f);
+	}
+	moveBy(v);
+	if (onGround) position.y = groundHeight;
 
 	velocity += (!jumpButtonPressed || velocity.y < 0 ? fastFall : 1) * acceleration * delta;
+	setPosition(position);
 }
 
 void Retry::Player::updateActionBuffer()

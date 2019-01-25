@@ -151,13 +151,16 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)\Resources" /D /E /I /F /Y
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Classes\Actor.cpp" />
+    <ClCompile Include="..\Classes\Algorithms.cpp" />
     <ClCompile Include="..\Classes\AppDelegate.cpp" />
-    <ClCompile Include="..\Classes\AudioManager.cpp" />
+    <ClCompile Include="..\Classes\AudioPlayer.cpp" />
     <ClCompile Include="..\Classes\CameraManager.cpp" />
+    <ClCompile Include="..\Classes\CollisionBody.cpp" />
     <ClCompile Include="..\Classes\ControllerManager.cpp" />
     <ClCompile Include="..\Classes\Enemy.cpp" />
     <ClCompile Include="..\Classes\KeyboardManager.cpp" />
     <ClCompile Include="..\Classes\MainScene.cpp" />
+    <ClCompile Include="..\Classes\MenuScene.cpp" />
     <ClCompile Include="..\Classes\MouseManager.cpp" />
     <ClCompile Include="..\Classes\PerlinNoise.cpp" />
     <ClCompile Include="..\Classes\Player.cpp" />
@@ -165,13 +168,16 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)\Resources" /D /E /I /F /Y
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Classes\Actor.h" />
+    <ClInclude Include="..\Classes\Algorithms.h" />
     <ClInclude Include="..\Classes\AppDelegate.h" />
-    <ClInclude Include="..\Classes\AudioManager.h" />
+    <ClInclude Include="..\Classes\AudioPlayer.h" />
     <ClInclude Include="..\Classes\CameraManager.h" />
+    <ClInclude Include="..\Classes\CollisionBody.h" />
     <ClInclude Include="..\Classes\ControllerManager.h" />
     <ClInclude Include="..\Classes\Enemy.h" />
     <ClInclude Include="..\Classes\KeyboardManager.h" />
     <ClInclude Include="..\Classes\MainScene.h" />
+    <ClInclude Include="..\Classes\MenuScene.h" />
     <ClInclude Include="..\Classes\MouseManager.h" />
     <ClInclude Include="..\Classes\PerlinNoise.h" />
     <ClInclude Include="..\Classes\Player.h" />

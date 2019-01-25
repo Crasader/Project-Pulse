@@ -3,6 +3,8 @@
 #include "cocos2d.h"
 #include "AudioEngine.h"
 
+#include "Algorithms.h"
+
 namespace Retry
 {
 
@@ -15,7 +17,7 @@ bool Audio::mute = false;
 
 void Audio::setMasterVolume(float vol)
 {
-	vol = vol < 0 ? 0 : (vol > 1.0f ? 1.0f : vol);
+	vol = clamp(vol, 0, 1);
 	vol = abs(log10(1 - 0.9f * vol));
 	if ((int) cocos2d::experimental::AudioEngine::getState(music.id) > 0)
 		cocos2d::experimental::AudioEngine::setVolume(music.id, music.volume * vol * !mute);
@@ -66,7 +68,7 @@ void Audio::resumeMusic()
 
 void Audio::setMusicVolume(float vol)
 {
-	vol = vol < 0 ? 0 : vol > 1.0f ? 1.0f : vol;
+	vol = clamp(vol, 0, 1);
 	music.volume = vol;
 	cocos2d::experimental::AudioEngine::setVolume(music.id, masterVolume * music.volume * (int) !mute);
 }
@@ -165,7 +167,7 @@ void Audio::setEffectVolume(std::string path, float vol, bool affectAll)
 {
 	if (effects.find(path) == effects.end()) return;
 
-	vol = vol < 0 ? 0 : vol > 1.0f ? 1.0f : vol;
+	vol = clamp(vol, 0, 1);
 
 	auto list = &effects[path];
 
@@ -180,7 +182,7 @@ void Audio::setEffectVolume(std::string path, float vol, int index)
 {
 	if (effects.find(path) == effects.end()) return;
 	if (index < 0 || index >= (signed) effects[path].size()) return;
-	vol = vol < 0 ? 0 : vol > 1.0f ? 1.0f : vol;
+	vol = clamp(vol, 0, 1);
 
 	cocos2d::experimental::AudioEngine::setVolume(effects[path][index].id, masterVolume * vol * (int) !mute);
 	effects[path][index].volume = vol;
