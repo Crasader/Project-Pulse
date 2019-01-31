@@ -5,7 +5,7 @@ namespace Retry
 
 Enemy::Enemy(std::string path, cocos2d::Vec2 pos)
 {
-	load(path, pos);
+	init(path, pos);
 }
 
 void Enemy::update(float dt)

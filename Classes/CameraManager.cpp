@@ -120,8 +120,9 @@ void Camera::setCamera(cocos2d::Camera * camera)
 
 void Camera::transformUI(cocos2d::Node* ui)
 {
-	ui->setPosition((Camera::position + Camera::offset) / camera->getParent()->getScale());
+	ui->setPosition((Camera::position + Camera::offset));
 	ui->setRotation(Camera::angle);
+	ui->setScale(1 / camera->getParent()->getScale());
 }
 
 }

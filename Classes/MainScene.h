@@ -46,13 +46,15 @@ public:
 
 	void update(float delta);
 
-	void transformUINodes();
-
 private:
 	void initPlayer(cocos2d::Vec2 position);
 	void updateBackground();
-	
+
+	void toggleDebug();
+
 	Retry::Player* player;
+
+	Retry::Actor* actor;
 
 	std::vector<Retry::Actor*> actorList;
 
@@ -61,6 +63,8 @@ private:
 	std::vector<cocos2d::Sprite*> cameraAnchors;
 
 	cocos2d::Node* gui;
+
+	bool doDebug = true;
 };
 
 #endif // __HELLOWORLD_SCENE_H__

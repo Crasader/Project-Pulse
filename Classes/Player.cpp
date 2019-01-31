@@ -14,7 +14,7 @@ std::unordered_map<std::string, KeyMap> Retry::Player::actionMapping;
 
 Retry::Player::Player(std::string path, cocos2d::Vec2 pos)
 {
-	load(path, pos);
+	init(path, pos);
 
 	actionBuffer["jump"];
 	actionBuffer["left"];
@@ -89,7 +89,7 @@ void Retry::Player::update(float delta)
 
 	acceleration = cocos2d::Vec2(0, g);
 
-	// LANDING
+	// LANDING ON THE GROUND
 	static const float groundHeight = 50;
 	if (position.y < groundHeight)
 	{
