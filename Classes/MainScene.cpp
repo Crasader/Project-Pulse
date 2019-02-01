@@ -135,9 +135,10 @@ bool MainScene::init()
 	Retry::Camera::setPosition(player->getSprite()->getPosition());
 
 	//player->getHurtBox()->addRect(Vec2(0, 0), cocos2d::Size(48, 48));
-	player->getHurtBox()->addCircle(Vec2(24, 24), 24);
+	player->getHurtBox()->addRect(Vec2(100, 100), Size(15, 15));
+	player->getHurtBox()->addCapsule(Vec2(50, 24), Vec2(-10, -10), 10);
 	actor->getHurtBox()->addRect(Vec2(0, 0), cocos2d::Size(48, 48));
-	
+
 	auto s = cocos2d::Sprite::create("CloseSelected.png");
 	s->retain();
 	s->setName("test");
@@ -157,7 +158,7 @@ void MainScene::update(float delta)
 
 	if (Retry::Keyboard::isKeyDown(Retry::KeyCode::ESCAPE) || Retry::Controller::isButtonDown(Retry::ControllerButton::START))
 		cocos2d::Director::getInstance()->replaceScene(MenuScene::createScene());
-	
+
 	if (Retry::Keyboard::isKeyDown(Retry::KeyCode::F2))
 		toggleDebug();
 
@@ -167,39 +168,39 @@ void MainScene::update(float delta)
 		player->getSprite()->runAction(cocos2d::RotateBy::create(0, -135 * delta));
 	else if (Retry::Keyboard::isKeyPressed(Retry::KeyCode::RIGHT_ARROW))
 		player->getSprite()->runAction(cocos2d::RotateBy::create(0, 135 * delta));
-	
+
 	if (Retry::Keyboard::isKeyPressed(Retry::KeyCode::UP_ARROW))
 		this->setScale(2);
 	else if (Retry::Keyboard::isKeyPressed(Retry::KeyCode::DOWN_ARROW))
 		this->setScale(0.5f);
 	else this->setScale(1);
 
-		if (player->getHurtBox()->isCollidingWith(actor->getHurtBox()))
-		{
-			player->getHurtBox()->setDebugDrawColor(cocos2d::Color4F(0, 1, 0, 0.3f));
-			actor->getHurtBox()->setDebugDrawColor(cocos2d::Color4F(0, 1, 0, 0.3f));
-		} else
-		{
-			player->getHurtBox()->setDebugDrawColor(cocos2d::Color4F(1, 0, 0, 0.3f));
-			actor->getHurtBox()->setDebugDrawColor(cocos2d::Color4F(1, 0, 0, 0.3f));
-		}
+	if (player->getHurtBox()->isCollidingWith(actor->getHurtBox()))
+	{
+		player->getHurtBox()->setDebugDrawColor(cocos2d::Color4F(0, 1, 0, 0.3f));
+		actor->getHurtBox()->setDebugDrawColor(cocos2d::Color4F(0, 1, 0, 0.3f));
+	} else
+	{
+		player->getHurtBox()->setDebugDrawColor(cocos2d::Color4F(1, 0, 0, 0.3f));
+		actor->getHurtBox()->setDebugDrawColor(cocos2d::Color4F(1, 0, 0, 0.3f));
+	}
 
 
-		Retry::Camera::update(delta);
+	Retry::Camera::update(delta);
 
-		static bool doFull = false;
-		if (Retry::Keyboard::isKeyDown(Retry::KeyCode::F11))
-		{
-			if (!(doFull = !doFull))
-				dynamic_cast<cocos2d::GLViewImpl*>(cocos2d::Director::getInstance()->getOpenGLView())->setWindowed(1280, 720);
-			else
-				dynamic_cast<cocos2d::GLViewImpl*>(cocos2d::Director::getInstance()->getOpenGLView())->setFullscreen();
-		}
+	static bool doFull = false;
+	if (Retry::Keyboard::isKeyDown(Retry::KeyCode::F11))
+	{
+		if (!(doFull = !doFull))
+			dynamic_cast<cocos2d::GLViewImpl*>(cocos2d::Director::getInstance()->getOpenGLView())->setWindowed(1280, 720);
+		else
+			dynamic_cast<cocos2d::GLViewImpl*>(cocos2d::Director::getInstance()->getOpenGLView())->setFullscreen();
+	}
 
 
-		updateBackground();
+	updateBackground();
 
-		Retry::Camera::transformUI(gui);
+	Retry::Camera::transformUI(gui);
 
 }
 

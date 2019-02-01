@@ -81,6 +81,9 @@
     <ClCompile Include="..\Classes\Entity.cpp">
       <Filter>src\entities</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\CXBOXController.cpp">
+      <Filter>src\utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -130,6 +133,9 @@
     </ClInclude>
     <ClInclude Include="..\Classes\Entity.h">
       <Filter>src\entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\CXBOXController.h">
+      <Filter>src\utilities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
