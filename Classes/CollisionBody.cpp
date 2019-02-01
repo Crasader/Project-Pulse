@@ -94,12 +94,14 @@ void Body::setDebugDraw(const bool &doDebugDraw)
 
 void Body::setDebugDrawColor(const cocos2d::Color4B &color)
 {
+	if (cocos2d::Color4F(color) == debugDrawColor) return;
 	debugDrawColor = cocos2d::Color4F(color);
 	redraw();
 }
 
 void Body::setDebugDrawColor(const cocos2d::Color4F &color)
 {
+	if (color == debugDrawColor) return;
 	debugDrawColor = color;
 	redraw();
 }

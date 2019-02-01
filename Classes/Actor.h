@@ -10,7 +10,7 @@ struct ActionInfo
 	float time = 0;
 	bool down = false;
 	bool up = false;
-	bool pressed = false;
+	float value = 0;
 };
 }
 
@@ -24,7 +24,7 @@ public:
 	Actor(const std::string &path, const cocos2d::Vec2 &position);
 	Actor::~Actor() { delete sprite; }
 
-	void bufferAction(std::string action);
+	void bufferAction(const std::string &action);
 
 protected:
 	std::unordered_map<std::string, ActionInfo> actionBuffer;
@@ -33,11 +33,12 @@ protected:
 
 	virtual void updateActionBuffer();
 
-	bool isActionPressed(std::string action);
-	bool isActionDown(std::string action);
-	bool isActionUp(std::string action);
+	bool isActionPressed(const std::string &action);
+	bool isActionDown(const std::string &action);
+	bool isActionUp(const std::string &action);
 
-	float actionPressedDuration(std::string action);
+	float actionPressedDuration(const std::string &action);
+	float actionPressedValue(const std::string &action);
 };
 
 }

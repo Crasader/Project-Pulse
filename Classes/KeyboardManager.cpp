@@ -24,11 +24,9 @@ void Keyboard::createListener(cocos2d::EventDispatcher* dispatcher, cocos2d::Nod
 	cocos2d::Director::getInstance()->getOpenGLView()->setIMEKeyboardState(true);
 	eventListener->onKeyPressed = [](cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event) {
 		Retry::Keyboard::updateKey((Retry::KeyCode) keyCode, true);
-		Retry::Controller::setUseController(false);
 	};
 	eventListener->onKeyReleased = [](cocos2d::EventKeyboard::KeyCode keyCode, cocos2d::Event* event) {
 		Retry::Keyboard::updateKey((Retry::KeyCode) keyCode, false);
-		Retry::Controller::setUseController(false);
 	};
 	dispatcher->addEventListenerWithSceneGraphPriority(eventListener, node);
 

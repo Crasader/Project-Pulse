@@ -19,6 +19,7 @@ Retry::Player::Player(std::string path, cocos2d::Vec2 pos)
 	actionBuffer["jump"];
 	actionBuffer["left"];
 	actionBuffer["right"];
+	actionBuffer["leftStick"];
 
 	using namespace Retry;
 	KeyMap jump;
@@ -32,11 +33,13 @@ Retry::Player::Player(std::string path, cocos2d::Vec2 pos)
 	right.kButtons.push_back(KeyCode::D);
 	right.cButtons.push_back(ControllerButton::LEFT_STICK_RIGHT);
 	right.cButtons.push_back(ControllerButton::DPAD_RIGHT);
+	KeyMap leftStick;
+	leftStick.cButtons.push_back(ControllerButton::LEFT_STICK_X);
 
 	actionMapping["jump"] = jump;
 	actionMapping["left"] = left;
 	actionMapping["right"] = right;
-
+	actionMapping["leftStick"] = leftStick;
 
 }
 
@@ -69,10 +72,10 @@ void Retry::Player::update(float delta)
 	bool goLeft = isActionPressed("left"),
 		goRight = isActionPressed("right");
 
-	bool leftStickSens = Retry::Controller::isAxisPressed(ControllerButton::LEFT_STICK_LEFT) ||
-		Retry::Controller::isAxisPressed(ControllerButton::LEFT_STICK_RIGHT);
+	//bool leftStickSens = Retry::Controller::isAxisPressed(ControllerButton::LEFT_STICK_LEFT) ||
+	//	Retry::Controller::isAxisPressed(ControllerButton::LEFT_STICK_RIGHT);
 
-// Side Movement Constants and Variables
+    // Side Movement Constants and Variables
 	static const float animMoveTime = 0.12f * 450.f;
 	static const float sideMove = 700;
 	static const float timeToMax = 0.1f;
@@ -117,11 +120,12 @@ void Retry::Player::update(float delta)
 	{
 		time = abs(time) - step < 0 ? 0 : time - sign(time) * step;
 	}
-	if (Retry::Controller::doUseController() && leftStickSens)
-	{
-		if (!doJump)
-			time = abs(time) > abs(Retry::Controller::getLStickX()) ? sign(time) * abs(Retry::Controller::getLStickX() * Retry::Controller::getLStickX()) : time;
-	}
+	if (!doJump)
+		if (isActionPressed("leftStick") && abs(time) > abs(actionPressedValue("leftStick")))
+		{
+			time = sign(time) * abs(actionPressedValue("leftStick") * actionPressedValue("leftStick"));
+		}
+	
 	velocity.x = (lerp(0, sideMove, abs(time)) + (doJump ? lerp(0, 100, abs(time)) : 0)) * sign(time);
 
 	// JUMP
@@ -168,31 +172,32 @@ void Retry::Player::updateActionBuffer()
 		int count = 0;
 		i.second.down = false;
 		i.second.up = false;
-		i.second.pressed = false;
+		i.second.value = 0;
 		for (auto j : actionMapping[i.first].kButtons)
 		{
 			i.second.down = i.second.down || Retry::Keyboard::isKeyDown(j);
 			i.second.up = i.second.up || Retry::Keyboard::isKeyUp(j);
-			i.second.pressed = i.second.pressed || Retry::Keyboard::isKeyPressed(j);
+			i.second.value = i.second.value || Retry::Keyboard::isKeyPressed(j);
 		}
 		for (auto j : actionMapping[i.first].mButtons)
 		{
 			i.second.down = i.second.down || Retry::Mouse::isButtonDown(j);
 			i.second.up = i.second.up || Retry::Mouse::isButtonUp(j);
-			i.second.pressed = i.second.pressed || Retry::Mouse::isButtonPressed(j);
+			i.second.value = i.second.value || Retry::Mouse::isButtonPressed(j);
 		}
 		for (auto j : actionMapping[i.first].cButtons)
 		{
-			if ((int) j < (int) ControllerButton::AXIS_START)
+			if ((int) j < 16)
 			{
 				i.second.down = i.second.down || Retry::Controller::isButtonDown(j);
 				i.second.up = i.second.up || Retry::Controller::isButtonUp(j);
-				i.second.pressed = i.second.pressed || Retry::Controller::isButtonPressed(j);
+				i.second.value = i.second.value || Retry::Controller::isButtonPressed(j);
 			} else
 			{
 				i.second.down = i.second.down || Retry::Controller::isAxisDown(j);
 				i.second.up = i.second.up || Retry::Controller::isAxisUp(j);
-				i.second.pressed = i.second.pressed || Retry::Controller::isAxisPressed(j);
+				float tVal = Retry::Controller::getAxis(j);
+ 				i.second.value = tVal != 0 && Retry::Controller::isAxisPressed(j) ? tVal : i.second.value;
 			}
 		}
 	}

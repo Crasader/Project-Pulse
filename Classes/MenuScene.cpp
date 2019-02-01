@@ -39,7 +39,7 @@ bool MenuScene::init()
 
 	Retry::Keyboard::createListener(_eventDispatcher, this);
 	Retry::Mouse::createListener(_eventDispatcher, this);
-	Retry::Controller::createListener(_eventDispatcher, this);
+	Retry::Controller::createListener(this);
 
 	auto cobble = cocos2d::Sprite::create("cobblestone.png");
 	auto cSize = cobble->getContentSize();

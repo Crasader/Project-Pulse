@@ -93,7 +93,7 @@ bool MainScene::init()
 
 	Retry::Keyboard::createListener(_eventDispatcher, this);
 	Retry::Mouse::createListener(_eventDispatcher, this);
-	Retry::Controller::createListener(_eventDispatcher, this);
+	Retry::Controller::createListener(this);
 
 	this->scheduleUpdate();
 
