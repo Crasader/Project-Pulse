@@ -25,11 +25,14 @@
     <Filter Include="src\utilities">
       <UniqueIdentifier>{f72efda9-644f-4d8e-b577-2f34dfe38b88}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\entities\collision">
-      <UniqueIdentifier>{b68b17dd-b528-4efd-adca-d011c49252b5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\entities\agents">
       <UniqueIdentifier>{e9984e12-7bdb-4ae5-a643-ba291b7c6ae0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Collision">
+      <UniqueIdentifier>{c5ab7375-ef44-42ba-b3ac-1414d22f0b45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\World Object">
+      <UniqueIdentifier>{4130eb70-2a1c-4896-918c-f67428602ba4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -60,9 +63,6 @@
     <ClCompile Include="..\Classes\AudioPlayer.cpp">
       <Filter>src\managers</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\CollisionBody.cpp">
-      <Filter>src\entities\collision</Filter>
-    </ClCompile>
     <ClCompile Include="..\Classes\MenuScene.cpp">
       <Filter>src\scenes</Filter>
     </ClCompile>
@@ -83,6 +83,12 @@
     </ClCompile>
     <ClCompile Include="..\Classes\CXBOXController.cpp">
       <Filter>src\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\CollisionBody.cpp">
+      <Filter>src\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Level.cpp">
+      <Filter>src\World Object</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -113,9 +119,6 @@
     <ClInclude Include="..\Classes\AudioPlayer.h">
       <Filter>src\managers</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\CollisionBody.h">
-      <Filter>src\entities\collision</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\MenuScene.h">
       <Filter>src\scenes</Filter>
     </ClInclude>
@@ -136,6 +139,12 @@
     </ClInclude>
     <ClInclude Include="..\Classes\CXBOXController.h">
       <Filter>src\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\CollisionBody.h">
+      <Filter>src\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Level.h">
+      <Filter>src\World Object</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
