@@ -46,11 +46,19 @@ public:
 
 	static const float getRightTrigger(const int &id = 0);
 	static const float getDeltaRightTrigger(const int &id = 0);
+	
+	static void updateVibration(const float &delta, const int &id);
+
+	static void vibrate(const float &intensity, const float &duration, const int &id = 0);
+	static void vibrateLeft(const float &intensity, const float &duration, const int &id = 0);
+	static void vibrateRight(const float &intensity, const float &duration, const int &id = 0);
 
 	//static void setDeadZone(const ControllerAxis &axis, const float &t, const int &id = 0);
 
 private:
 	static XBOXController controllers[4];
+
+	static Vec2 vibration[4][2];
 
 	static float deadzone[4][4];
 

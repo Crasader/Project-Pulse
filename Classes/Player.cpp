@@ -4,42 +4,23 @@
 
 #include "Algorithms.h"
 
-//Retry::MouseManager* Player::mouseIn = Retry::MouseManager::getInstance();
-//Retry::ControllerManager* Player::controllerIn = Retry::ControllerManager::getInstance();
-
 namespace Retry
 {
-
-std::unordered_map<std::string, KeyMap> Retry::Player::actionMapping;
 
 Retry::Player::Player(std::string path, cocos2d::Vec2 pos)
 {
 	init(path, pos);
 
-	actionBuffer["jump"];
-	actionBuffer["left"];
-	actionBuffer["right"];
-	actionBuffer["leftStick"];
+	addButtonToMapping("jump", KeyCode::SPACE);
+	addButtonToMapping("jump", ControllerButton::A);
 
-	using namespace Retry;
-	KeyMap jump;
-	jump.kButtons.push_back(KeyCode::SPACE);
-	jump.cButtons.push_back(ControllerButton::A);
-	KeyMap left;
-	left.kButtons.push_back(KeyCode::A);
-	left.cButtons.push_back(ControllerButton::LEFT_STICK_LEFT);
-	left.cButtons.push_back(ControllerButton::DPAD_LEFT);
-	KeyMap right;
-	right.kButtons.push_back(KeyCode::D);
-	right.cButtons.push_back(ControllerButton::LEFT_STICK_RIGHT);
-	right.cButtons.push_back(ControllerButton::DPAD_RIGHT);
-	KeyMap leftStick;
-	leftStick.cButtons.push_back(ControllerButton::LEFT_STICK_X);
+	addButtonToMapping("left", KeyCode::A);
+	addButtonToMapping("left", ControllerButton::LEFT_STICK_LEFT);
 
-	actionMapping["jump"] = jump;
-	actionMapping["left"] = left;
-	actionMapping["right"] = right;
-	actionMapping["leftStick"] = leftStick;
+	addButtonToMapping("right", KeyCode::D);
+	addButtonToMapping("right", ControllerButton::LEFT_STICK_RIGHT);
+
+	addButtonToMapping("leftStick", ControllerButton::LEFT_STICK_X);
 
 }
 
@@ -47,12 +28,6 @@ float lerp(float p0, float p1, float t)
 {
 	t = clamp(t, 0, 1);
 	return p1 * t + p0 * (1 - t);
-}
-
-float lerpSq(float p0, float p1, float t)
-{
-	t = clamp(t, 0, 1);
-	return p1 * t * t + p0 * (1 - t * t);
 }
 
 int sign(float x)
@@ -64,89 +39,74 @@ void Retry::Player::update(float delta)
 {
 	updateActionBuffer();
 
-	using namespace Retry;
+	lastPosition = position;
 
 	bool jumpButtonDown = isActionDown("jump");
 	bool jumpButtonPressed = isActionPressed("jump");
 
-	bool goLeft = isActionPressed("left"),
-		goRight = isActionPressed("right");
+	bool goLeft = isActionPressed("left");
+	bool goRight = isActionPressed("right");
 
-	//bool leftStickSens = Retry::Controller::isAxisPressed(ControllerButton::LEFT_STICK_LEFT) ||
-	//	Retry::Controller::isAxisPressed(ControllerButton::LEFT_STICK_RIGHT);
-
-    // Side Movement Constants and Variables
+	// Side Movement Constants and Variables
 	static const float animMoveTime = 0.12f * 450.f;
 	static const float sideMove = 700;
 	static const float timeToMax = 0.1f;
-	static float time = 0;
 
 	// Jumping Constants and Variables
 	static const float h = 400;
 	static const float t_h = 0.5f;
 	static const float g = (-2 * h) / (t_h * t_h);
 	static const float fastFall = 2.f;
-	static int doJump = 0;
+	//static int doJump = 0;
 	static bool hasMoved = false;
-	static bool onGround = true;
+	//static bool onGround = true;
 
 	acceleration = cocos2d::Vec2(0, g);
 
-	// LANDING ON THE GROUND
-	static const float groundHeight = 50;
-	if (position.y < groundHeight)
+	// LEFT AND RIGHT MOVEMENT
+	if (goLeft != goRight)
 	{
-		if (!onGround)
-			Retry::Camera::addTrauma(0.3f);
-
-		position.y = groundHeight;
-		doJump = 0;
-		hasMoved = false;
-		onGround = true;
-	}
-
-	float step = (!doJump || goLeft || goRight) * (delta / timeToMax) / (doJump ? (velocity.y > 100 ? 5.0f : 3.0f) : 1);
-
-	if (goLeft || goRight) hasMoved = true;
-
-	// MOVEMENT
-	if (goLeft && !goRight)
-	{
-		time = time - step < -1 ? -1 : time - step;
-	} else if (goRight && !goLeft)
-	{
-		time = time + step > 1 ? 1 : time + step;
+		acceleration.x = (goLeft ? -1 : 1) * sideMove / timeToMax / (!onGround ? (velocity.y > 100 ? 5.0f : 3.0f) : 1);
 	} else
 	{
-		time = abs(time) - step < 0 ? 0 : time - sign(time) * step;
+		acceleration.x = !onGround ? 0 : -sign(velocity.x) * sideMove / timeToMax;
+		if (sign(velocity.x) * (velocity.x + acceleration.x * delta) < 0)
+			acceleration.x = velocity.x = 0;
 	}
-	if (!doJump)
-		if (isActionPressed("leftStick") && abs(time) > abs(actionPressedValue("leftStick")))
-		{
-			time = sign(time) * abs(actionPressedValue("leftStick") * actionPressedValue("leftStick"));
-		}
-	
-	velocity.x = (lerp(0, sideMove, abs(time)) + (doJump ? lerp(0, 100, abs(time)) : 0)) * sign(time);
+	velocity.x += acceleration.x * delta;
+	velocity.x = sign(velocity.x) * clamp(abs(velocity.x), 0, sideMove + (doJump ? 100 : 0));
+
+	if (hasLanded)
+	{
+		Retry::Camera::addTrauma(0.3f);
+		Retry::Controller::vibrate(0.2f, 0.1f);
+		hasLanded = false;
+	}
 
 	// JUMP
+	if (onGround) doJump = 0;
 	if (doJump < 2 && jumpButtonDown)
 	{
 		onGround = false;
 		velocity.y = -g * t_h;
 		doJump++;
+
 		if (goLeft && velocity.x > 0 || goRight && velocity.x < 0)
-			velocity.x = (lerp(0, sideMove, abs(time = -0.5 * sign(time))) + (doJump ? lerp(0, 100, abs(time)) : 0)) * sign(time);
-		else if (!goLeft && !goRight)
-			velocity.x = (lerp(0, sideMove, abs(time /= 5)) + (doJump ? lerp(0, 100, abs(time)) : 0)) * sign(time);
+		{
+			velocity.x *= -0.5f;
+		} else if (!goLeft && !goRight)
+		{
+			velocity.x *= 0.2f;
+		}
 	}
 
 	auto v = velocity * delta + 0.5f * acceleration * delta * delta;
-	
+
 	// Animation Stuff
-	if (time != 0) sprite->setFlippedX(time < 0);
+	if (velocity.x != 0) sprite->setFlippedX(velocity.x < 0);
 	if (onGround)
 	{
-		if (time != 0)
+		if (velocity.x != 0)
 		{
 			runAnimation("run", animMoveTime / sideMove);
 		} else
@@ -158,9 +118,10 @@ void Retry::Player::update(float delta)
 		runAnimation("jump", 0.05f);
 	}
 	moveBy(v);
-	if (onGround) position.y = groundHeight;
+	//if (onGround) position.y = groundHeight;
 
-	velocity += (!jumpButtonPressed || velocity.y < 0 ? fastFall : 1) * acceleration * delta;
+	velocity.y += (!jumpButtonPressed || velocity.y < 0 ? fastFall : 1) * acceleration.y * delta;
+	velocity.y = clamp(velocity.y, -3000, 3000);
 	setPosition(position);
 }
 
@@ -197,9 +158,71 @@ void Retry::Player::updateActionBuffer()
 				i.second.down = i.second.down || Retry::Controller::isAxisDown(j);
 				i.second.up = i.second.up || Retry::Controller::isAxisUp(j);
 				float tVal = Retry::Controller::getAxis(j);
- 				i.second.value = tVal != 0 && Retry::Controller::isAxisPressed(j) ? tVal : i.second.value;
+				i.second.value = tVal != 0 && Retry::Controller::isAxisPressed(j) ? tVal : i.second.value;
 			}
 		}
 	}
 }
+
+void Player::addButtonToMapping(const std::string &action, const Retry::KeyCode &button)
+{
+	if (actionBuffer.find(action) == actionBuffer.end())
+		actionBuffer[action];
+	actionMapping[action].kButtons.push_back(button);
+}
+
+void Player::addButtonToMapping(const std::string &action, const Retry::MouseButton &button)
+{
+	if (actionBuffer.find(action) == actionBuffer.end())
+		actionBuffer[action];
+	actionMapping[action].mButtons.push_back(button);
+}
+
+void Player::addButtonToMapping(const std::string &action, const Retry::ControllerButton &button)
+{
+	if (actionBuffer.find(action) == actionBuffer.end())
+		actionBuffer[action];
+	actionMapping[action].cButtons.push_back(button);
+}
+
+void Player::removeButtonFromMapping(const std::string &action, const Retry::KeyCode &button)
+{
+	auto keyMap = &actionMapping[action].kButtons;
+	for (int i = 0, n = keyMap->size(); i < n; i++)
+	{
+		if (keyMap->at(i) == button)
+		{
+			keyMap->erase(keyMap->begin() + i);
+			return;
+		}
+	}
+}
+
+void Player::removeButtonFromMapping(const std::string &action, const Retry::MouseButton &button)
+{
+	auto keyMap = &actionMapping[action].mButtons;
+	for (int i = 0, n = keyMap->size(); i < n; i++)
+	{
+		if (keyMap->at(i) == button)
+		{
+			keyMap->erase(keyMap->begin() + i);
+			return;
+		}
+	}
+}
+
+void Player::removeButtonFromMapping(const std::string &action, const Retry::ControllerButton &button)
+{
+	auto keyMap = &actionMapping[action].cButtons;
+	for (int i = 0, n = keyMap->size(); i < n; i++)
+	{
+		if (keyMap->at(i) == button)
+		{
+			keyMap->erase(keyMap->begin() + i);
+			return;
+		}
+	}
+}
+
+
 }

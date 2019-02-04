@@ -38,6 +38,8 @@
 
 #include "CollisionBody.h"
 
+#include "Level.h"
+
 using cocos2d::Vec2;
 
 cocos2d::Scene* MainScene::createScene()
@@ -66,7 +68,7 @@ bool MainScene::init()
 
 	gui = cocos2d::Node::create();
 
-	initPlayer(Vec2(1230, 50));
+	initPlayer(Vec2(1230, 400));
 	actor = new Retry::Actor("CloseNormal.png", Vec2(1000, 50));
 	this->addChild(actor->getSprite());
 	actorList.push_back(actor);
@@ -134,16 +136,20 @@ bool MainScene::init()
 
 	Retry::Camera::setPosition(player->getSprite()->getPosition());
 
-	//player->getHurtBox()->addRect(Vec2(0, 0), cocos2d::Size(48, 48));
-	player->getHurtBox()->addRect(Vec2(100, 100), Size(15, 15));
-	player->getHurtBox()->addCapsule(Vec2(50, 24), Vec2(-10, -10), 10);
-	actor->getHurtBox()->addRect(Vec2(0, 0), cocos2d::Size(48, 48));
+	player->getHurtBox()->addRect(Vec2(8, 0), cocos2d::Size(32, 40));
+	//player->getHurtBox()->addCircle(Vec2(24, 20), 20);
+	//player->getHurtBox()->addCapsule(Vec2(50, 24), Vec2(-10, -10), 10);
+	//actor->getHurtBox()->addRect(Vec2(0, 0), cocos2d::Size(48, 48));
 
 	auto s = cocos2d::Sprite::create("CloseSelected.png");
 	s->retain();
 	s->setName("test");
 	s->setPosition(0, -10000);
 	this->addChild(s, 1000);
+
+	level = new Retry::Level(1);
+	this->addChild(level->debugDraw);
+	level->debugDraw->setScale(4);
 
 	return true;
 }
@@ -155,6 +161,7 @@ void MainScene::menuCloseCallback(Ref* pSender)
 
 void MainScene::update(float delta)
 {
+	if (Retry::Controller::isAxisPressed(Retry::ControllerButton::RIGHT_TRIGGER)) delta *= 0.25f;
 
 	if (Retry::Keyboard::isKeyDown(Retry::KeyCode::ESCAPE) || Retry::Controller::isButtonDown(Retry::ControllerButton::START))
 		cocos2d::Director::getInstance()->replaceScene(MenuScene::createScene());
@@ -163,6 +170,21 @@ void MainScene::update(float delta)
 		toggleDebug();
 
 	for (auto i : actorList) i->update(delta);
+	for (const auto &i : level->room->terrain)
+	{
+		player->doTerrainCollision(i, delta);
+
+		if (player->getHurtBox()->isCollidingWith(i))
+		{
+			player->getHurtBox()->setDebugDrawColor(cocos2d::Color4F(0, 1, 0, 0.3f));
+			i->setDebugDrawColor(cocos2d::Color4F(0, 1, 0, 0.3f));
+		} else
+		{
+			player->getHurtBox()->setDebugDrawColor(cocos2d::Color4F(1, 0, 0, 0.3f));
+			i->setDebugDrawColor(cocos2d::Color4F(1, 0, 0, 0.3f));
+		}
+	}
+
 
 	if (Retry::Keyboard::isKeyPressed(Retry::KeyCode::LEFT_ARROW))
 		player->getSprite()->runAction(cocos2d::RotateBy::create(0, -135 * delta));
@@ -186,6 +208,8 @@ void MainScene::update(float delta)
 	}
 
 
+
+
 	Retry::Camera::update(delta);
 
 	static bool doFull = false;
@@ -201,7 +225,6 @@ void MainScene::update(float delta)
 	updateBackground();
 
 	Retry::Camera::transformUI(gui);
-
 }
 
 void MainScene::initPlayer(cocos2d::Vec2 position)

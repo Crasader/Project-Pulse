@@ -35,13 +35,17 @@ void Camera::update(float delta)
 	offset.x = maxOffset.x * trauma * trauma * (p2.noise(totalTime, totalTime, 0) * 2 - 1);
 	offset.y = maxOffset.y * trauma * trauma * (p3.noise(totalTime, totalTime, 0) * 2 - 1);
 
-	if (targetingMask & 0b10)
+	if (targetingMask & 0x2)
 	{
 		// MAKE ACTUAL SIZE
 		float targetOffsetX = (cocos2d::Vec2(0.5f, 0.5f) - followTarget->getAnchorPoint()).x * followTarget->getContentSize().width;
 		float targetOffsetY = (cocos2d::Vec2(0.5f, 0.5f) - followTarget->getAnchorPoint()).y * followTarget->getContentSize().height;
-		moveBy((followTarget->getPosition() + cocos2d::Vec2(targetOffsetX, targetOffsetY) - position) * delta / timeToTarget);
-	} else if (targetingMask & 0b100)
+		
+		cocos2d::Vec2 amountToMove = followTarget->getPosition() + cocos2d::Vec2(targetOffsetX, targetOffsetY) - position;
+		
+		if (amountToMove.getLengthSq() < 1 * delta) position += amountToMove;
+		else moveBy(amountToMove * delta / timeToTarget);
+	} else if (targetingMask & 0x4)
 	{
 		float totalInfluence = 2.f;
 		cocos2d::Vec2 posToAvg = followTarget->getPosition() * 2.f;

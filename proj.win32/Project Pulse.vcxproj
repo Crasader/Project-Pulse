@@ -114,6 +114,9 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)\Resources" /D /E /I /F /Y
       <Outputs>$(TargetName).cab</Outputs>
       <Inputs>$(TargetFileName)</Inputs>
     </CustomBuildStep>
+    <ClCompile>
+      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdcpp14</LanguageStandard>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -167,6 +170,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)\Resources" /D /E /I /F /Y
     <ClCompile Include="..\Classes\MouseManager.cpp" />
     <ClCompile Include="..\Classes\PerlinNoise.cpp" />
     <ClCompile Include="..\Classes\Player.cpp" />
+    <ClCompile Include="..\Classes\Room.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -187,6 +191,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)\Resources" /D /E /I /F /Y
     <ClInclude Include="..\Classes\MouseManager.h" />
     <ClInclude Include="..\Classes\PerlinNoise.h" />
     <ClInclude Include="..\Classes\Player.h" />
+    <ClInclude Include="..\Classes\Room.h" />
     <ClInclude Include="main.h" />
   </ItemGroup>
   <ItemGroup>

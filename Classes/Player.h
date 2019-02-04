@@ -25,8 +25,17 @@ public:
 
 	void update(float delta);
 
+	void addButtonToMapping(const std::string &action, const Retry::KeyCode &button);
+	void addButtonToMapping(const std::string &action, const Retry::MouseButton &button);
+	void addButtonToMapping(const std::string &action, const Retry::ControllerButton &button);
+
+	void removeButtonFromMapping(const std::string &action, const Retry::KeyCode &button);
+	void removeButtonFromMapping(const std::string &action, const Retry::MouseButton &button);
+	void removeButtonFromMapping(const std::string &action, const Retry::ControllerButton &button);
+	
+
 private:
-	static std::unordered_map<std::string, KeyMap> actionMapping;
+	std::unordered_map<std::string, KeyMap> actionMapping;
 
 	void updateActionBuffer();
 };

@@ -90,6 +90,9 @@
     <ClCompile Include="..\Classes\Level.cpp">
       <Filter>src\World Object</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\Room.cpp">
+      <Filter>src\World Object</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -144,6 +147,9 @@
       <Filter>src\Collision</Filter>
     </ClInclude>
     <ClInclude Include="..\Classes\Level.h">
+      <Filter>src\World Object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Room.h">
       <Filter>src\World Object</Filter>
     </ClInclude>
   </ItemGroup>

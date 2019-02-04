@@ -53,8 +53,10 @@ protected:
 	cocos2d::Vec2 velocity;
 	cocos2d::Vec2 acceleration;
 
+	cocos2d::Vec2 lastPosition;
+
 	float totalTime;
-	std::string currentAction;
+	std::string currentAnimation;
 	std::unordered_map<std::string, cocos2d::Animation*> animations;
 
 	Retry::Collision::Body hurtBox;

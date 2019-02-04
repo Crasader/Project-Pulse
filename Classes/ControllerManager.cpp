@@ -6,6 +6,12 @@ namespace Retry
 
 XBOXController Controller::controllers[4] = { XBOXController(1), XBOXController(2), XBOXController(3), XBOXController(4) };
 
+Vec2 Controller::vibration[4][2] = {
+	{ Vec2::ZERO, Vec2::ZERO },
+	{ Vec2::ZERO, Vec2::ZERO },
+	{ Vec2::ZERO, Vec2::ZERO },
+	{ Vec2::ZERO, Vec2::ZERO }, };
+
 float Controller::deadzone[4][4] = {
 		{ 0.3f, 0.3f, 0.0f, 0.0f },
 		{ 0.3f, 0.3f, 0.0f, 0.0f },
@@ -22,6 +28,7 @@ void Controller::pollControllers(float delta)
 	for (int id = 0; id < 4; id++)
 	{
 		controllers[id].updateState();
+		updateVibration(delta, id);
 	}
 }
 
@@ -272,9 +279,69 @@ const Vec2 Controller::crossDeadzone(const Vec2 & rawInput, const float & deadzo
 	return newInput;
 }
 
-//void Controller::setDeadZone(const ControllerAxis & axis, const float & t, const int & id)
-//{
-//	
-//}
+void Controller::updateVibration(const float &delta, const int &id)
+{
+	bool doStop = false;
+
+	if (vibration[id][0].x < 0)
+	{
+		vibration[id][0].x = vibration[id][0].y = 0;
+
+		doStop = true;
+
+		//controllers[id].Vibrate(0, vibration[id][1].y);
+	}
+
+	if (vibration[id][1].x < 0)
+	{
+		vibration[id][1].x = vibration[id][1].y = 0;
+
+		doStop = true;
+
+		//controllers[id].Vibrate(vibration[id][0].y, 0);
+	}
+
+	if (doStop)
+	{
+		controllers[id].Vibrate(vibration[id][0].y, vibration[id][1].y);
+	}
+
+	if (vibration[id][0].x != 0)
+		vibration[id][0].x -= delta;
+	if (vibration[id][1].x != 0)
+		vibration[id][1].x -= delta;
+	//static float count = 0;
+	//if (count > 3)
+	//{
+	//	count = 0;
+	//	controllers[id].Vibrate(vibration[id][0].y, vibration[id][1].y);
+	//}
+	//count += delta;
+}
+
+void Controller::vibrate(const float &intensity, const float &duration, const int &id)
+{
+	float newIntensity = clamp(intensity, 0, 1);
+	float newDuration = clamp(duration, 0, duration);
+	vibration[id][0] = Vec2(newDuration, newIntensity);
+	vibration[id][1] = Vec2(newDuration, newIntensity);
+	controllers[id].Vibrate(newIntensity, newIntensity);
+}
+
+void Controller::vibrateLeft(const float &intensity, const float &duration, const int &id)
+{
+	float newIntensity = clamp(intensity, 0, 1);
+	float newDuration = clamp(duration, 0, duration);
+	vibration[id][0] = Vec2(newDuration, newIntensity);
+	controllers[id].Vibrate(newIntensity, vibration[id][1].y);
+}
+
+void Controller::vibrateRight(const float &intensity, const float &duration, const int &id)
+{
+	float newIntensity = clamp(intensity, 0, 1);
+	float newDuration = clamp(duration, 0, duration);
+	vibration[id][1] = Vec2(newDuration, newIntensity);
+	controllers[id].Vibrate(vibration[id][0].y, newIntensity);
+}
 
 }

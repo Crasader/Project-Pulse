@@ -61,9 +61,9 @@ void Entity::runAnimation(std::string action, float totalTime)
 {
 	this->totalTime = totalTime;
 	if (totalTime > 0) animations[action]->setDelayPerUnit(totalTime);
-	if (currentAction != action)
+	if (currentAnimation != action)
 	{
-		currentAction = action;
+		currentAnimation = action;
 		sprite->stopActionByTag('anim');
 		auto tempAnim = cocos2d::Animate::create(animations[action]->clone())->clone();
 		tempAnim->setTag('anim');

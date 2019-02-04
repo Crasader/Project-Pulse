@@ -25,11 +25,11 @@
 #ifndef __HELLOWORLD_SCENE_H__
 #define __HELLOWORLD_SCENE_H__
 
-#include <map>
-
 #include "cocos2d.h"
 
 #include "Player.h"
+
+#include "Level.h"
 
 class MainScene : public cocos2d::Scene {
 public:
@@ -64,7 +64,9 @@ private:
 
 	cocos2d::Node* gui;
 
-	bool doDebug = true;
+	bool doDebug = false;
+
+	Retry::Level* level;
 };
 
 #endif // __HELLOWORLD_SCENE_H__

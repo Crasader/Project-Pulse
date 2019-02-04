@@ -195,7 +195,6 @@ bool doSATCollision(const std::vector<Vec2> &o1, const std::vector<Vec2> &o2)
 
 bool Body::doCollisionTest(const CollisionRect &rect1, const CollisionRect &rect2)
 {
-	setTestPosition(rect1.position);
 	if (rect1.rotation == 0 && rect2.rotation == 0)
 		if (rect1.position.x < rect2.position.x + rect2.size.width &&
 			rect1.position.x + rect1.size.width > rect2.position.x &&

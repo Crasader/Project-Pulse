@@ -2,29 +2,26 @@
 #define COLLISION_BODY
 
 #include "cocos2d.h"
-#include "2d/CCDrawNode.h"
 
-using cocos2d::Vec2;
-using cocos2d::Size;
 
-namespace
-{
-struct CollisionRect;
-struct CollisionCircle;
-struct CollisionCapsule;
-struct CollisionPolygon;
-}
 
 namespace Retry
 {
 namespace Collision
 {
+using cocos2d::Vec2;
+using cocos2d::Size;
+
+struct CollisionRect;
+struct CollisionCircle;
+struct CollisionCapsule;
+struct CollisionPolygon;
 
 class Body
 {
 public:
-	Body() { hitBox = cocos2d::DrawNode::create(); };
-	Body(cocos2d::Node* node) { hitBox = cocos2d::DrawNode::create(); node->addChild(hitBox); }
+	Body() { hitBox = cocos2d::DrawNode::create(); hitBox->setVisible(false); };
+	Body(cocos2d::Node* node) { hitBox = cocos2d::DrawNode::create(); node->addChild(hitBox); hitBox->setVisible(false); }
 
 	cocos2d::DrawNode* getHitBox() const { return hitBox; }
 
@@ -34,6 +31,11 @@ public:
 	void addCircle(const Vec2 &position, const float &radius);
 	void addCapsule(const Vec2 &sPosition, const Vec2 &ePosition, const float &radius);
 	void addPolygon(const std::vector<Vec2> &verts);
+
+	std::vector<CollisionRect> getRects() { return collisionRects; }
+	std::vector<CollisionCircle> getCircles() { return collisionCircles; }
+	std::vector<CollisionCapsule> getCapsules() { return collisionCapsules; }
+	std::vector<CollisionPolygon> getPolygons() { return collisionPolygons; }
 
 	void clear();
 
@@ -81,13 +83,6 @@ bool pointInRect(const Vec2 &pos, const Vec2 &A, const Vec2 &AB, const Vec2 &AD)
 
 bool doLineCircleCollision(const Vec2 &B, const Vec2 &A, const Vec2 &P, const float &R);
 
-}
-
-}
-
-namespace
-{
-
 struct CollisionRect
 {
 	bool doDraw = true;
@@ -124,6 +119,8 @@ struct CollisionPolygon
 
 	std::vector<Vec2> verts;
 };
+
+}
 
 }
 
