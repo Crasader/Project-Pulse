@@ -96,39 +96,12 @@ bool MainScene::init()
 	Retry::Keyboard::createListener(_eventDispatcher, this);
 	Retry::Mouse::createListener(_eventDispatcher, this);
 	Retry::Controller::createListener(this);
+	Retry::Camera::setCamera(this->getDefaultCamera());
 
 	this->scheduleUpdate();
 
-	Retry::Camera::setCamera(this->getDefaultCamera());
 
-	auto button = cocos2d::MenuItemImage::create("CloseNormal.png", "CloseSelected.png", "CloseNormal.png");
-
-	button->setCallback([&](Ref* sender) {
-		static bool isPaused = false;
-
-		if (!isPaused) this->unscheduleUpdate();
-		else           this->scheduleUpdate();
-		isPaused = !isPaused;
-	});
-
-	button->setPosition(Vec2(200, 200));
-
-	auto b = cocos2d::MenuItemImage::create("CloseNormal.png", "CloseSelected.png", "CloseNormal.png");
-
-	b->setCallback([&](Ref* sender) {
-		static bool isPaused = false;
-
-		if (!isPaused) this->unscheduleUpdate();
-		else           this->scheduleUpdate();
-		isPaused = !isPaused;
-	});
-
-	b->setPosition(Vec2(200, 400));
-
-	auto menu = cocos2d::Menu::create(button, b, NULL);
-	menu->setPosition(cocos2d::Vec2(0, 0));
-
-	gui->addChild(menu);
+	
 	for (auto i : gui->getChildren())
 		i->setPosition(i->getPosition() - cocos2d::Director::getInstance()->getVisibleSize() / 2);
 
@@ -148,8 +121,10 @@ bool MainScene::init()
 	this->addChild(s, 1000);
 
 	level = new Retry::Level(1);
-	this->addChild(level->debugDraw);
-	level->debugDraw->setScale(4);
+	this->addChild(level->getLevelDraw());
+	//this->addChild(level->getDebugDraw());
+	level->getLevelDraw()->setScale(4);
+	//level->getDebugDraw()->setScale(4);
 
 	return true;
 }
@@ -170,7 +145,11 @@ void MainScene::update(float delta)
 		toggleDebug();
 
 	for (auto i : actorList) i->update(delta);
-	for (const auto &i : level->room->terrain)
+
+
+	// DO SIMPLE GRID COLLISION
+	// CHECK IF A POSITION ON A GRID IS TRUE OR FALSE 
+	for (auto j : level->getRooms()) for (auto i : j.getTerrain())
 	{
 		player->doTerrainCollision(i, delta);
 
@@ -185,27 +164,21 @@ void MainScene::update(float delta)
 		}
 	}
 
-
-	if (Retry::Keyboard::isKeyPressed(Retry::KeyCode::LEFT_ARROW))
-		player->getSprite()->runAction(cocos2d::RotateBy::create(0, -135 * delta));
-	else if (Retry::Keyboard::isKeyPressed(Retry::KeyCode::RIGHT_ARROW))
-		player->getSprite()->runAction(cocos2d::RotateBy::create(0, 135 * delta));
-
 	if (Retry::Keyboard::isKeyPressed(Retry::KeyCode::UP_ARROW))
 		this->setScale(2);
 	else if (Retry::Keyboard::isKeyPressed(Retry::KeyCode::DOWN_ARROW))
 		this->setScale(0.5f);
 	else this->setScale(1);
 
-	if (player->getHurtBox()->isCollidingWith(actor->getHurtBox()))
-	{
-		player->getHurtBox()->setDebugDrawColor(cocos2d::Color4F(0, 1, 0, 0.3f));
-		actor->getHurtBox()->setDebugDrawColor(cocos2d::Color4F(0, 1, 0, 0.3f));
-	} else
-	{
-		player->getHurtBox()->setDebugDrawColor(cocos2d::Color4F(1, 0, 0, 0.3f));
-		actor->getHurtBox()->setDebugDrawColor(cocos2d::Color4F(1, 0, 0, 0.3f));
-	}
+	//if (player->getHurtBox()->isCollidingWith(actor->getHurtBox()))
+	//{
+	//	player->getHurtBox()->setDebugDrawColor(cocos2d::Color4F(0, 1, 0, 0.3f));
+	//	actor->getHurtBox()->setDebugDrawColor(cocos2d::Color4F(0, 1, 0, 0.3f));
+	//} else
+	//{
+	//	player->getHurtBox()->setDebugDrawColor(cocos2d::Color4F(1, 0, 0, 0.3f));
+	//	actor->getHurtBox()->setDebugDrawColor(cocos2d::Color4F(1, 0, 0, 0.3f));
+	//}
 
 
 

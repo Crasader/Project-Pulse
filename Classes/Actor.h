@@ -26,11 +26,11 @@ public:
 
 	void bufferAction(const std::string &action);
 
-	const bool isOnGround() { return onGround; }
-	void setOnGround(const bool &onGround) { this->onGround = onGround; }
+	//const bool isOnGround() { return onGround; }
+	//void setOnGround(const bool &onGround) { this->onGround = onGround; }
 
-	const bool getDoJump() { return doJump; }
-	void setDoJump(const int &doJump) { this->doJump = doJump; }
+	//const bool getDoJump() { return doJump; }
+	//void setDoJump(const int &doJump) { this->doJump = doJump; }
 
 	virtual void doTerrainCollision(Retry::Collision::Body* terrain, const float &delta);
 

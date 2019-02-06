@@ -7,7 +7,9 @@ Retry::Room::Room(const int &directions, const int &templateNum)
 {
 	cocos2d::Image* roomData = new cocos2d::Image;
 	roomData->initWithImageFile("level.png");
-	anchor = cocos2d::Node::create();
+	//roomDraw = cocos2d::Node::create();
+	debugDraw = cocos2d::Node::create();
+	//debugDraw->retain();
 
 	int numChannels = roomData->getBitPerPixel() / 8;
 
@@ -17,16 +19,20 @@ Retry::Room::Room(const int &directions, const int &templateNum)
 		{
 			if (roomData->getData()[(i + (roomData->getHeight() - j - 1) * roomData->getWidth()) * numChannels] == 0)
 			{
-				terrain.push_back(new Retry::Collision::Body);
-				terrain.back()->addRect(Vec2(i * tileSize.width, j * tileSize.height), tileSize);
-				auto s = cocos2d::Sprite::create("dirt.png");
-				s->setScale(32.f / 512.f);
-				s->setAnchorPoint(Vec2::ZERO);
-				s->setPosition(Vec2(i * tileSize.width, j * tileSize.height));
-				anchor->addChild(s);
+				auto t = new Retry::Collision::Body(debugDraw);
+				t->addRect(Vec2(i * tileSize.width, j * tileSize.height), tileSize);
+				t->setDebugDraw(true);
+				//debugDraw->addChild(t->getHitBox());
+				terrain.push_back(t);
+				//auto s = cocos2d::Sprite::create("dirt.png");
+				//s->setScale(32.f / 512.f);
+				//s->setAnchorPoint(Vec2::ZERO);
+				//s->setPosition(Vec2(i * tileSize.width, j * tileSize.height));
+				//roomDraw->addChild(s);
 			}
 		}
 	}
+	//roomDraw->addChild(debugDraw);
 }
 
 }

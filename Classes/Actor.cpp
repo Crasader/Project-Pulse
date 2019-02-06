@@ -31,6 +31,7 @@ void Actor::doTerrainCollision(Retry::Collision::Body* terrain, const float &del
 	setPosition(Vec2(lastPosition.x, temp.y));
 	if (this->getHurtBox()->isCollidingWith(terrain))
 	{
+		//terrain->setTestPosition();
 		if (position.y < block.position.y + block.size.height * 2 &&
 			position.y + this->getHeight() > block.position.y)
 		{

@@ -46,6 +46,7 @@ public:
 	bool isCollidingWith(const Body* body);
 
 
+	void setTestPosition(Vec2 pos);
 private:
 	cocos2d::DrawNode* hitBox;
 	cocos2d::DrawNode* actualHitBox;
@@ -69,13 +70,13 @@ private:
 
 	bool doCollisionTest(const CollisionCapsule &caps1, const CollisionCapsule &caps2);
 
+
 	friend CollisionRect worldSpaceRect(const cocos2d::Node* p, const CollisionRect &c);
 	friend CollisionCircle worldSpaceCircle(const cocos2d::Node* p, const CollisionCircle &c);
 	friend CollisionCapsule worldSpaceCapsule(const cocos2d::Node* p, const CollisionCapsule &c);
 	friend CollisionPolygon worldSpacePolygon(const cocos2d::Node* p, const CollisionPolygon &c);
-
-	void setTestPosition(Vec2 pos);
 };
+
 
 Vec2 project(const Vec2 &u, const Vec2 &v);
 
@@ -90,7 +91,7 @@ struct CollisionRect
 	Vec2 position;
 	Size size;
 
-	float rotation  = 0;
+	float rotation = 0;
 };
 
 struct CollisionCircle

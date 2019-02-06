@@ -9,7 +9,7 @@ namespace Collision
 
 void Body::setTestPosition(Vec2 pos)
 {
-	hitBox->getParent()->getParent()->getChildByName("test")->setPosition(pos);
+	cocos2d::Director::getInstance()->getRunningScene()->getChildByName("test")->setPosition(pos);
 }
 
 void Body::redraw()
@@ -312,7 +312,13 @@ CollisionRect worldSpaceRect(const cocos2d::Node* p, const CollisionRect &c)
 {
 	CollisionRect newShape;
 	newShape.position = p->convertToWorldSpace(c.position) / cocos2d::Director::getInstance()->getRunningScene()->getScale();
-	newShape.size = c.size * p->getParent()->getScale();
+	float totalScale = 1;
+	for (cocos2d::Node* n = (cocos2d::Node*) p; n != nullptr; n = n->getParent())
+	{
+		totalScale *= n->getScale();
+	}
+	
+	newShape.size = c.size * totalScale;
 	newShape.rotation = -p->getParent()->getRotation() * 3.1415 / 180;
 	return newShape;
 }

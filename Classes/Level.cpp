@@ -5,16 +5,13 @@ namespace Retry
 
 Level::Level(int levelNum)
 {
-	debugDraw = cocos2d::Node::create();
-	room = new Room(1, 1);
+	levelDraw = cocos2d::Node::create();
 
-	debugDraw->addChild(room->anchor);
-	for (auto &i : room->terrain)
+	rooms.push_back(Room(1, 1));
+
+	for (int i = 0; i < rooms.size(); i++)
 	{
-		debugDraw->addChild(i->getHitBox());
-		//i->setDebugDraw(true);
-		//i->setDebugDrawColor(cocos2d::Color4F(1, 0, 0, 0.3f));
-
+		levelDraw->addChild(rooms[i].getDebugDraw());
 	}
 }
 

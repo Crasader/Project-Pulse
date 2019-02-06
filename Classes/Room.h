@@ -18,14 +18,17 @@ public:
 	Room() = default;
 	Room(const int &directions, const int &templateNum);
 
+	cocos2d::Node* getDebugDraw() { return debugDraw; }
 
-	//Retry::Collision::Body ground;
+	cocos2d::Node* getRoomDraw() { return roomDraw; }
+
+	std::vector<Retry::Collision::Body*> getTerrain() { return terrain; }
+
+private:
+	cocos2d::Node* roomDraw = nullptr;
+	cocos2d::Node* debugDraw = nullptr;
 
 	std::vector<Retry::Collision::Body*> terrain;
-
-	cocos2d::Node* anchor;
-private:
-
 
 	const cocos2d::Size tileSize = cocos2d::Size(32, 32);
 
