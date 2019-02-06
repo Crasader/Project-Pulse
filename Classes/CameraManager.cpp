@@ -104,8 +104,7 @@ void Camera::addTarget(cocos2d::Node * target, float nearThreshHold, float farTh
 	for (auto i : focusTargets) if (i.first == target) return;
 
 	targetingMask = 0b100;
-	using namespace cocos2d;
-	focusTargets.push_back(std::make_pair(target, Vec2(nearThreshHold, farThreshHold)));
+	focusTargets.push_back(std::make_pair(target, cocos2d::Vec2(nearThreshHold, farThreshHold)));
 }
 
 void Camera::setTimeToTarget(float f)

@@ -17,46 +17,36 @@ void Actor::bufferAction(const std::string &action)
 		actionBuffer[action];
 }
 
-void Actor::doTerrainCollision(Retry::Collision::Body* terrain, const float &delta)
+bool Actor::doTerrainCollision(Retry::Level* level, const float &delta)
 {
-	auto block = Retry::Collision::worldSpaceRect(terrain->getHitBox(), terrain->getRects().front());
+	if (velocity.y < -800) hasLanded = false;
 
-	if (velocity.y < -800) hasLanded = onGround = false;
-	
-	float dist = (position - block.position).getLengthSq();
-	float length = (Vec2(getWidth(), getHeight()) + block.size).getLengthSq();
-	if (dist > length) return;
+	Vec2 temp = position;
+	bool doCollide = false;
 
-	auto temp = position;
-	setPosition(Vec2(lastPosition.x, temp.y));
-	if (this->getHurtBox()->isCollidingWith(terrain))
+	cocos2d::Director::getInstance()->getRunningScene()->getChildByName("test")->setPosition(position);
+
+	Vec2 loLeft = Vec2(int(lastPosition.x) / level->getTileSize(), int(position.y) / level->getTileSize());
+	if (level->getCollisionDataAt(loLeft))
 	{
-		//terrain->setTestPosition();
-		if (position.y < block.position.y + block.size.height * 2 &&
-			position.y + this->getHeight() > block.position.y)
-		{
-			if (velocity.y < 0)
-			{
-				if (!onGround && !hasLanded) hasLanded = true;
-				onGround = true;
-				doJump = 0;
-			}
-			temp.y = lastPosition.y;
-			velocity.y = 0;
-		}
-	}
-	setPosition(Vec2(temp.x, lastPosition.y));
-	if (this->getHurtBox()->isCollidingWith(terrain))
-	{
-		if (position.x < block.position.x + block.size.width * 2 &&
-			position.x + this->getWidth() > block.position.x)
-		{
-			temp.x = lastPosition.x;
-			velocity.x = 0;
-		}
+		temp.y = lastPosition.y;
+		velocity.y = 0;
+		doCollide = true;
 
+		onGround = true;
 	}
-	position = temp;
+
+	loLeft = Vec2((int) position.x / level->getTileSize(), (int) lastPosition.y / level->getTileSize());
+	if (level->getCollisionDataAt(loLeft))
+	{
+		temp.x = lastPosition.x;
+		velocity.x = 0;
+		doCollide = true;
+	}
+
+	setPosition(temp);
+
+	return temp != position;
 }
 
 void Actor::updateActionBuffer()

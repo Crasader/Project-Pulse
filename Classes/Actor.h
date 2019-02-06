@@ -3,6 +3,8 @@
 
 #include "Entity.h"
 
+#include "Level.h"
+
 namespace
 {
 struct ActionInfo
@@ -32,13 +34,12 @@ public:
 	//const bool getDoJump() { return doJump; }
 	//void setDoJump(const int &doJump) { this->doJump = doJump; }
 
-	virtual void doTerrainCollision(Retry::Collision::Body* terrain, const float &delta);
+	virtual bool doTerrainCollision(Retry::Level* level , const float &delta);
 
 protected:
 	int doJump = 0;
 	bool onGround = false;
 	bool hasLanded = false;
-	
 
 	std::unordered_map<std::string, cocos2d::Animation*> animations;
 

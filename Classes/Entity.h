@@ -36,7 +36,11 @@ public:
 	cocos2d::Vec2 getVelocity() { return velocity; }
 	cocos2d::Vec2 getAcceleration() { return acceleration; }
 
-	void setPosition(cocos2d::Vec2 position) { sprite->setPosition(position); this->position = position; }
+	void setPosition(cocos2d::Vec2 position)
+	{
+		sprite->setPosition(position + sprite->getBoundingBox().size / 2); 
+		this->position = position;
+	}
 	void setVelocity(cocos2d::Vec2 velocity) { this->velocity = velocity; }
 	void setAcceleration(cocos2d::Vec2 accel) { this->acceleration = accel; }
 

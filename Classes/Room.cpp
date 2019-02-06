@@ -1,15 +1,15 @@
 #include "Room.h"
 
+#include "Algorithms.h"
+
 namespace Retry
 {
 
-Retry::Room::Room(const int &directions, const int &templateNum)
+Retry::Room::Room()
 {
 	cocos2d::Image* roomData = new cocos2d::Image;
 	roomData->initWithImageFile("level.png");
 	//roomDraw = cocos2d::Node::create();
-	debugDraw = cocos2d::Node::create();
-	//debugDraw->retain();
 
 	int numChannels = roomData->getBitPerPixel() / 8;
 
@@ -19,20 +19,19 @@ Retry::Room::Room(const int &directions, const int &templateNum)
 		{
 			if (roomData->getData()[(i + (roomData->getHeight() - j - 1) * roomData->getWidth()) * numChannels] == 0)
 			{
-				auto t = new Retry::Collision::Body(debugDraw);
-				t->addRect(Vec2(i * tileSize.width, j * tileSize.height), tileSize);
-				t->setDebugDraw(true);
-				//debugDraw->addChild(t->getHitBox());
-				terrain.push_back(t);
-				//auto s = cocos2d::Sprite::create("dirt.png");
-				//s->setScale(32.f / 512.f);
-				//s->setAnchorPoint(Vec2::ZERO);
-				//s->setPosition(Vec2(i * tileSize.width, j * tileSize.height));
-				//roomDraw->addChild(s);
+				//maxPositions.x = MAX(maxPositions.x, i);
+				//maxPositions.y = MAX(maxPositions.y, j);
+				Vec4 tile;
+				//tile.x = roomData->getData()[(i + (roomData->getHeight() - j - 1) * roomData->getWidth()) * numChannels];
+				tile.x = 1;
+				tile.y = roomData->getData()[(i + (roomData->getHeight() - j - 1) * roomData->getWidth()) * numChannels + 1];
+				tile.z = roomData->getData()[(i + (roomData->getHeight() - j - 1) * roomData->getWidth()) * numChannels + 2];
+				tile.w = roomData->getData()[(i + (roomData->getHeight() - j - 1) * roomData->getWidth()) * numChannels + 3];
+
+				tileData[convertVec2ToLong(Vec2(i, j))] = tile;
 			}
 		}
 	}
-	//roomDraw->addChild(debugDraw);
 }
 
 }

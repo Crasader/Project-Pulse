@@ -101,7 +101,7 @@ bool MainScene::init()
 	this->scheduleUpdate();
 
 
-	
+
 	for (auto i : gui->getChildren())
 		i->setPosition(i->getPosition() - cocos2d::Director::getInstance()->getVisibleSize() / 2);
 
@@ -109,7 +109,8 @@ bool MainScene::init()
 
 	Retry::Camera::setPosition(player->getSprite()->getPosition());
 
-	player->getHurtBox()->addRect(Vec2(8, 0), cocos2d::Size(32, 40));
+	//player->getHurtBox()->addRect(Vec2(8, 0), cocos2d::Size(32, 40));
+	player->getHurtBox()->addRect(Vec2(0, 0), cocos2d::Size(48, 48));
 	//player->getHurtBox()->addCircle(Vec2(24, 20), 20);
 	//player->getHurtBox()->addCapsule(Vec2(50, 24), Vec2(-10, -10), 10);
 	//actor->getHurtBox()->addRect(Vec2(0, 0), cocos2d::Size(48, 48));
@@ -123,7 +124,7 @@ bool MainScene::init()
 	level = new Retry::Level(1);
 	this->addChild(level->getLevelDraw());
 	//this->addChild(level->getDebugDraw());
-	level->getLevelDraw()->setScale(4);
+	//level->getLevelDraw()->setScale(4);
 	//level->getDebugDraw()->setScale(4);
 
 	return true;
@@ -149,19 +150,14 @@ void MainScene::update(float delta)
 
 	// DO SIMPLE GRID COLLISION
 	// CHECK IF A POSITION ON A GRID IS TRUE OR FALSE 
-	for (auto j : level->getRooms()) for (auto i : j.getTerrain())
+	if (player->doTerrainCollision(level, delta))
 	{
-		player->doTerrainCollision(i, delta);
-
-		if (player->getHurtBox()->isCollidingWith(i))
-		{
-			player->getHurtBox()->setDebugDrawColor(cocos2d::Color4F(0, 1, 0, 0.3f));
-			i->setDebugDrawColor(cocos2d::Color4F(0, 1, 0, 0.3f));
-		} else
-		{
-			player->getHurtBox()->setDebugDrawColor(cocos2d::Color4F(1, 0, 0, 0.3f));
-			i->setDebugDrawColor(cocos2d::Color4F(1, 0, 0, 0.3f));
-		}
+		//player->getHurtBox()->setDebugDrawColor(cocos2d::Color4F(0, 1, 0, 0.3f));
+		//i->setDebugDrawColor(cocos2d::Color4F(0, 1, 0, 0.3f));
+	} else
+	{
+		//player->getHurtBox()->setDebugDrawColor(cocos2d::Color4F(1, 0, 0, 0.3f));
+		//i->setDebugDrawColor(cocos2d::Color4F(1, 0, 0, 0.3f));
 	}
 
 	if (Retry::Keyboard::isKeyPressed(Retry::KeyCode::UP_ARROW))
