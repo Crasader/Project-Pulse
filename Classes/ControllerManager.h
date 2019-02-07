@@ -8,11 +8,11 @@
 #include <ctime>
 #include <unordered_map>
 
-using cocos2d::Vec2;
 
 
 namespace Retry
 {
+using cocos2d::Vec2;
 
 enum class ControllerButton;
 

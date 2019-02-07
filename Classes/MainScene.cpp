@@ -68,7 +68,7 @@ bool MainScene::init()
 
 	gui = cocos2d::Node::create();
 
-	initPlayer(Vec2(1230, 400));
+	initPlayer(Vec2(1230, 350));
 	actor = new Retry::Actor("CloseNormal.png", Vec2(1000, 50));
 	this->addChild(actor->getSprite());
 	actorList.push_back(actor);
@@ -109,11 +109,10 @@ bool MainScene::init()
 
 	Retry::Camera::setPosition(player->getSprite()->getPosition());
 
-	//player->getHurtBox()->addRect(Vec2(8, 0), cocos2d::Size(32, 40));
-	player->getHurtBox()->addRect(Vec2(0, 0), cocos2d::Size(48, 48));
+	player->getHurtBox()->addRect(Vec2(8, 0), cocos2d::Size(32, 40));
+	//player->getHurtBox()->addRect(Vec2(0, 0), cocos2d::Size(48, 48));
 	//player->getHurtBox()->addCircle(Vec2(24, 20), 20);
 	//player->getHurtBox()->addCapsule(Vec2(50, 24), Vec2(-10, -10), 10);
-	//actor->getHurtBox()->addRect(Vec2(0, 0), cocos2d::Size(48, 48));
 
 	auto s = cocos2d::Sprite::create("CloseSelected.png");
 	s->retain();
@@ -137,7 +136,8 @@ void MainScene::menuCloseCallback(Ref* pSender)
 
 void MainScene::update(float delta)
 {
-	if (Retry::Controller::isAxisPressed(Retry::ControllerButton::RIGHT_TRIGGER)) delta *= 0.25f;
+	if (Retry::Controller::isAxisPressed(Retry::ControllerButton::RIGHT_TRIGGER) ||
+		Retry::Keyboard::isKeyPressed(Retry::KeyCode::SHIFT)) delta *= 0.25f;
 
 	if (Retry::Keyboard::isKeyDown(Retry::KeyCode::ESCAPE) || Retry::Controller::isButtonDown(Retry::ControllerButton::START))
 		cocos2d::Director::getInstance()->replaceScene(MenuScene::createScene());

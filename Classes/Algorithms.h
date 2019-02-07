@@ -3,10 +3,10 @@
 
 #include "cocos2d.h"
 
-using cocos2d::Vec2;
 
 namespace Retry
 {
+using cocos2d::Vec2;
 
 float clamp(float v, float lo, float hi);
 

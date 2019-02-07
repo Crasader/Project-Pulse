@@ -47,6 +47,7 @@ void Body::addRect(const Vec2 &position, const Size &size)
 	CollisionRect c;
 	c.position = position;
 	c.size = size;
+	c.boundingBox = Rect(position, size);
 	collisionRects.push_back(c);
 	redraw();
 }
@@ -56,6 +57,7 @@ void Body::addCircle(const Vec2 &position, const float &radius)
 	CollisionCircle c;
 	c.position = position;
 	c.radius = radius;
+	c.boundingBox = Rect(position - Vec2(radius, radius), Size(2 * radius, 2 * radius));
 	collisionCircles.push_back(c);
 	redraw();
 }
@@ -66,6 +68,14 @@ void Body::addCapsule(const Vec2 &sPosition, const Vec2 &ePosition, const float 
 	c.sPosition = sPosition;
 	c.ePosition = ePosition;
 	c.radius = radius;
+
+	float minx, miny, maxx, maxy;
+	minx = MIN(sPosition.x, ePosition.x) - radius;
+	miny = MIN(sPosition.y, ePosition.y) - radius;
+	maxx = MAX(sPosition.x, ePosition.x) + radius;
+	maxy = MAX(sPosition.y, ePosition.y) + radius;
+
+	c.boundingBox = Rect(Vec2(minx, miny), Size(maxx - minx, maxy - miny));
 	collisionCapsules.push_back(c);
 	redraw();
 }
@@ -138,6 +148,37 @@ bool Body::isCollidingWith(const Body* body)
 			if (doCollisionTest(worldSpaceCapsule(hitBox, i), worldSpaceCapsule(body->hitBox, j))) return true;
 	}
 	return false;
+}
+
+Rect Body::getBoundingBox()
+{
+	Rect boundingBox;
+	for (const auto &i : collisionRects)
+	{
+		if (boundingBox.size.width == 0 && boundingBox.size.height == 0) 
+			boundingBox = i.boundingBox;
+		boundingBox = boundingBox.unionWithRect(i.boundingBox);
+	}
+	for (const auto &i : collisionCircles)
+	{
+		if (boundingBox.size.width == 0 && boundingBox.size.height == 0)
+			boundingBox = i.boundingBox;
+		boundingBox = boundingBox.unionWithRect(i.boundingBox);
+	}
+	for (const auto &i : collisionCapsules)
+	{
+		if (boundingBox.size.width == 0 && boundingBox.size.height == 0) 
+			boundingBox = i.boundingBox;
+		boundingBox = boundingBox.unionWithRect(i.boundingBox);
+	}
+	for (const auto &i : collisionPolygons)
+	{
+		if (boundingBox.size.width == 0 && boundingBox.size.height == 0) 
+			boundingBox = i.boundingBox;
+		boundingBox = boundingBox.unionWithRect(i.boundingBox);
+	}
+
+	return boundingBox;
 }
 
 std::vector<Vec2> newRectVerts(const CollisionRect &rect)

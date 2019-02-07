@@ -11,6 +11,7 @@ namespace Collision
 {
 using cocos2d::Vec2;
 using cocos2d::Size;
+using cocos2d::Rect;
 
 struct CollisionRect;
 struct CollisionCircle;
@@ -45,6 +46,7 @@ public:
 
 	bool isCollidingWith(const Body* body);
 
+	Rect getBoundingBox();
 
 	void setTestPosition(Vec2 pos);
 private:
@@ -69,14 +71,12 @@ private:
 	bool doCollisionTest(const CollisionCapsule &caps, const CollisionCircle &circ) { return doCollisionTest(circ, caps); };
 
 	bool doCollisionTest(const CollisionCapsule &caps1, const CollisionCapsule &caps2);
-
-
-	friend CollisionRect worldSpaceRect(const cocos2d::Node* p, const CollisionRect &c);
-	friend CollisionCircle worldSpaceCircle(const cocos2d::Node* p, const CollisionCircle &c);
-	friend CollisionCapsule worldSpaceCapsule(const cocos2d::Node* p, const CollisionCapsule &c);
-	friend CollisionPolygon worldSpacePolygon(const cocos2d::Node* p, const CollisionPolygon &c);
 };
 
+CollisionRect worldSpaceRect(const cocos2d::Node* p, const CollisionRect &c);
+CollisionCircle worldSpaceCircle(const cocos2d::Node* p, const CollisionCircle &c);
+CollisionCapsule worldSpaceCapsule(const cocos2d::Node* p, const CollisionCapsule &c);
+CollisionPolygon worldSpacePolygon(const cocos2d::Node* p, const CollisionPolygon &c);
 
 Vec2 project(const Vec2 &u, const Vec2 &v);
 
@@ -92,6 +92,8 @@ struct CollisionRect
 	Size size;
 
 	float rotation = 0;
+
+	Rect boundingBox;
 };
 
 struct CollisionCircle
@@ -100,6 +102,8 @@ struct CollisionCircle
 
 	Vec2 position;
 	float radius;
+
+	Rect boundingBox;
 };
 
 struct CollisionCapsule
@@ -112,6 +116,8 @@ struct CollisionCapsule
 
 	float rotation = 0;
 	Vec2 toRadius;
+
+	Rect boundingBox;
 };
 
 struct CollisionPolygon
@@ -119,6 +125,8 @@ struct CollisionPolygon
 	bool doDraw = true;
 
 	std::vector<Vec2> verts;
+
+	Rect boundingBox;
 };
 
 }

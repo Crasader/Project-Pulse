@@ -89,10 +89,12 @@ void MenuScene::menuCloseCallback(Ref* pSender)
 
 void MenuScene::update(float delta)
 {
-	if (Retry::Keyboard::isKeyDown(Retry::KeyCode::ESCAPE) || Retry::Controller::isButtonDown(Retry::ControllerButton::B))
+	if (Retry::Keyboard::isKeyDown(Retry::KeyCode::ESCAPE) || 
+		Retry::Controller::isButtonDown(Retry::ControllerButton::B))
 		cocos2d::Director::getInstance()->end();
 
-	if (Retry::Controller::isButtonDown(Retry::ControllerButton::A))
+	if (Retry::Controller::isButtonDown(Retry::ControllerButton::A) ||
+		Retry::Keyboard::isKeyPressed(Retry::KeyCode::SPACE))
 	{
 		cocos2d::Director::getInstance()->replaceScene(MainScene::createScene());
 	}
