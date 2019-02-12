@@ -93,6 +93,12 @@
     <ClCompile Include="..\Classes\Room.cpp">
       <Filter>src\World Object</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\GameSettings.cpp">
+      <Filter>src\managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\OptionsMenu.cpp">
+      <Filter>src\scenes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -151,6 +157,12 @@
     </ClInclude>
     <ClInclude Include="..\Classes\Room.h">
       <Filter>src\World Object</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\GameSettings.h">
+      <Filter>src\managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\OptionsMenu.h">
+      <Filter>src\scenes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

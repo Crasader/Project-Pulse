@@ -26,6 +26,8 @@
 #include "MainScene.h"
 #include "MenuScene.h"
 
+#include "GameSettings.h"
+
  #define USE_AUDIO_ENGINE 1
  //#define USE_SIMPLE_AUDIO_ENGINE 1
 
@@ -51,11 +53,9 @@ static cocos2d::Size largeResolutionSize = cocos2d::Size(1920, 1080);
 AppDelegate::AppDelegate() {}
 
 AppDelegate::~AppDelegate() {
-#if USE_AUDIO_ENGINE
-	//AudioEngine::end();
-#elif USE_SIMPLE_AUDIO_ENGINE
-	SimpleAudioEngine::end();
-#endif
+
+	Retry::Config::saveSettingsToFile();
+
 }
 
 // if you want a different context, modify the value of glContextAttrs
@@ -90,7 +90,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	director->setDisplayStats(true);
 
 	// set FPS. the default value is 1.0/60 if you don't call this
-	director->setAnimationInterval(1.0f / 1000);
+	director->setAnimationInterval(1.0f / 60);
 
 	// Set the design resolution
 	glview->setDesignResolutionSize(designResolutionSize.width, designResolutionSize.height, ResolutionPolicy::NO_BORDER);
@@ -110,6 +110,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
 	register_all_packages();
 
+	Retry::Config::loadSettingsFromFile();
 
 	cocos2d::experimental::AudioEngine::lazyInit();
 
@@ -128,29 +129,16 @@ bool AppDelegate::applicationDidFinishLaunching() {
 
 // This function will be called when the app is inactive. Note, when receiving a phone call it is invoked.
 void AppDelegate::applicationDidEnterBackground() {
+	
 	Director::getInstance()->stopAnimation();
 
-	//cocos2d::Controller::startDiscoveryController();
-
-#if USE_AUDIO_ENGINE
 	AudioEngine::pauseAll();
-#elif USE_SIMPLE_AUDIO_ENGINE
-	SimpleAudioEngine::getInstance()->pauseBackgroundMusic();
-	SimpleAudioEngine::getInstance()->pauseAllEffects();
-#endif
 }
 
 // this function will be called when the app is active again
 void AppDelegate::applicationWillEnterForeground() {
+	
 	Director::getInstance()->startAnimation();
 
-	//cocos2d::Controller::startDiscoveryController();
-
-#if USE_AUDIO_ENGINE
-	/// Only resume ones I haven't paused manually
 	AudioEngine::resumeAll();
-#elif USE_SIMPLE_AUDIO_ENGINE
-	SimpleAudioEngine::getInstance()->resumeBackgroundMusic();
-	SimpleAudioEngine::getInstance()->resumeAllEffects();
-#endif
 }

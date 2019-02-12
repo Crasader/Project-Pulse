@@ -1,5 +1,7 @@
 #include "CameraManager.h"
 
+#include "GameSettings.h"
+
 namespace Retry
 {
 
@@ -31,9 +33,12 @@ void Camera::update(float delta)
 {
 	static PerlinNoise p1 = PerlinNoise(126), p2 = PerlinNoise(127), p3 = PerlinNoise(128);
 
-	angle = maxAngle * trauma * trauma * (p1.noise(totalTime, totalTime, 0) * 2 - 1);
-	offset.x = maxOffset.x * trauma * trauma * (p2.noise(totalTime, totalTime, 0) * 2 - 1);
-	offset.y = maxOffset.y * trauma * trauma * (p3.noise(totalTime, totalTime, 0) * 2 - 1);
+	if (Config::doScreenShake())
+	{
+		angle = maxAngle * trauma * trauma * (p1.noise(totalTime, totalTime, 0) * 2 - 1);
+		offset.x = maxOffset.x * trauma * trauma * (p2.noise(totalTime, totalTime, 0) * 2 - 1);
+		offset.y = maxOffset.y * trauma * trauma * (p3.noise(totalTime, totalTime, 0) * 2 - 1);
+	}
 
 	if (targetingMask & 0x2)
 	{

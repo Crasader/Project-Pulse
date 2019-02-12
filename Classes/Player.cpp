@@ -1,8 +1,8 @@
 #include "Player.h"
 
-#include "CameraManager.h"
-
 #include "Algorithms.h"
+
+#include "GameSettings.h"
 
 namespace Retry
 {
@@ -21,7 +21,6 @@ Retry::Player::Player(std::string path, cocos2d::Vec2 pos)
 	addButtonToMapping("right", ControllerButton::LEFT_STICK_RIGHT);
 
 	addButtonToMapping("leftStick", ControllerButton::LEFT_STICK_X);
-
 }
 
 float lerp(float p0, float p1, float t)
@@ -39,8 +38,6 @@ void Retry::Player::update(float delta)
 {
 	updateActionBuffer();
 
-	lastPosition = position;
-
 	bool jumpButtonDown = isActionDown("jump");
 	bool jumpButtonPressed = isActionPressed("jump");
 
@@ -54,12 +51,10 @@ void Retry::Player::update(float delta)
 
 	// Jumping Constants and Variables
 	static const float h = 400;
-	static const float t_h = 0.5f;
+	static const float t_h = 0.65f;
 	static const float g = (-2 * h) / (t_h * t_h);
 	static const float fastFall = 2.f;
-	//static int doJump = 0;
 	static bool hasMoved = false;
-	//static bool onGround = true;
 
 	acceleration = cocos2d::Vec2(0, g);
 
@@ -75,16 +70,10 @@ void Retry::Player::update(float delta)
 	}
 	velocity.x += acceleration.x * delta;
 	velocity.x = sign(velocity.x) * clamp(abs(velocity.x), 0, sideMove + (doJump ? 100 : 0));
-
-	if (hasLanded)
-	{
-		Retry::Camera::addTrauma(0.3f);
-		Retry::Controller::vibrate(0.2f, 0.1f);
-		hasLanded = false;
-	}
+	// !LEFT AND RIGHT MOVEMENT
 
 	// JUMP
-	if (onGround) doJump = 0;
+	if (onGround || Retry::Config::doDebug()) doJump = 0;
 	if (doJump < 2 && jumpButtonDown)
 	{
 		onGround = false;
@@ -99,10 +88,10 @@ void Retry::Player::update(float delta)
 			velocity.x *= 0.2f;
 		}
 	}
+	// !JUMP
 
-	auto v = velocity * delta + 0.5f * acceleration * delta * delta;
 
-	// Animation Stuff
+	// ANIMATION HANDLING
 	if (velocity.x != 0) sprite->setFlippedX(velocity.x < 0);
 	if (onGround)
 	{
@@ -117,12 +106,12 @@ void Retry::Player::update(float delta)
 	{
 		runAnimation("jump", 0.05f);
 	}
-	moveBy(v);
-	//if (onGround) position.y = groundHeight;
+	// !ANIMATION HANDLING
+
+	moveBy(velocity * delta + 0.5f * acceleration * delta * delta);
 
 	velocity.y += (!jumpButtonPressed || velocity.y < 0 ? fastFall : 1) * acceleration.y * delta;
-	velocity.y = clamp(velocity.y, -3000, 3000);
-	setPosition(position);
+	velocity.y = clamp(velocity.y, -2000, 2000);
 }
 
 void Retry::Player::updateActionBuffer()

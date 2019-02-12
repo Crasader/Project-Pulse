@@ -24,6 +24,7 @@
 
 #include "MainScene.h"
 #include "MenuScene.h"
+#include "OptionsMenu.h"
 
 #include "KeyboardManager.h"
 #include "MouseManager.h"
@@ -40,7 +41,19 @@
 
 #include "Level.h"
 
+#include "GameSettings.h"
+
 using cocos2d::Vec2;
+using cocos2d::Size;
+using cocos2d::Rect;
+
+using Retry::Keyboard;
+using Retry::KeyCode;
+using Retry::Mouse;
+using Retry::MouseButton;
+using Retry::Controller;
+using Retry::ControllerButton;
+
 
 cocos2d::Scene* MainScene::createScene()
 {
@@ -68,10 +81,7 @@ bool MainScene::init()
 
 	gui = cocos2d::Node::create();
 
-	initPlayer(Vec2(1230, 350));
-	actor = new Retry::Actor("CloseNormal.png", Vec2(1000, 50));
-	this->addChild(actor->getSprite());
-	actorList.push_back(actor);
+	initPlayer(Vec2(1230, 4000));
 
 	auto cobble = cocos2d::Sprite::create("cobblestone.png");
 	auto cSize = cobble->getContentSize();
@@ -91,16 +101,29 @@ bool MainScene::init()
 		}
 	}
 
-	Retry::Camera::lazyFollowTarget(player->getSprite(), 0.25f);
+	healthBarBack = cocos2d::Sprite::create("healthbar.png", Rect(0, 0, 128, 32));
+	healthBarBack->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
+	healthBarBack->setPosition(Vec2(50, 50));
+	healthBarBack->setScale(4);
+	healthBarFront = cocos2d::Sprite::create("healthbar.png", Rect(0, 32, 128, 32));
+	healthBarFront->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
+	healthBarFront->setPosition(Vec2(50, 50));
+	healthBarFront->setScale(4);
 
-	Retry::Keyboard::createListener(_eventDispatcher, this);
-	Retry::Mouse::createListener(_eventDispatcher, this);
-	Retry::Controller::createListener(this);
-	Retry::Camera::setCamera(this->getDefaultCamera());
+	auto label = cocos2d::Label::create();
+	label->setName("HealthLabel");
+	std::stringstream ss;
+	ss << "Health: " << player->getHealth() << " / " << player->getMaxHealth();
+	label->setString(ss.str());
+	label->setSystemFontSize(50);
+	label->setPosition(healthBarFront->getPosition() + healthBarFront->getBoundingBox().size / 2 + Vec2(0, 120));
 
+	gui->addChild(healthBarBack, 100);
+	gui->addChild(healthBarFront, healthBarBack->getLocalZOrder() + 1);
+	gui->addChild(label, healthBarBack->getLocalZOrder() + 2);
+
+	// ADD ALL GUI AND ACTORS BEFORE HERE
 	this->scheduleUpdate();
-
-
 
 	for (auto i : gui->getChildren())
 		i->setPosition(i->getPosition() - cocos2d::Director::getInstance()->getVisibleSize() / 2);
@@ -122,9 +145,14 @@ bool MainScene::init()
 
 	level = new Retry::Level(1);
 	this->addChild(level->getLevelDraw());
-	//this->addChild(level->getDebugDraw());
-	//level->getLevelDraw()->setScale(4);
-	//level->getDebugDraw()->setScale(4);
+
+	Retry::Camera::lazyFollowTarget(player->getSprite(), 0.25f);
+	Retry::Camera::setPosition(player->getPosition());
+	Retry::Camera::setCamera(this->getDefaultCamera());
+
+	Keyboard::createListener(_eventDispatcher, this);
+	Mouse::createListener(_eventDispatcher, this);
+	Controller::createListener(this);
 
 	return true;
 }
@@ -136,53 +164,52 @@ void MainScene::menuCloseCallback(Ref* pSender)
 
 void MainScene::update(float delta)
 {
-	if (Retry::Controller::isAxisPressed(Retry::ControllerButton::RIGHT_TRIGGER) ||
-		Retry::Keyboard::isKeyPressed(Retry::KeyCode::SHIFT)) delta *= 0.25f;
+	//if (Controller::isAxisPressed(ControllerButton::RIGHT_TRIGGER) ||
+	//	Keyboard::isKeyPressed(KeyCode::SHIFT)) delta *= 0.25f;
 
-	if (Retry::Keyboard::isKeyDown(Retry::KeyCode::ESCAPE) || Retry::Controller::isButtonDown(Retry::ControllerButton::START))
-		cocos2d::Director::getInstance()->replaceScene(MenuScene::createScene());
+	if (Keyboard::isKeyDown(KeyCode::ESCAPE) || Controller::isButtonDown(ControllerButton::START))
+		cocos2d::Director::getInstance()->pushScene(OptionsMenu::createScene());
 
-	if (Retry::Keyboard::isKeyDown(Retry::KeyCode::F2))
-		toggleDebug();
+	if (Keyboard::isKeyDown(KeyCode::Q))
+		cocos2d::Director::getInstance()->replaceScene(MenuScene::create());
+
+	if (Keyboard::isKeyDown(KeyCode::F2))
+		Retry::Config::toggleDebug();
+	//if (Controller::isAxisPressed(ControllerButton::LEFT_TRIGGER))
+		Retry::Config::setDebug(Controller::isAxisPressed(ControllerButton::LEFT_TRIGGER));
+
+	if (Keyboard::isKeyDown(KeyCode::F3))
+		Retry::Config::toggleScreenShake();
+
+	if (Keyboard::isKeyDown(KeyCode::F4))
+		Retry::Config::toggleVibration();
 
 	for (auto i : actorList) i->update(delta);
 
 
-	// DO SIMPLE GRID COLLISION
-	// CHECK IF A POSITION ON A GRID IS TRUE OR FALSE 
-	if (player->doTerrainCollision(level, delta))
-	{
-		//player->getHurtBox()->setDebugDrawColor(cocos2d::Color4F(0, 1, 0, 0.3f));
-		//i->setDebugDrawColor(cocos2d::Color4F(0, 1, 0, 0.3f));
-	} else
-	{
-		//player->getHurtBox()->setDebugDrawColor(cocos2d::Color4F(1, 0, 0, 0.3f));
-		//i->setDebugDrawColor(cocos2d::Color4F(1, 0, 0, 0.3f));
-	}
+	// COLLISION
+	if (!Retry::Config::doDebug())
+		player->doTerrainCollision(level, delta);
 
-	if (Retry::Keyboard::isKeyPressed(Retry::KeyCode::UP_ARROW))
-		this->setScale(2);
-	else if (Retry::Keyboard::isKeyPressed(Retry::KeyCode::DOWN_ARROW))
-		this->setScale(0.5f);
-	else this->setScale(1);
+	if (Keyboard::isKeyPressed(KeyCode::UP_ARROW) ||
+		Controller::isAxisPressed(ControllerButton::RIGHT_STICK_UP))
+		player->increaseHealth(delta);
+	else if (Keyboard::isKeyPressed(KeyCode::DOWN_ARROW) ||
+			 Controller::isAxisPressed(ControllerButton::RIGHT_STICK_DOWN))
+		player->decreaseHealth(delta);
 
-	//if (player->getHurtBox()->isCollidingWith(actor->getHurtBox()))
-	//{
-	//	player->getHurtBox()->setDebugDrawColor(cocos2d::Color4F(0, 1, 0, 0.3f));
-	//	actor->getHurtBox()->setDebugDrawColor(cocos2d::Color4F(0, 1, 0, 0.3f));
-	//} else
-	//{
-	//	player->getHurtBox()->setDebugDrawColor(cocos2d::Color4F(1, 0, 0, 0.3f));
-	//	actor->getHurtBox()->setDebugDrawColor(cocos2d::Color4F(1, 0, 0, 0.3f));
-	//}
+	static float orgWidth = healthBarFront->getTextureRect().size.width;
+	float newWidth = player->getHealthRatio() * orgWidth;
+	healthBarFront->setTextureRect(Rect(Vec2(0, 32), Size(newWidth, healthBarFront->getTextureRect().size.height)));
 
-
-
+	std::stringstream ss;
+	ss << "Health: " << player->getHealth() << " / " << player->getMaxHealth();
+	((cocos2d::Label*)gui->getChildByName("HealthLabel"))->setString(ss.str());
 
 	Retry::Camera::update(delta);
 
 	static bool doFull = false;
-	if (Retry::Keyboard::isKeyDown(Retry::KeyCode::F11))
+	if (Keyboard::isKeyDown(KeyCode::F11))
 	{
 		if (!(doFull = !doFull))
 			dynamic_cast<cocos2d::GLViewImpl*>(cocos2d::Director::getInstance()->getOpenGLView())->setWindowed(1280, 720);
@@ -231,10 +258,10 @@ void MainScene::updateBackground()
 
 void MainScene::toggleDebug()
 {
-	doDebug = !doDebug;
+	Retry::Config::toggleDebug();
 	for (auto i : actorList)
 	{
-		i->getHurtBox()->setDebugDraw(doDebug);
-		i->getHitBox()->setDebugDraw(doDebug);
+		//i->getHurtBox()->setDebugDraw(Retry::Config::doDebug());
+		//i->getHitBox()->setDebugDraw(Retry::Config::doDebug());
 	}
 }

@@ -38,8 +38,9 @@ void Entity::kill(float delay)
 
 void Entity::moveBy(cocos2d::Vec2 movement)
 {
-	position += movement;
-	sprite->setPosition(position);
+	setPosition(position + movement);
+	//position += movement;
+	//sprite->setPosition(position);
 }
 
 void Entity::initAnimation(std::string action, std::string file, cocos2d::Vec2 startCell, cocos2d::Vec2 frameSize, int numFrames)
@@ -51,7 +52,7 @@ void Entity::initAnimation(std::string action, std::string file, cocos2d::Vec2 s
 		cocos2d::Vec2 startPosition((startCell.x + i) * frameSize.x, (startCell.y) * frameSize.y);
 		temp->addSpriteFrame(cocos2d::SpriteFrame::create(file.c_str(), cocos2d::Rect(startPosition, cocos2d::Size(frameSize))));
 	}
-	temp->setLoops(-1);
+	temp->setLoops(1);
 
 	animations[action] = temp;
 	animations[action]->retain();
@@ -59,16 +60,37 @@ void Entity::initAnimation(std::string action, std::string file, cocos2d::Vec2 s
 
 void Entity::runAnimation(std::string action, float totalTime)
 {
-	this->totalTime = totalTime;
+	auto currentAnimate = (cocos2d::Animate*)sprite->getActionByTag('anim');
+
 	if (totalTime > 0) animations[action]->setDelayPerUnit(totalTime);
+
 	if (currentAnimation != action)
 	{
 		currentAnimation = action;
-		sprite->stopActionByTag('anim');
-		auto tempAnim = cocos2d::Animate::create(animations[action]->clone())->clone();
+		sprite->stopAllActionsByTag('anim');
+		auto tempAnim = cocos2d::Animate::create(animations[action]);
 		tempAnim->setTag('anim');
 		sprite->runAction(tempAnim);
+	} else if (currentAnimate == nullptr)
+	{
+		sprite->stopAllActionsByTag('anim');
+		auto tempAnim = cocos2d::Animate::create(animations[action]);
+		tempAnim->setTag('anim');
+		sprite->runAction(tempAnim);
+	} else
+	{
+		float elapsed = currentAnimate->getElapsed();
+		if (this->totalTime != totalTime && elapsed > 0)
+		{
+			sprite->stopAllActionsByTag('anim');
+			auto tempAnim = cocos2d::Animate::create(animations[action]->clone());
+			tempAnim->setTag('anim');
+			sprite->runAction(tempAnim);
+			((cocos2d::Animate*)sprite->getActionByTag('anim'))->step(elapsed);
+		}
 	}
+	this->totalTime = totalTime;
+	//cocos2d::log("%f", ((cocos2d::Animate*)sprite->getActionByTag('anim')));
 }
 
 }

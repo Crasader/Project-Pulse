@@ -19,6 +19,10 @@ struct ActionInfo
 namespace Retry
 {
 
+using cocos2d::Vec2;
+using cocos2d::Size;
+using cocos2d::Rect;
+
 class Actor : public Entity
 {
 public:
@@ -28,18 +32,20 @@ public:
 
 	void bufferAction(const std::string &action);
 
-	//const bool isOnGround() { return onGround; }
-	//void setOnGround(const bool &onGround) { this->onGround = onGround; }
-
-	//const bool getDoJump() { return doJump; }
-	//void setDoJump(const int &doJump) { this->doJump = doJump; }
-
 	virtual bool doTerrainCollision(Retry::Level* level , const float &delta);
 
+	int getHealth() { return (int) health; }
+	int getMaxHealth() { return (int) maxHealth; }
+	float getHealthRatio() { return health / maxHealth; }
+	void decreaseHealth(const float &delta);
+	void increaseHealth(const float &delta);
+
 protected:
+	float health = 100;
+	float maxHealth = 100;
+
 	int doJump = 0;
 	bool onGround = false;
-	bool hasLanded = false;
 
 	std::unordered_map<std::string, cocos2d::Animation*> animations;
 
@@ -53,6 +59,12 @@ protected:
 
 	float actionPressedDuration(const std::string &action);
 	float actionPressedValue(const std::string &action);
+
+	float doSolidCollisionX(Retry::Level* level, const Rect &boundingBox);
+	float doSolidCollisionY(Retry::Level* level, const Rect &boundingBox);
+
+	float doPlatformCollisionX(Retry::Level* level, const Rect &boundingBox);
+	float doPlatformCollisionY(Retry::Level* level, const Rect &boundingBox);
 };
 
 }

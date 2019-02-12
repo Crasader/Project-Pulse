@@ -18,7 +18,7 @@ Level::Level(int levelNum)
 		{
 
 			tileData[j.first] = Vec3(j.second.x, j.second.y, j.second.z);
-			collisionData[j.first] = j.second.x;
+			collisionData[j.first] = j.second.w;
 		}
 	}
 
@@ -36,12 +36,11 @@ Level::Level(int levelNum)
 	//levelDraw->addChild(debugDraw);
 }
 
-char Level::getCollisionDataAt(const Vec2 & v)
+char Level::getCollisionDataAt(const Vec2 &v)
 {
 	if (v.x < 0 || v.y < 0) return 0;
 	if (collisionData.find(convertVec2ToLong(v)) != collisionData.end())
-		//return collisionData.at(convertVec2ToLong(v));
-		return true;
+		return collisionData.at(convertVec2ToLong(v));
 	return 0;
 }
 

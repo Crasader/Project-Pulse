@@ -1,6 +1,8 @@
 #include "ControllerManager.h"
 #include "Algorithms.h"
 
+#include "GameSettings.h"
+
 namespace Retry
 {
 
@@ -321,6 +323,8 @@ void Controller::updateVibration(const float &delta, const int &id)
 
 void Controller::vibrate(const float &intensity, const float &duration, const int &id)
 {
+	if (!Config::doVibration()) return;
+
 	float newIntensity = clamp(intensity, 0, 1);
 	float newDuration = clamp(duration, 0, duration);
 	vibration[id][0] = Vec2(newDuration, newIntensity);
@@ -330,6 +334,8 @@ void Controller::vibrate(const float &intensity, const float &duration, const in
 
 void Controller::vibrateLeft(const float &intensity, const float &duration, const int &id)
 {
+	if (!Config::doVibration()) return;
+
 	float newIntensity = clamp(intensity, 0, 1);
 	float newDuration = clamp(duration, 0, duration);
 	vibration[id][0] = Vec2(newDuration, newIntensity);
@@ -338,6 +344,8 @@ void Controller::vibrateLeft(const float &intensity, const float &duration, cons
 
 void Controller::vibrateRight(const float &intensity, const float &duration, const int &id)
 {
+	if (!Config::doVibration()) return;
+
 	float newIntensity = clamp(intensity, 0, 1);
 	float newDuration = clamp(duration, 0, duration);
 	vibration[id][1] = Vec2(newDuration, newIntensity);

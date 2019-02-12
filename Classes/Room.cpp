@@ -8,7 +8,7 @@ namespace Retry
 Retry::Room::Room()
 {
 	cocos2d::Image* roomData = new cocos2d::Image;
-	roomData->initWithImageFile("level.png");
+	roomData->initWithImageFile("level2.png");
 	//roomDraw = cocos2d::Node::create();
 
 	int numChannels = roomData->getBitPerPixel() / 8;
@@ -19,14 +19,16 @@ Retry::Room::Room()
 		{
 			if (roomData->getData()[(i + (roomData->getHeight() - j - 1) * roomData->getWidth()) * numChannels] == 0)
 			{
-				//maxPositions.x = MAX(maxPositions.x, i);
-				//maxPositions.y = MAX(maxPositions.y, j);
+				// x = sprite sheet x
+				// y = sprite sheet y
+				// z = sprite sheet id
+				// w = collision info
 				Vec4 tile;
-				//tile.x = roomData->getData()[(i + (roomData->getHeight() - j - 1) * roomData->getWidth()) * numChannels];
-				tile.x = 1;
+				tile.x = roomData->getData()[(i + (roomData->getHeight() - j - 1) * roomData->getWidth()) * numChannels];
 				tile.y = roomData->getData()[(i + (roomData->getHeight() - j - 1) * roomData->getWidth()) * numChannels + 1];
 				tile.z = roomData->getData()[(i + (roomData->getHeight() - j - 1) * roomData->getWidth()) * numChannels + 2];
-				tile.w = roomData->getData()[(i + (roomData->getHeight() - j - 1) * roomData->getWidth()) * numChannels + 3];
+				//tile.w = roomData->getData()[(i + (roomData->getHeight() - j - 1) * roomData->getWidth()) * numChannels + 3];
+				tile.w = 0x02;
 
 				tileData[convertVec2ToLong(Vec2(i, j))] = tile;
 			}

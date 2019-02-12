@@ -54,13 +54,14 @@ private:
 
 	Retry::Player* player;
 
-	Retry::Actor* actor;
-
 	std::vector<Retry::Actor*> actorList;
 
 	std::vector<cocos2d::Sprite*> background;
 
 	std::vector<cocos2d::Sprite*> cameraAnchors;
+
+	cocos2d::Sprite* healthBarBack;
+	cocos2d::Sprite* healthBarFront;
 
 	cocos2d::Node* gui;
 

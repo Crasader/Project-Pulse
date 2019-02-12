@@ -36,10 +36,14 @@ public:
 	cocos2d::Vec2 getVelocity() { return velocity; }
 	cocos2d::Vec2 getAcceleration() { return acceleration; }
 
-	void setPosition(cocos2d::Vec2 position)
+	void setPosition(const cocos2d::Vec2 &position)
 	{
+		lastPosition = this->position;
+
 		sprite->setPosition(position + sprite->getBoundingBox().size / 2); 
 		this->position = position;
+
+		deltaPosition = this->position - this->lastPosition;
 	}
 	void setVelocity(cocos2d::Vec2 velocity) { this->velocity = velocity; }
 	void setAcceleration(cocos2d::Vec2 accel) { this->acceleration = accel; }
@@ -58,6 +62,7 @@ protected:
 	cocos2d::Vec2 acceleration;
 
 	cocos2d::Vec2 lastPosition;
+	cocos2d::Vec2 deltaPosition;
 
 	float totalTime;
 	std::string currentAnimation;
@@ -69,8 +74,6 @@ protected:
 
 
 }
-
-
 
 
 #endif

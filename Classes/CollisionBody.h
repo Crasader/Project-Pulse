@@ -3,8 +3,6 @@
 
 #include "cocos2d.h"
 
-
-
 namespace Retry
 {
 namespace Collision
