@@ -233,7 +233,7 @@ void MainScene::initPlayer(cocos2d::Vec2 position)
 	//player->getCollisionBody()->setSize(cocos2d::Size(tileSize));
 
 	player->initAnimation("run", "sonic.png", cocos2d::Vec2(0, 0), tileSize, 6);
-	player->initAnimation("idle", "sonic.png", cocos2d::Vec2(6, 0), tileSize, 1);
+	player->initAnimation("idle", "sonic.png", cocos2d::Vec2(6, 0), tileSize, 6);
 	player->initAnimation("jump", "sonic.png", cocos2d::Vec2(0, 3), tileSize, 5);
 	player->runAnimation("run", 0);
 

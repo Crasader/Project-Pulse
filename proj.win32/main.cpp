@@ -26,6 +26,11 @@
 #include "AppDelegate.h"
 #include "cocos2d.h"
 
+#include <direct.h>
+#include <stdio.h>
+
+#include <experimental/filesystem>
+
 USING_NS_CC;
 
 int WINAPI _tWinMain(HINSTANCE hInstance,
@@ -33,6 +38,9 @@ int WINAPI _tWinMain(HINSTANCE hInstance,
                        LPTSTR    lpCmdLine,
                        int       nCmdShow)
 {
+	
+	std::string path = std::experimental::filesystem::current_path().string();
+
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
 

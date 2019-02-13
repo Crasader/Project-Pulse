@@ -4,6 +4,8 @@
 #include <string>
 #include <algorithm>
 
+#include "cocos2d.h"
+
 namespace Retry
 {
 
@@ -12,31 +14,40 @@ std::unordered_map<std::string, bool> Config::settings;
 bool Config::loadSettingsFromFile()
 {
 	// TODO: Change to search nearby directories for the config directory
-	std::ifstream config("./../Config/config.txt");
+	std::string configDirectory = cocos2d::FileUtils::getInstance()->getWritablePath() + "\\Config";
+	std::string configPath = configDirectory + "\\config.txt";
+	std::ifstream config(configPath);
 
-	if (config.is_open())
+	if (!config.is_open())
 	{
-		std::string settingName;
-		char c;
-		while (config.get(c))
-		{
-			if (c == ' ')
-			{
-				settings[settingName] = config.get() - 48;
-				settingName.clear();
-				std::getline(config, std::string());
-				config.get(c);
-			}
-			settingName += c;
-		}
-		return true;
+		if (!cocos2d::FileUtils::getInstance()->isDirectoryExist(configDirectory))
+			cocos2d::FileUtils::getInstance()->createDirectory(configDirectory);
+
+		std::ofstream newFile(configPath);
+		newFile << "debug 0\nscreenshake 1\nvibration 1";
+		newFile.close();
+		config.open(configPath);
 	}
-	return false;
+
+	std::string settingName;
+	char c;
+	while (config.get(c))
+	{
+		if (c == ' ')
+		{
+			settings[settingName] = config.get() - 48;
+			settingName.clear();
+			std::getline(config, std::string());
+			config.get(c);
+		}
+		settingName += c;
+	}
+	return true;
 }
 
 bool Config::saveSettingsToFile()
 {
-	std::fstream config("./../Config/config.txt");
+	std::fstream config(cocos2d::FileUtils::getInstance()->getWritablePath() + "\\Config\\config.txt");
 
 	if (config.is_open())
 	{

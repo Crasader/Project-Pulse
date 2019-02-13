@@ -47,9 +47,10 @@ void Entity::initAnimation(std::string action, std::string file, cocos2d::Vec2 s
 {
 	//TODO: Add more functionality
 	auto temp = cocos2d::Animation::create();
+	int width = sprite->getTexture()->getPixelsWide() / frameSize.x;
 	for (int i = 0; i < numFrames; i++)
 	{
-		cocos2d::Vec2 startPosition((startCell.x + i) * frameSize.x, (startCell.y) * frameSize.y);
+		cocos2d::Vec2 startPosition((((int) startCell.x + i) % width) * frameSize.x, (startCell.y + ((int) startCell.x + i) / width) * frameSize.y);
 		temp->addSpriteFrame(cocos2d::SpriteFrame::create(file.c_str(), cocos2d::Rect(startPosition, cocos2d::Size(frameSize))));
 	}
 	temp->setLoops(1);
@@ -68,13 +69,13 @@ void Entity::runAnimation(std::string action, float totalTime)
 	{
 		currentAnimation = action;
 		sprite->stopAllActionsByTag('anim');
-		auto tempAnim = cocos2d::Animate::create(animations[action]);
+		auto tempAnim = cocos2d::Animate::create(animations[action]->clone());
 		tempAnim->setTag('anim');
 		sprite->runAction(tempAnim);
 	} else if (currentAnimate == nullptr)
 	{
 		sprite->stopAllActionsByTag('anim');
-		auto tempAnim = cocos2d::Animate::create(animations[action]);
+		auto tempAnim = cocos2d::Animate::create(animations[action]->clone());
 		tempAnim->setTag('anim');
 		sprite->runAction(tempAnim);
 	} else

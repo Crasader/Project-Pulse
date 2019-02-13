@@ -75,6 +75,7 @@ static int register_all_packages() {
 
 bool AppDelegate::applicationDidFinishLaunching() {
 	// initialize director
+
 	auto director = Director::getInstance();
 	auto glview = director->getOpenGLView();
 	if (!glview) {
@@ -85,6 +86,8 @@ bool AppDelegate::applicationDidFinishLaunching() {
 #endif
 		director->setOpenGLView(glview);
 	}
+
+	Retry::Config::loadSettingsFromFile();
 
 	// turn on display FPS
 	director->setDisplayStats(true);
@@ -109,8 +112,6 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	}
 
 	register_all_packages();
-
-	Retry::Config::loadSettingsFromFile();
 
 	cocos2d::experimental::AudioEngine::lazyInit();
 
