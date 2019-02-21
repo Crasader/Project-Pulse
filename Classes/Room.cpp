@@ -8,7 +8,7 @@ namespace Retry
 Retry::Room::Room()
 {
 	cocos2d::Image* roomData = new cocos2d::Image;
-	roomData->initWithImageFile("level2.png");
+	roomData->initWithImageFile("tutorial.png");
 	//roomDraw = cocos2d::Node::create();
 
 	int numChannels = roomData->getBitPerPixel() / 8;
@@ -28,7 +28,7 @@ Retry::Room::Room()
 				tile.y = roomData->getData()[(i + (roomData->getHeight() - j - 1) * roomData->getWidth()) * numChannels + 1];
 				tile.z = roomData->getData()[(i + (roomData->getHeight() - j - 1) * roomData->getWidth()) * numChannels + 2];
 				//tile.w = roomData->getData()[(i + (roomData->getHeight() - j - 1) * roomData->getWidth()) * numChannels + 3];
-				tile.w = 0x02;
+				tile.w = 0x01;
 
 				tileData[convertVec2ToLong(Vec2(i, j))] = tile;
 			}

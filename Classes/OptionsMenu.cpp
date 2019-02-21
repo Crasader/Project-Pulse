@@ -83,7 +83,8 @@ bool OptionsMenu::init()
 void OptionsMenu::update(float delta)
 {
 	if (Retry::Keyboard::isKeyDown(Retry::KeyCode::ESCAPE) ||
-		Retry::Controller::isButtonDown(Retry::ControllerButton::B))
+		Retry::Controller::isButtonDown(Retry::ControllerButton::B) ||
+		Retry::Controller::isButtonDown(Retry::ControllerButton::START))
 		cocos2d::Director::getInstance()->popScene();
 
 

@@ -81,7 +81,7 @@ bool MainScene::init()
 
 	gui = cocos2d::Node::create();
 
-	initPlayer(Vec2(1230, 4000));
+	initPlayer(Vec2(150, 400));
 
 	auto cobble = cocos2d::Sprite::create("cobblestone.png");
 	auto cSize = cobble->getContentSize();
@@ -132,11 +132,6 @@ bool MainScene::init()
 
 	Retry::Camera::setPosition(player->getSprite()->getPosition());
 
-	player->getHurtBox()->addRect(Vec2(8, 0), cocos2d::Size(32, 40));
-	//player->getHurtBox()->addRect(Vec2(0, 0), cocos2d::Size(48, 48));
-	//player->getHurtBox()->addCircle(Vec2(24, 20), 20);
-	//player->getHurtBox()->addCapsule(Vec2(50, 24), Vec2(-10, -10), 10);
-
 	auto s = cocos2d::Sprite::create("CloseSelected.png");
 	s->retain();
 	s->setName("test");
@@ -170,11 +165,20 @@ void MainScene::update(float delta)
 	if (Keyboard::isKeyDown(KeyCode::ESCAPE) || Controller::isButtonDown(ControllerButton::START))
 		cocos2d::Director::getInstance()->pushScene(OptionsMenu::createScene());
 
-	if (Keyboard::isKeyDown(KeyCode::Q))
+	if (Keyboard::isKeyDown(KeyCode::Q) || Controller::isButtonDown(ControllerButton::BACK))
 		cocos2d::Director::getInstance()->replaceScene(MenuScene::create());
 
-	if (Keyboard::isKeyDown(KeyCode::F2))
-		Retry::Config::toggleDebug();
+	if (Controller::isAxisPressed(ControllerButton::RIGHT_TRIGGER))
+		delta *= 0.25f;
+
+	if (Controller::isButtonPressed(ControllerButton::RIGHT_BUMPER))
+		Retry::Camera::setTrauma(0.3f);
+
+	if (Controller::isButtonPressed(ControllerButton::RIGHT_STICK))
+		Retry::Camera::setTrauma(1);
+
+	if (Keyboard::isKeyDown(KeyCode::F2) || Controller::isButtonDown(ControllerButton::LEFT_BUMPER))
+		toggleDebug();
 	//if (Controller::isAxisPressed(ControllerButton::LEFT_TRIGGER))
 		Retry::Config::setDebug(Controller::isAxisPressed(ControllerButton::LEFT_TRIGGER));
 
@@ -225,17 +229,20 @@ void MainScene::update(float delta)
 
 void MainScene::initPlayer(cocos2d::Vec2 position)
 {
-	player = new Retry::Player("sonic.png", position);
-	//player->getSprite()->setAnchorPoint(cocos2d::Vec2(0.5, 0));
-	player->getSprite()->setScale(3);
+	player = new Retry::Player("cybercop.png", position);
 
-	const cocos2d::Vec2 tileSize(48, 48);
-	//player->getCollisionBody()->setSize(cocos2d::Size(tileSize));
+	const cocos2d::Vec2 tileSize(128, 128);
 
-	player->initAnimation("run", "sonic.png", cocos2d::Vec2(0, 0), tileSize, 6);
-	player->initAnimation("idle", "sonic.png", cocos2d::Vec2(6, 0), tileSize, 6);
-	player->initAnimation("jump", "sonic.png", cocos2d::Vec2(0, 3), tileSize, 5);
+	player->initAnimation("run", "cybercop.png", cocos2d::Vec2(0, 2), tileSize, 6);
+	player->initAnimation("idle", "cybercop.png", cocos2d::Vec2(0, 0), tileSize, 20);
+	player->initAnimation("jump", "cybercop.png", cocos2d::Vec2(6, 2), tileSize, 14);
 	player->runAnimation("run", 0);
+
+	//player->getHurtBox()->addRect(Vec2(32, 0), cocos2d::Size(64, 128));
+	player->getHurtBox()->addCapsule(Vec2(64, 32), Vec2(64, 96), 32);
+	//player->getHurtBox()->setDebugDrawColor(cocos2d::Color4F(1, 0, 0, 1));
+
+	player->getSprite()->setScale(1);
 
 	this->addChild(player->getSprite(), 100);
 	actorList.push_back(player);
@@ -258,10 +265,11 @@ void MainScene::updateBackground()
 
 void MainScene::toggleDebug()
 {
-	Retry::Config::toggleDebug();
+	//Retry::Config::toggleDebug();
+	static bool doDraw = false;
 	for (auto i : actorList)
 	{
-		//i->getHurtBox()->setDebugDraw(Retry::Config::doDebug());
-		//i->getHitBox()->setDebugDraw(Retry::Config::doDebug());
+		i->getHurtBox()->setDebugDraw(doDraw = !doDraw);
+		i->getHitBox()->setDebugDraw(doDraw);
 	}
 }

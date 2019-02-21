@@ -5,6 +5,10 @@
 namespace Retry
 {
 
+using cocos2d::Vec2;
+using cocos2d::Size;
+using cocos2d::Rect;
+
 Entity::Entity(std::string path, cocos2d::Vec2 position)
 {
 	init(path, position);
@@ -43,15 +47,15 @@ void Entity::moveBy(cocos2d::Vec2 movement)
 	//sprite->setPosition(position);
 }
 
-void Entity::initAnimation(std::string action, std::string file, cocos2d::Vec2 startCell, cocos2d::Vec2 frameSize, int numFrames)
+void Entity::initAnimation(std::string action, std::string file, Vec2 startCell, Vec2 frameSize, int numFrames)
 {
 	//TODO: Add more functionality
 	auto temp = cocos2d::Animation::create();
 	int width = sprite->getTexture()->getPixelsWide() / frameSize.x;
 	for (int i = 0; i < numFrames; i++)
 	{
-		cocos2d::Vec2 startPosition((((int) startCell.x + i) % width) * frameSize.x, (startCell.y + ((int) startCell.x + i) / width) * frameSize.y);
-		temp->addSpriteFrame(cocos2d::SpriteFrame::create(file.c_str(), cocos2d::Rect(startPosition, cocos2d::Size(frameSize))));
+		Vec2 startPosition((((int) startCell.x + i) % width) * frameSize.x, (startCell.y + ((int) startCell.x + i) / width) * frameSize.y);
+		temp->addSpriteFrame(cocos2d::SpriteFrame::create(file.c_str(), Rect(startPosition, Size(frameSize))));
 	}
 	temp->setLoops(1);
 

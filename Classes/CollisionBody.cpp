@@ -39,7 +39,6 @@ void Body::redraw()
 	{
 		hitBox->drawSolidPoly(poly.verts.data(), poly.verts.size(), debugDrawColor);
 	}
-
 }
 
 void Body::addRect(const Vec2 &position, const Size &size)
@@ -155,7 +154,7 @@ Rect Body::getBoundingBox()
 	Rect boundingBox;
 	for (const auto &i : collisionRects)
 	{
-		if (boundingBox.size.width == 0 && boundingBox.size.height == 0) 
+		if (boundingBox.size.width == 0 && boundingBox.size.height == 0)
 			boundingBox = i.boundingBox;
 		boundingBox = boundingBox.unionWithRect(i.boundingBox);
 	}
@@ -167,13 +166,13 @@ Rect Body::getBoundingBox()
 	}
 	for (const auto &i : collisionCapsules)
 	{
-		if (boundingBox.size.width == 0 && boundingBox.size.height == 0) 
+		if (boundingBox.size.width == 0 && boundingBox.size.height == 0)
 			boundingBox = i.boundingBox;
 		boundingBox = boundingBox.unionWithRect(i.boundingBox);
 	}
 	for (const auto &i : collisionPolygons)
 	{
-		if (boundingBox.size.width == 0 && boundingBox.size.height == 0) 
+		if (boundingBox.size.width == 0 && boundingBox.size.height == 0)
 			boundingBox = i.boundingBox;
 		boundingBox = boundingBox.unionWithRect(i.boundingBox);
 	}
@@ -358,7 +357,7 @@ CollisionRect worldSpaceRect(const cocos2d::Node* p, const CollisionRect &c)
 	{
 		totalScale *= n->getScale();
 	}
-	
+
 	newShape.size = c.size * totalScale;
 	newShape.rotation = -p->getParent()->getRotation() * 3.1415 / 180;
 	return newShape;

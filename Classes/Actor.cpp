@@ -2,13 +2,10 @@
 
 #include "CameraManager.h"
 #include "ControllerManager.h"
+#include "KeyboardManager.h"
 
 namespace Retry
 {
-
-using cocos2d::Vec2;
-using cocos2d::Size;
-using cocos2d::Rect;
 
 Actor::Actor(const std::string &name, const cocos2d::Vec2 &position)
 {
@@ -104,7 +101,7 @@ float Actor::doSolidCollisionX(Retry::Level* level, const Rect &boundingBox)
 		for (float j = boundingBox.getMinY(), m = boundingBox.getMaxY(); j <= m; j += incY)
 		{
 			Vec2 currentTile = Vec2(i, j - deltaPosition.y) / level->getTileSize();
-			if (level->getCollisionDataAt(currentTile) & 0x01)
+			if (boundingBox.getMinX() < 0 || level->getCollisionDataAt(currentTile) & 0x01)
 			{
 				position.x = lastPosition.x;
 				velocity.x = 0;
@@ -126,7 +123,7 @@ float Actor::doSolidCollisionY(Retry::Level* level, const Rect &boundingBox)
 		for (float j = boundingBox.getMinY(), m = boundingBox.getMaxY(); j <= m; j += incY)
 		{
 			Vec2 currentTile = Vec2(i - (position.x == lastPosition.x ? deltaPosition.x : 0), j) / level->getTileSize();
-			if (level->getCollisionDataAt(currentTile) & 0x01)
+			if (boundingBox.getMinY() < 0 || level->getCollisionDataAt(currentTile) & 0x01)
 			{
 				if (!onGround && velocity.y < 0)
 				{
@@ -147,30 +144,15 @@ float Actor::doSolidCollisionY(Retry::Level* level, const Rect &boundingBox)
 float Actor::doPlatformCollisionX(Retry::Level* level, const Rect &boundingBox)
 {
 
-	if (velocity.y > 0 || Controller::getAxis(ControllerButton::LEFT_STICK_DOWN) < -0.8f) return position.x;
-
-	float incX = (boundingBox.getMaxX() - boundingBox.getMinX()) / ceil(getWidth() / (level->getTileSize() - 1));
-	float incY = (boundingBox.getMaxY() - boundingBox.getMinY()) / ceil(getHeight() / (level->getTileSize() - 1));
-
-	for (float i = boundingBox.getMinX(), n = boundingBox.getMaxX(); i <= n; i += incX)
-	{
-		for (float j = boundingBox.getMinY(), m = boundingBox.getMaxY(); j <= m; j += incY)
-		{
-			Vec2 currentTile = Vec2(i, j - deltaPosition.y) / level->getTileSize();
-			if (onGround && level->getCollisionDataAt(currentTile) & 0x02)
-			{
-				position.x = lastPosition.x;
-				velocity.x = 0;
-				return position.x;
-			}
-		}
-	}
+	
 	return position.x;
 }
 
 float Actor::doPlatformCollisionY(Retry::Level* level, const Rect &boundingBox)
 {
-	if (velocity.y > 0 || Controller::getAxis(ControllerButton::LEFT_STICK_DOWN) < -0.8f) return position.y;
+	if (velocity.y > 0 || 
+		Controller::getAxis(ControllerButton::LEFT_STICK_DOWN) < -0.8f ||
+		Keyboard::isKeyDown(KeyCode::S)) return position.y;
 
 	float incX = (boundingBox.getMaxX() - boundingBox.getMinX()) / ceil(getWidth() / (level->getTileSize() - 1));
 

@@ -92,19 +92,20 @@ void Retry::Player::update(float delta)
 
 
 	// ANIMATION HANDLING
+	float multi = Controller::isAxisPressed(ControllerButton::RIGHT_TRIGGER) ? 4 : 1;
 	if (velocity.x != 0) sprite->setFlippedX(velocity.x < 0);
 	if (onGround)
 	{
 		if (velocity.x != 0)
 		{
-			runAnimation("run", animMoveTime / sideMove);
+			runAnimation("run", animMoveTime / sideMove * multi);
 		} else
 		{
-			runAnimation("idle", 0.15f);
+			runAnimation("idle", 0.12f * multi);
 		}
 	} else
 	{
-		runAnimation("jump", 0.05f);
+		runAnimation("jump", 0.1f * multi);
 	}
 	// !ANIMATION HANDLING
 

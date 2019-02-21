@@ -90,7 +90,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	Retry::Config::loadSettingsFromFile();
 
 	// turn on display FPS
-	director->setDisplayStats(true);
+	//director->setDisplayStats(true);
 
 	// set FPS. the default value is 1.0/60 if you don't call this
 	director->setAnimationInterval(1.0f / 60);
@@ -116,7 +116,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	cocos2d::experimental::AudioEngine::lazyInit();
 
 	//dynamic_cast<GLViewImpl*>(director->getOpenGLView())->setFullscreen();
-	dynamic_cast<GLViewImpl*>(director->getOpenGLView())->setWindowed(smallResolutionSize.width, smallResolutionSize.height);
+	dynamic_cast<GLViewImpl*>(director->getOpenGLView())->setWindowed(largeResolutionSize.width, largeResolutionSize.height);
 	//glview->setDesignResolutionSize(glview->getFrameSize().width, glview->getFrameSize().height, ResolutionPolicy::NO_BORDER);
 
 	// create a scene. it's an autorelease object
