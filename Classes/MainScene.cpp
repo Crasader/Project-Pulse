@@ -55,27 +55,22 @@ using Retry::Controller;
 using Retry::ControllerButton;
 
 
-cocos2d::Scene* MainScene::createScene()
-{
+cocos2d::Scene* MainScene::createScene() {
 	auto scene = MainScene::create();
 
 	return scene;
 }
 
-void MainScene::onExit()
-{
+void MainScene::onExit() {
 	Scene::onExit();
 }
 
-void MainScene::onEnter()
-{
+void MainScene::onEnter() {
 	Scene::onEnter();
 }
 
-bool MainScene::init()
-{
-	if (!Scene::init())
-	{
+bool MainScene::init() {
+	if (!Scene::init()) {
 		return false;
 	}
 
@@ -83,15 +78,20 @@ bool MainScene::init()
 
 	initPlayer(Vec2(150, 400));
 
+	enemy = new Retry::Actor("HelloWorld.png", Vec2(6000, 1000));
+	enemy->getSprite()->setScale(0.5f);
+	enemy->getHurtBox()->addRect(Vec2(0, 0), Size(200, 250));
+	this->addChild(enemy->getSprite());
+
+	actorList.emplace_back(enemy);
+
 	auto cobble = cocos2d::Sprite::create("cobblestone.png");
 	auto cSize = cobble->getContentSize();
 	auto sSize = cocos2d::Director::getInstance()->getVisibleSize();
 
 
-	for (int i = 0; i < (int) sSize.width / (int) cSize.width + 3; i++)
-	{
-		for (int j = 0; j < (int) sSize.height / (int) cSize.height + 3; j++)
-		{
+	for (int i = 0; i < (int) sSize.width / (int) cSize.width + 3; i++) {
+		for (int j = 0; j < (int) sSize.height / (int) cSize.height + 3; j++) {
 			auto newCobble = cocos2d::Sprite::create("cobblestone.png");
 			newCobble->setAnchorPoint(Vec2(0, 0));
 			newCobble->setPosition(i * cSize.width, j * cSize.height);
@@ -152,13 +152,11 @@ bool MainScene::init()
 	return true;
 }
 
-void MainScene::menuCloseCallback(Ref* pSender)
-{
+void MainScene::menuCloseCallback(Ref* pSender) {
 	cocos2d::Director::getInstance()->end();
 }
 
-void MainScene::update(float delta)
-{
+void MainScene::update(float delta) {
 	//if (Controller::isAxisPressed(ControllerButton::RIGHT_TRIGGER) ||
 	//	Keyboard::isKeyPressed(KeyCode::SHIFT)) delta *= 0.25f;
 
@@ -180,7 +178,7 @@ void MainScene::update(float delta)
 	if (Keyboard::isKeyDown(KeyCode::F2) || Controller::isButtonDown(ControllerButton::LEFT_BUMPER))
 		toggleDebug();
 	//if (Controller::isAxisPressed(ControllerButton::LEFT_TRIGGER))
-		Retry::Config::setDebug(Controller::isAxisPressed(ControllerButton::LEFT_TRIGGER));
+	Retry::Config::setDebug(Controller::isAxisPressed(ControllerButton::LEFT_TRIGGER));
 
 	if (Keyboard::isKeyDown(KeyCode::F3))
 		Retry::Config::toggleScreenShake();
@@ -188,12 +186,21 @@ void MainScene::update(float delta)
 	if (Keyboard::isKeyDown(KeyCode::F4))
 		Retry::Config::toggleVibration();
 
-	for (auto i : actorList) i->update(delta);
+	if (Keyboard::isKeyPressed(KeyCode::LEFT_ARROW))
+		enemy->bufferAction("left");
+	if (Keyboard::isKeyPressed(KeyCode::RIGHT_ARROW))
+		enemy->bufferAction("right");
+	if (Keyboard::isKeyPressed(KeyCode::UP_ARROW))
+		enemy->bufferAction("jump");
 
+	for (auto i : actorList) i->update(delta);
+	static int count = 0;
+	for (auto i : actorList) if (i != player) if (player->isAttackCollidingWith(i)) cocos2d::log("Hit! %d", count++);
 
 	// COLLISION
 	if (!Retry::Config::doDebug())
 		player->doTerrainCollision(level, delta);
+	for (auto i : actorList) if (i != player) i->doTerrainCollision(level, delta);
 
 	if (Keyboard::isKeyPressed(KeyCode::UP_ARROW) ||
 		Controller::isAxisPressed(ControllerButton::RIGHT_STICK_UP))
@@ -213,8 +220,7 @@ void MainScene::update(float delta)
 	Retry::Camera::update(delta);
 
 	static bool doFull = false;
-	if (Keyboard::isKeyDown(KeyCode::F11))
-	{
+	if (Keyboard::isKeyDown(KeyCode::F11)) {
 		if (!(doFull = !doFull))
 			dynamic_cast<cocos2d::GLViewImpl*>(cocos2d::Director::getInstance()->getOpenGLView())->setWindowed(1280, 720);
 		else
@@ -227,8 +233,7 @@ void MainScene::update(float delta)
 	Retry::Camera::transformUI(gui);
 }
 
-void MainScene::initPlayer(cocos2d::Vec2 position)
-{
+void MainScene::initPlayer(cocos2d::Vec2 position) {
 	player = new Retry::Player("cybercop.png", position);
 
 	const cocos2d::Vec2 tileSize(128, 128);
@@ -245,17 +250,14 @@ void MainScene::initPlayer(cocos2d::Vec2 position)
 	player->getSprite()->setScale(1);
 
 	this->addChild(player->getSprite(), 100);
-	actorList.push_back(player);
+	actorList.emplace_back(player);
 }
 
-void MainScene::updateBackground()
-{
+void MainScene::updateBackground() {
 	static auto cSize = background.front()->getContentSize();
 	static auto sSize = cocos2d::Director::getInstance()->getVisibleSize();
-	for (int i = 0; i < (int) sSize.width / (int) cSize.width + 3; i++)
-	{
-		for (int j = 0; j < (int) sSize.height / (int) cSize.height + 3; j++)
-		{
+	for (int i = 0; i < (int) sSize.width / (int) cSize.width + 3; i++) {
+		for (int j = 0; j < (int) sSize.height / (int) cSize.height + 3; j++) {
 			int index = i + j * ((int) sSize.width / (int) cSize.width + 3);
 			auto camPos = Retry::Camera::getPosition();
 			background[index]->setPosition(camPos - sSize / 2 + cocos2d::Vec2((i - 1) * cSize.width, j * cSize.height) - cocos2d::Vec2((int) camPos.x % (int) cSize.width, (int) camPos.y % (int) cSize.height) + cocos2d::Vec2(10, 10));
@@ -263,13 +265,12 @@ void MainScene::updateBackground()
 	}
 }
 
-void MainScene::toggleDebug()
-{
+void MainScene::toggleDebug() {
 	//Retry::Config::toggleDebug();
 	static bool doDraw = false;
-	for (auto i : actorList)
-	{
-		i->getHurtBox()->setDebugDraw(doDraw = !doDraw);
+	doDraw = !doDraw;
+	for (auto i : actorList) {
+		i->getHurtBox()->setDebugDraw(doDraw);
 		i->getHitBox()->setDebugDraw(doDraw);
 	}
 }

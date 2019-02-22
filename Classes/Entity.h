@@ -6,11 +6,11 @@
 
 #include "CollisionBody.h"
 
-namespace Retry
-{
+namespace Retry {
 
-class Entity
-{
+class Attack;
+
+class Entity {
 public:
 
 	Entity() = default;
@@ -20,7 +20,7 @@ public:
 	void init(std::string path, cocos2d::Vec2 position);
 	void kill(float delay = 0.0f);
 
-	virtual void update(float dt) {};
+	virtual void update(const float& dt) {};
 
 	void moveBy(cocos2d::Vec2 movement);
 
@@ -36,11 +36,11 @@ public:
 	cocos2d::Vec2 getVelocity() { return velocity; }
 	cocos2d::Vec2 getAcceleration() { return acceleration; }
 
-	void setPosition(const cocos2d::Vec2 &position)
-	{
+	void setPosition(const cocos2d::Vec2 &position) {
+
 		lastPosition = this->position;
 
-		sprite->setPosition(position + sprite->getBoundingBox().size / 2); 
+		sprite->setPosition(position + sprite->getBoundingBox().size / 2);
 		this->position = position;
 
 		deltaPosition = this->position - this->lastPosition;
@@ -51,11 +51,8 @@ public:
 	void Entity::initAnimation(std::string action, std::string file, cocos2d::Vec2 startCell, cocos2d::Vec2 frameSize, int numFrames);
 
 	void Entity::runAnimation(std::string action, float totalTime);
-
-
-
+	
 protected:
-
 	cocos2d::Sprite* sprite;
 	cocos2d::Vec2 position;
 	cocos2d::Vec2 velocity;
@@ -68,10 +65,9 @@ protected:
 	std::string currentAnimation;
 	std::unordered_map<std::string, cocos2d::Animation*> animations;
 
-	Retry::Collision::Body hurtBox;
-	Retry::Collision::Body hitBox;
+	Collision::Body hurtBox;
+	Collision::Body hitBox;
 };
-
 
 }
 

@@ -23,7 +23,9 @@ class Player : public Actor
 public:
 	Player(std::string path, cocos2d::Vec2 pos);
 
-	void update(float delta);
+	void update(const float& delta) override;
+
+	void updateAnimations(const float& delta) override;
 
 	void addButtonToMapping(const std::string &action, const Retry::KeyCode &button);
 	void addButtonToMapping(const std::string &action, const Retry::MouseButton &button);
@@ -37,7 +39,11 @@ public:
 private:
 	std::unordered_map<std::string, KeyMap> actionMapping;
 
-	void updateActionBuffer();
+	void updateActionBuffer(const float& delta) override;
+
+	void performSideMovement(const float& delta) override;
+
+	void performJump(const float& delta) override;
 };
 
 }

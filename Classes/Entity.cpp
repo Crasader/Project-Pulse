@@ -65,6 +65,8 @@ void Entity::initAnimation(std::string action, std::string file, Vec2 startCell,
 
 void Entity::runAnimation(std::string action, float totalTime)
 {
+	if (animations.find(action) == animations.end()) return;
+
 	auto currentAnimate = (cocos2d::Animate*)sprite->getActionByTag('anim');
 
 	if (totalTime > 0) animations[action]->setDelayPerUnit(totalTime);

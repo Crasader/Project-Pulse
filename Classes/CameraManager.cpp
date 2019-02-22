@@ -46,7 +46,7 @@ void Camera::update(float delta)
 		float targetOffsetX = (cocos2d::Vec2(0.5f, 0.5f) - followTarget->getAnchorPoint()).x * followTarget->getContentSize().width;
 		float targetOffsetY = (cocos2d::Vec2(0.5f, 0.5f) - followTarget->getAnchorPoint()).y * followTarget->getContentSize().height;
 
-		Vec2 cameraFollowPoint = followTarget->getPosition() + cocos2d::Vec2(targetOffsetX, targetOffsetY);
+		cocos2d::Vec2 cameraFollowPoint = followTarget->getPosition() + cocos2d::Vec2(targetOffsetX, targetOffsetY);
 		if (cameraFollowPoint.x - cocos2d::Director::getInstance()->getVisibleSize().width / 2 < 0) \
 			cameraFollowPoint.x = cocos2d::Director::getInstance()->getVisibleSize().width / 2;
 		if (cameraFollowPoint.y - cocos2d::Director::getInstance()->getVisibleSize().height / 2 < 0) 

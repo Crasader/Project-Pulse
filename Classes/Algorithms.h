@@ -6,13 +6,16 @@
 
 namespace Retry
 {
-using cocos2d::Vec2;
 
-float clamp(float v, float lo, float hi);
+float clamp(const float& v, const float& lo, const float& hi);
 
-long convertVec2ToLong(const Vec2 &v);
+int sign(const float& n);
 
-Vec2 convertLongToVec2(const long &l);
+float lerp(const float& p0, const float& p1, const float& t);
+
+long convertVec2ToLong(const cocos2d::Vec2 &v);
+
+cocos2d::Vec2 convertLongToVec2(const long &l);
 
 }
 

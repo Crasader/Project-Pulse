@@ -19,10 +19,12 @@ struct CollisionPolygon;
 class Body
 {
 public:
-	Body() { hitBox = cocos2d::DrawNode::create(); hitBox->setVisible(false); };
-	Body(cocos2d::Node* node) { hitBox = cocos2d::DrawNode::create(); node->addChild(hitBox); hitBox->setVisible(false); }
+	Body();
+	Body(cocos2d::Node* node);
 
 	cocos2d::DrawNode* getHitBox() const { return hitBox; }
+
+	void setParent(cocos2d::Node* node) { node->addChild(hitBox); }
 
 	void redraw();
 
@@ -49,9 +51,8 @@ public:
 	void setTestPosition(Vec2 pos);
 private:
 	cocos2d::DrawNode* hitBox;
-	cocos2d::DrawNode* actualHitBox;
 
-	cocos2d::Color4F debugDrawColor = cocos2d::Color4F(1, 1, 1, 1);
+	cocos2d::Color4F debugDrawColor = cocos2d::Color4F(1.0f, 0.0f, 0.0f, 0.3f);
 
 	std::vector<CollisionRect> collisionRects;
 	std::vector<CollisionCircle> collisionCircles;

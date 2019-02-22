@@ -53,6 +53,7 @@ private:
 	void toggleDebug();
 
 	Retry::Player* player;
+	Retry::Actor* enemy;
 
 	std::vector<Retry::Actor*> actorList;
 
