@@ -10,6 +10,43 @@ namespace Retry {
 
 Actor::Actor(const std::string &name, const cocos2d::Vec2 &position) {
 	init(name, position);
+
+	Attack* atk = new Attack();
+	atk->setDamage(10);
+	atk->setDelay(0.0f);
+	atk->setDuration(0.3f);
+	atk->setRecovery(0.05f);
+	atk->setKnockBackAmount(3);
+	atk->setKnockBackDirection(Vec2(1, 0.25f));
+	atk->getHitBox()->addRect(Vec2(64, 64), cocos2d::Size(100, 50));
+	atk->getHitBox()->setParent(sprite);
+	attackList[0b00000001] = atk;
+
+	atk = new Attack();
+	atk->setDamage(10);
+	atk->setDelay(0.1f);
+	atk->setDuration(0.3f);
+	atk->setRecovery(0.15f);
+	atk->setKnockBackAmount(3);
+	atk->setKnockBackDirection(Vec2(1, 0.25f));
+	atk->getHitBox()->addCircle(Vec2(96, 64), 24);
+	atk->getHitBox()->setParent(sprite);
+	attackList[0b00000100] = atk;
+
+	atk = new Attack();
+	atk->setDamage(20);
+	atk->setDelay(0.0f);
+	atk->setDuration(0.4f);
+	atk->setRecovery(0.05f);
+	atk->setKnockBackAmount(3);
+	atk->setKnockBackDirection(Vec2(1, 0.25f));
+	atk->getHitBox()->addRect(Vec2(64, 64), cocos2d::Size(150, 50));
+	atk->getHitBox()->setParent(sprite);
+	attackList[0b00010000] = atk;
+}
+
+Actor::~Actor() {
+	
 }
 
 void Actor::setFlippedX(const bool& flip) {
@@ -29,12 +66,12 @@ void Actor::update(const float& delta) {
 	performSideMovement(delta);
 
 	performJump(delta);
-	
+
 	moveBy(velocity * delta + 0.5f * acceleration * delta * delta);
 
 	velocity.y += (!isActionPressed("jump") || velocity.y < 0 ? 2 : 1) * acceleration.y * delta;
 	velocity.y = clamp(velocity.y, -2000, 2000);
-	
+
 	performAttack(delta);
 
 	updateAnimations(delta);
@@ -50,6 +87,10 @@ bool Actor::doTerrainCollision(Retry::Level* level, const float &delta) {
 	cocos2d::Rect boundingBox(sprite->convertToWorldSpace(hurtBox.getBoundingBox().origin), hurtBox.getBoundingBox().size);
 	for (cocos2d::Node* n = sprite; n != nullptr; n = n->getParent())
 		boundingBox.size = boundingBox.size * n->getScale();
+	boundingBox.origin = boundingBox.origin / cocos2d::Director::getInstance()->getRunningScene()->getScale();
+	boundingBox.size = boundingBox.size / cocos2d::Director::getInstance()->getRunningScene()->getScale();
+
+	//cocos2d::Rect boundingBox = hurtBox.getBoundingBox();
 
 	doSolidCollisionX(level, boundingBox);
 	doSolidCollisionY(level, boundingBox);
@@ -70,9 +111,9 @@ bool Actor::isAttackCollidingWith(Actor* target) {
 			attackTimer < currentAttack->getRecovery())
 			return false;
 
-		return (invincibilityTimer <= 0 &&
+		return (!target->isInvincible() &&
 				currentAttack->getHitBox()->isCollidingWith(target->getHurtBox()));
-	}
+	} else return false;
 }
 
 void Actor::updateAnimations(const float & delta) {
@@ -158,15 +199,26 @@ void Actor::performJump(const float & delta) {
 	}
 }
 
-// TENTATIVE FUNCTIONS DO NOT USE UNLESS YOU KNOW WHAT THEY DO
-void Actor::decreaseHealth(const float &delta) {
-	health -= 40 * delta;
-	if (health < 0) health = 0;
+void Actor::adjustHealth(const float &amount) {
+	this->health += amount;
+	this->health = clamp(this->health, 0, this->maxHealth);
 }
 
-void Actor::increaseHealth(const float &delta) {
-	health += 40 * delta;
-	if (health > maxHealth) health = maxHealth;
+void Actor::doAttackOnActor(Actor* actor) {
+	if (getCurrentAttack()) {
+		actor->adjustHealth(-abs(getCurrentAttack()->getDamage()));
+
+		Vec2 kb = getCurrentAttack()->getKnockBackDirection() * getCurrentAttack()->getKnockBackAmount() * 100;
+		kb.x = sprite->isFlippedX() ? -kb.x : kb.x;
+		if (kb.y > 0) {
+			actor->doJump++;
+			actor->onGround = false;
+		}
+		actor->setVelocity(kb);
+
+		actor->setInvincible();
+	}
+
 }
 
 void Actor::updateActionBuffer(const float& delta) {
@@ -206,8 +258,8 @@ bool Actor::isActionUp(const std::string &action) {
 }
 
 float Actor::actionPressedDuration(const std::string &action) {
-	//if (actionBuffer.find(action) != actionBuffer.end())
-	//	return actionBuffer[action].time;
+//if (actionBuffer.find(action) != actionBuffer.end())
+//	return actionBuffer[action].time;
 	return 0;
 }
 

@@ -22,7 +22,7 @@ class Actor : public Entity {
 public:
 	Actor() = default;
 	Actor(const std::string &path, const cocos2d::Vec2 &position);
-	Actor::~Actor() { delete sprite; }
+	virtual ~Actor();
 
 	void bufferAction(const std::string &action);
 
@@ -31,24 +31,27 @@ public:
 
 	bool isAttackCollidingWith(Actor* body);
 
+	void doAttackOnActor(Actor* actor);
+
 	// GETTERS AND SETTERS
-	float getMaxJumpHeight() { return maxJumpHeight; }
-	float getTimeToMaxJumpHeight() { return timeToMaxJumpHeight; }
+	float getMaxJumpHeight() const { return maxJumpHeight; }
+	float getTimeToMaxJumpHeight() const { return timeToMaxJumpHeight; }
 	void setMaxJumpHeigh(const float& f) { maxJumpHeight = f; }
 	void setTimeTomaxJumpHeight(const float& f) { timeToMaxJumpHeight = f; }
 
-	float getSideMoveSpeed() { return sideMoveSpeed; }
-	float getTimeToMaxSpeed() { return timeToMaxSpeed; }
+	float getSideMoveSpeed() const { return sideMoveSpeed; }
+	float getTimeToMaxSpeed() const { return timeToMaxSpeed; }
 	void setSideMoveSpeed(const float& f) { sideMoveSpeed = f; }
 	void setTimeToMaxSpeed(const float& f) { timeToMaxSpeed = f; }
 
-	int getHealth() { return (int) health; }
-	int getMaxHealth() { return (int) maxHealth; }
-	float getHealthRatio() { return health / maxHealth; }
-	void decreaseHealth(const float &delta);
-	void increaseHealth(const float &delta);
+	int getHealth() const { return (int) health; }
+	int getMaxHealth() const { return (int) maxHealth; }
+	float getHealthRatio() const { return health / maxHealth; }
+	void adjustHealth(const float &amount);
 
-	bool isInvincible() { return invincibilityTimer <= 0; }
+	Attack* getCurrentAttack() const { return attackList.find(currentAttackKey) != attackList.end() ? attackList.at(currentAttackKey) : nullptr; }
+
+	bool isInvincible() const { return invincibilityTimer > 0; }
 	void setInvincible() { invincibilityTimer = invincibilityTime; }
 
 protected:
@@ -103,8 +106,6 @@ protected:
 	char currentAttackKey = 0;
 	std::unordered_map<char, Attack*> attackList;
 
-	Attack* getCurrentAttack() { return attackList.find(currentAttackKey) != attackList.end() ? attackList[currentAttackKey] : nullptr; }
-
 	float attackTimer = 0;
 };
 
@@ -122,20 +123,20 @@ public:
 
 	void setDamage(const float& dmg) { damage = dmg; }
 	void setKnockBackAmount(const float& kbAmt) { this->kbAmt = kbAmt; }
-	void setKnockBackDirection(const cocos2d::Vec2& kbDir) { this->kbDir = kbDir; }
+	void setKnockBackDirection(const cocos2d::Vec2& kbDir) { this->kbDir = cocos2d::Vec2(abs(kbDir.x), kbDir.y).getNormalized(); }
 	void setDelay(const float& delay) { this->delay = delay; }
 	void setDuration(const float& duration) { this->duration = duration; }
 	void setRecovery(const float& recovery) { this->recovery = recovery; }
 
 private:
-	float damage;
+	float damage = 0;
 
-	float kbAmt;
-	cocos2d::Vec2 kbDir;
+	float kbAmt = 0;
+	cocos2d::Vec2 kbDir = Vec2::ZERO;
 
-	float delay;
-	float duration;
-	float recovery;
+	float delay = 0.1f;
+	float duration = 0.5f;
+	float recovery = 0.2f;
 
 	mutable Collision::Body hitBox;
 };

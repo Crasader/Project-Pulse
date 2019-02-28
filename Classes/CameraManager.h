@@ -8,26 +8,22 @@
 
 using Retry::clamp;
 
-namespace Retry
-{
+namespace Retry {
 
-class Camera abstract
-{
+class Camera abstract {
 public:
 	static void update(float delta);
 
 	static void moveBy(cocos2d::Vec2 position);
 
 	static void lazyFollowTarget(cocos2d::Node* target, float timeToReach = 0.5f);
-	static void addTarget(cocos2d::Node* target, float nearThreshHold = 1280 / 2, float farThreshHold = 1280 * 3 / 4);
+	static void addTarget(cocos2d::Node* target, float nearThreshHold = 1920 * 1 / 4, float farThreshHold = 1920 * 4 / 5);
 
 	static void setTimeToTarget(float f);
 
-	static void doLazyFollow()
-	{
-		Camera::targetingMask = 1;
-	}
-	static void doFocusFollow() { Camera::targetingMask = 2; }
+	static void doLazyFollow()  { Camera::targetingMask = 0x1; }
+	static void doFocusFollow() { Camera::targetingMask = 0x2; }
+	static void doMultiFollow() { Camera::targetingMask = 0x4; }
 
 	static cocos2d::Vec2 getPosition() { return Camera::position; }
 	static void setPosition(cocos2d::Vec2 pos) { Camera::position = pos; }

@@ -48,7 +48,6 @@ public:
 
 private:
 	void initPlayer(cocos2d::Vec2 position);
-	void updateBackground();
 
 	void toggleDebug();
 

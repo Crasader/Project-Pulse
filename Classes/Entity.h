@@ -15,7 +15,7 @@ public:
 
 	Entity() = default;
 	Entity(std::string, cocos2d::Vec2);
-	~Entity() {}
+	virtual ~Entity();
 
 	void init(std::string path, cocos2d::Vec2 position);
 	void kill(float delay = 0.0f);

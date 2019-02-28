@@ -14,6 +14,10 @@ Entity::Entity(std::string path, cocos2d::Vec2 position)
 	init(path, position);
 }
 
+Entity::~Entity() {
+	sprite->removeFromParent();
+}
+
 void Entity::init(std::string path, cocos2d::Vec2 position)
 {
 	sprite = cocos2d::Sprite::create(path);

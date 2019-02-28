@@ -12,7 +12,7 @@ Retry::Player::Player(std::string path, cocos2d::Vec2 pos) {
 	init(path, pos);
 
 	addButtonToMapping("jump", KeyCode::SPACE);
-	addButtonToMapping("jump", KeyCode::UP_ARROW);
+	addButtonToMapping("jump", KeyCode::W);
 	addButtonToMapping("jump", ControllerButton::A);
 
 	addButtonToMapping("left", KeyCode::A);
@@ -35,25 +35,84 @@ Retry::Player::Player(std::string path, cocos2d::Vec2 pos) {
 	atk->setDelay(0.0f);
 	atk->setDuration(0.3f);
 	atk->setRecovery(0.05f);
-	atk->getHitBox()->addRect(Vec2(64, 64), cocos2d::Size(200, 50));
+	atk->setKnockBackAmount(3);
+	atk->setKnockBackDirection(Vec2(1, 0.25f));
+	atk->getHitBox()->addRect(Vec2(64, 64), cocos2d::Size(100, 50));
 	atk->getHitBox()->setParent(sprite);
-	attackList[0b01] = atk;
+	attackList[0b00000001] = atk;
 
+	
 	atk = new Attack();
 	atk->setDelay(0.1f);
 	atk->setDuration(0.3f);
-	atk->setRecovery(0.1f);
-	atk->getHitBox()->addCapsule(Vec2(64, 64), Vec2(128, 64), 32);
+	atk->setRecovery(0.15f);
+	atk->setKnockBackAmount(10);
+	atk->setKnockBackDirection(Vec2(1, 0.25f));
+	atk->getHitBox()->addCircle(Vec2(96, 64), 24);
 	atk->getHitBox()->setParent(sprite);
-	attackList[0b100] = atk;
+	attackList[0b00000010] = atk;
+
+	atk = new Attack();
+	atk->setDelay(0.0f);
+	atk->setDuration(0.4f);
+	atk->setRecovery(0.05f);
+	atk->setKnockBackAmount(3);
+	atk->setKnockBackDirection(Vec2(1, 0.25f));
+	atk->getHitBox()->addRect(Vec2(64, 64), cocos2d::Size(150, 50));
+	atk->getHitBox()->setParent(sprite);
+	attackList[0b00000100] = atk;
+
+	atk = new Attack();
+	atk->setDelay(0.1f);
+	atk->setDuration(0.5f);
+	atk->setRecovery(0.11f);
+	atk->setKnockBackAmount(10);
+	atk->setKnockBackDirection(Vec2(1, 0.5f));
+	atk->getHitBox()->addCircle(Vec2(96, 64), 32);
+	atk->getHitBox()->setParent(sprite);
+	attackList[0b00001000] = atk;
 
 	atk = new Attack();
 	atk->setDelay(0.0f);
 	atk->setDuration(0.5f);
-	atk->setRecovery(1.0f);
-	atk->getHitBox()->addCapsule(Vec2(96, 64), Vec2(128, 64), 16);
+	atk->setRecovery(0.25f);
+	atk->setKnockBackAmount(6);
+	atk->setKnockBackDirection(Vec2(0.25, 1));
+	atk->getHitBox()->addRect(Vec2(48, 64), cocos2d::Size(200, 90));
 	atk->getHitBox()->setParent(sprite);
-	attackList[0b10000] = atk;
+	attackList[0b00010000] = atk;
+
+	atk = new Attack();
+	atk->setDelay(0.1f);
+	atk->setDuration(0.5f);
+	atk->setRecovery(0.35f);
+	atk->setKnockBackAmount(10);
+	atk->setKnockBackDirection(Vec2(1, 1));
+	atk->getHitBox()->addCapsule(Vec2(64, 64), Vec2(128, 64), 24);
+	atk->getHitBox()->setParent(sprite);
+	attackList[0b00100000] = atk;
+
+	atk = new Attack();
+	atk->setDelay(0.15f);
+	atk->setDuration(0.3f);
+	atk->setRecovery(0.05f);
+	atk->setKnockBackAmount(10);
+	atk->setKnockBackDirection(Vec2(1, 1));
+	atk->getHitBox()->addCapsule(Vec2(32, 64), cocos2d::Size(112, 64), 32);
+	atk->getHitBox()->setParent(sprite);
+	attackList[0b01000000] = atk;
+
+	atk = new Attack();
+	atk->setDelay(0.2f);
+	atk->setDuration(0.5f);
+	atk->setRecovery(0.4f);
+	atk->setKnockBackAmount(15);
+	atk->setKnockBackDirection(Vec2(1, 1));
+	atk->getHitBox()->addCircle(Vec2(64, 64), 48);
+	atk->getHitBox()->setParent(sprite);
+	attackList[0b10000000] = atk;
+
+
 }
 
 void Retry::Player::update(const float& delta) {
@@ -136,6 +195,7 @@ void Retry::Player::updateActionBuffer(const float& delta) {
 		i.second.down = false;
 		i.second.up = false;
 		i.second.value = 0;
+
 		for (auto j : actionMapping[i.first].kButtons) {
 			i.second.down = i.second.down || Retry::Keyboard::isKeyDown(j);
 			i.second.up = i.second.up || Retry::Keyboard::isKeyUp(j);

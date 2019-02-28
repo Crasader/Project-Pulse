@@ -45,7 +45,7 @@ private:
 
 	Vec2 maxPositions;
 
-	const int tileSize = 32 * 4;
+	const int tileSize = 32 * 2;
 
 };
 

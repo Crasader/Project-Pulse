@@ -78,49 +78,25 @@ bool MainScene::init() {
 
 	initPlayer(Vec2(150, 400));
 
-	enemy = new Retry::Actor("HelloWorld.png", Vec2(6000, 1000));
+	enemy = new Retry::Actor("HelloWorld.png", Vec2(6550, 2000));
 	enemy->getSprite()->setScale(0.5f);
 	enemy->getHurtBox()->addRect(Vec2(0, 0), Size(200, 250));
 	this->addChild(enemy->getSprite());
 
 	actorList.emplace_back(enemy);
 
-	auto cobble = cocos2d::Sprite::create("cobblestone.png");
-	auto cSize = cobble->getContentSize();
-	auto sSize = cocos2d::Director::getInstance()->getVisibleSize();
-
-
-	for (int i = 0; i < (int) sSize.width / (int) cSize.width + 3; i++) {
-		for (int j = 0; j < (int) sSize.height / (int) cSize.height + 3; j++) {
-			auto newCobble = cocos2d::Sprite::create("cobblestone.png");
-			newCobble->setAnchorPoint(Vec2(0, 0));
-			newCobble->setPosition(i * cSize.width, j * cSize.height);
-			newCobble->setColor(cocos2d::Color3B(127, 127, 127));
-			this->addChild(newCobble, -100);
-			background.push_back(newCobble);
-		}
-	}
-
 	healthBarBack = cocos2d::Sprite::create("healthbar.png", Rect(0, 0, 128, 32));
 	healthBarBack->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
 	healthBarBack->setPosition(Vec2(50, 50));
-	healthBarBack->setScale(4);
+	healthBarBack->setScale(3);
+
 	healthBarFront = cocos2d::Sprite::create("healthbar.png", Rect(0, 32, 128, 32));
-	healthBarFront->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
-	healthBarFront->setPosition(Vec2(50, 50));
-	healthBarFront->setScale(4);
-
-	auto label = cocos2d::Label::create();
-	label->setName("HealthLabel");
-	std::stringstream ss;
-	ss << "Health: " << player->getHealth() << " / " << player->getMaxHealth();
-	label->setString(ss.str());
-	label->setSystemFontSize(50);
-	label->setPosition(healthBarFront->getPosition() + healthBarFront->getBoundingBox().size / 2 + Vec2(0, 120));
-
+	healthBarFront->setAnchorPoint(healthBarBack->getAnchorPoint());
+	healthBarFront->setPosition(healthBarBack->getPosition());
+	healthBarFront->setScale(healthBarBack->getScale());
+	
 	gui->addChild(healthBarBack, 100);
 	gui->addChild(healthBarFront, healthBarBack->getLocalZOrder() + 1);
-	gui->addChild(label, healthBarBack->getLocalZOrder() + 2);
 
 	// ADD ALL GUI AND ACTORS BEFORE HERE
 	this->scheduleUpdate();
@@ -129,6 +105,8 @@ bool MainScene::init() {
 		i->setPosition(i->getPosition() - cocos2d::Director::getInstance()->getVisibleSize() / 2);
 
 	this->addChild(gui, 100);
+
+	Retry::Camera::setCamera(this->getDefaultCamera());
 
 	Retry::Camera::setPosition(player->getSprite()->getPosition());
 
@@ -142,8 +120,12 @@ bool MainScene::init() {
 	this->addChild(level->getLevelDraw());
 
 	Retry::Camera::lazyFollowTarget(player->getSprite(), 0.25f);
+
+	for (auto i : actorList) {
+		Retry::Camera::addTarget(i->getSprite());
+	}
+
 	Retry::Camera::setPosition(player->getPosition());
-	Retry::Camera::setCamera(this->getDefaultCamera());
 
 	Keyboard::createListener(_eventDispatcher, this);
 	Mouse::createListener(_eventDispatcher, this);
@@ -157,8 +139,6 @@ void MainScene::menuCloseCallback(Ref* pSender) {
 }
 
 void MainScene::update(float delta) {
-	//if (Controller::isAxisPressed(ControllerButton::RIGHT_TRIGGER) ||
-	//	Keyboard::isKeyPressed(KeyCode::SHIFT)) delta *= 0.25f;
 
 	if (Keyboard::isKeyDown(KeyCode::ESCAPE) || Controller::isButtonDown(ControllerButton::START))
 		cocos2d::Director::getInstance()->pushScene(OptionsMenu::createScene());
@@ -166,56 +146,39 @@ void MainScene::update(float delta) {
 	if (Keyboard::isKeyDown(KeyCode::Q) || Controller::isButtonDown(ControllerButton::BACK))
 		cocos2d::Director::getInstance()->replaceScene(MenuScene::create());
 
-	if (Controller::isAxisPressed(ControllerButton::RIGHT_TRIGGER))
-		delta *= 0.25f;
-
-	if (Controller::isButtonPressed(ControllerButton::RIGHT_BUMPER))
-		Retry::Camera::setTrauma(0.3f);
-
-	if (Controller::isButtonPressed(ControllerButton::RIGHT_STICK))
-		Retry::Camera::setTrauma(1);
-
 	if (Keyboard::isKeyDown(KeyCode::F2) || Controller::isButtonDown(ControllerButton::LEFT_BUMPER))
 		toggleDebug();
-	//if (Controller::isAxisPressed(ControllerButton::LEFT_TRIGGER))
-	Retry::Config::setDebug(Controller::isAxisPressed(ControllerButton::LEFT_TRIGGER));
 
-	if (Keyboard::isKeyDown(KeyCode::F3))
-		Retry::Config::toggleScreenShake();
+	Retry::Config::setDebug(Controller::isAxisPressed(ControllerButton::LEFT_TRIGGER) || Keyboard::isKeyPressed(KeyCode::SHIFT));
 
-	if (Keyboard::isKeyDown(KeyCode::F4))
-		Retry::Config::toggleVibration();
-
-	if (Keyboard::isKeyPressed(KeyCode::LEFT_ARROW))
+	if (Keyboard::isKeyPressed(KeyCode::LEFT_ARROW) || Controller::isAxisPressed(ControllerButton::RIGHT_STICK_LEFT))
 		enemy->bufferAction("left");
-	if (Keyboard::isKeyPressed(KeyCode::RIGHT_ARROW))
+	if (Keyboard::isKeyPressed(KeyCode::RIGHT_ARROW) || Controller::isAxisPressed(ControllerButton::RIGHT_STICK_RIGHT))
 		enemy->bufferAction("right");
-	if (Keyboard::isKeyPressed(KeyCode::UP_ARROW))
+	if (Keyboard::isKeyPressed(KeyCode::UP_ARROW) || Controller::isAxisPressed(ControllerButton::RIGHT_STICK_UP))
 		enemy->bufferAction("jump");
-
+	if (Keyboard::isKeyPressed(KeyCode::RIGHT_CTRL) || Controller::isButtonPressed(ControllerButton::B))
+		enemy->bufferAction("punch");
+		
 	for (auto i : actorList) i->update(delta);
-	static int count = 0;
-	for (auto i : actorList) if (i != player) if (player->isAttackCollidingWith(i)) cocos2d::log("Hit! %d", count++);
 
-	// COLLISION
-	if (!Retry::Config::doDebug())
-		player->doTerrainCollision(level, delta);
-	for (auto i : actorList) if (i != player) i->doTerrainCollision(level, delta);
+	for (auto i : actorList) {
+		if (i != player || (i == player && !Retry::Config::doDebug()))
+			i->doTerrainCollision(level, delta);
 
-	if (Keyboard::isKeyPressed(KeyCode::UP_ARROW) ||
-		Controller::isAxisPressed(ControllerButton::RIGHT_STICK_UP))
-		player->increaseHealth(delta);
-	else if (Keyboard::isKeyPressed(KeyCode::DOWN_ARROW) ||
-			 Controller::isAxisPressed(ControllerButton::RIGHT_STICK_DOWN))
-		player->decreaseHealth(delta);
+		if (i != player)
+			if (player->isAttackCollidingWith(i))
+				player->doAttackOnActor(i);
+			else if (i->isAttackCollidingWith(player))
+				i->doAttackOnActor(player);
+	}
+
+	if (Controller::isButtonDown(ControllerButton::RIGHT_BUMPER))
+		player->adjustHealth(100);
 
 	static float orgWidth = healthBarFront->getTextureRect().size.width;
 	float newWidth = player->getHealthRatio() * orgWidth;
 	healthBarFront->setTextureRect(Rect(Vec2(0, 32), Size(newWidth, healthBarFront->getTextureRect().size.height)));
-
-	std::stringstream ss;
-	ss << "Health: " << player->getHealth() << " / " << player->getMaxHealth();
-	((cocos2d::Label*)gui->getChildByName("HealthLabel"))->setString(ss.str());
 
 	Retry::Camera::update(delta);
 
@@ -226,9 +189,6 @@ void MainScene::update(float delta) {
 		else
 			dynamic_cast<cocos2d::GLViewImpl*>(cocos2d::Director::getInstance()->getOpenGLView())->setFullscreen();
 	}
-
-
-	updateBackground();
 
 	Retry::Camera::transformUI(gui);
 }
@@ -251,18 +211,6 @@ void MainScene::initPlayer(cocos2d::Vec2 position) {
 
 	this->addChild(player->getSprite(), 100);
 	actorList.emplace_back(player);
-}
-
-void MainScene::updateBackground() {
-	static auto cSize = background.front()->getContentSize();
-	static auto sSize = cocos2d::Director::getInstance()->getVisibleSize();
-	for (int i = 0; i < (int) sSize.width / (int) cSize.width + 3; i++) {
-		for (int j = 0; j < (int) sSize.height / (int) cSize.height + 3; j++) {
-			int index = i + j * ((int) sSize.width / (int) cSize.width + 3);
-			auto camPos = Retry::Camera::getPosition();
-			background[index]->setPosition(camPos - sSize / 2 + cocos2d::Vec2((i - 1) * cSize.width, j * cSize.height) - cocos2d::Vec2((int) camPos.x % (int) cSize.width, (int) camPos.y % (int) cSize.height) + cocos2d::Vec2(10, 10));
-		}
-	}
 }
 
 void MainScene::toggleDebug() {
