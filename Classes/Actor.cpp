@@ -46,7 +46,7 @@ Actor::Actor(const std::string &name, const cocos2d::Vec2 &position) {
 }
 
 Actor::~Actor() {
-	
+
 }
 
 void Actor::setFlippedX(const bool& flip) {
@@ -141,10 +141,10 @@ void Actor::performAttack(const float& delta) {
 		else currAttack->getHitBox()->setDebugDraw(false);
 	}
 
-	if (!isActionPressed("punch") && !isActionPressed("kick")) return;
+	if (!isActionDown("punch") && !isActionDown("kick")) return;
 	if (attackTimer <= -followUpAttackWindow) currentAttackKey = 0;
 
-	bool isKick = isActionPressed("kick");
+	bool isKick = isActionDown("kick");
 
 	// Each bit in "currentAttackKey" represents a different attack
 	// 00000000
@@ -216,26 +216,22 @@ void Actor::doAttackOnActor(Actor* actor) {
 		}
 		actor->setVelocity(kb);
 
-		actor->setInvincible();
+		actor->invincibilityTimer = getCurrentAttack()->getDuration();
 	}
 
 }
 
 void Actor::updateActionBuffer(const float& delta) {
 	for (auto& i : actionBuffer) {
-		if (i.second.time != 0) {
-			i.second.down = i.second.value == 0;
-			i.second.value = 1;
-		} else {
-			i.second.up = i.second.value != 0;
-			i.second.value = 0;
-		}
+		i.second.down = i.second.time == 1 && i.second.value == 0;
+		i.second.up = i.second.time == 0 && i.second.value == 1;
+		
+		i.second.value = i.second.time;
 		i.second.time = 0;
 	}
 }
 
 void Actor::bufferAction(const std::string &action) {
-
 	actionBuffer[action].time = 1;
 }
 
@@ -274,8 +270,8 @@ float Actor::doSolidCollisionX(Retry::Level* level, const cocos2d::Rect &boundin
 	float incY = (boundingBox.getMaxY() - boundingBox.getMinY()) / ceil(getHeight() / (level->getTileSize() - 1));
 	if (!incX || !incY) return position.x;
 
-	for (float i = boundingBox.getMinX(), n = boundingBox.getMaxX(); i <= n; i += incX) {
-		for (float j = boundingBox.getMinY(), m = boundingBox.getMaxY(); j <= m; j += incY) {
+	for (float i = boundingBox.getMinX(), n = boundingBox.getMaxX(); i <= n + incX * 0.5f; i += incX) {
+		for (float j = boundingBox.getMinY(), m = boundingBox.getMaxY(); j <= m + incY * 0.5f; j += incY) {
 			Vec2 currentTile = Vec2(i, j - deltaPosition.y) / level->getTileSize();
 			if (boundingBox.getMinX() < 0 || level->getCollisionDataAt(currentTile) & 0x01) {
 				position.x = lastPosition.x;
@@ -293,8 +289,8 @@ float Actor::doSolidCollisionY(Retry::Level* level, const cocos2d::Rect &boundin
 	float incY = (boundingBox.getMaxY() - boundingBox.getMinY()) / ceil(getHeight() / (level->getTileSize() - 1));
 	if (!incX || !incY) return position.y;
 
-	for (float i = boundingBox.getMinX(), n = boundingBox.getMaxX(); i <= n; i += incX) {
-		for (float j = boundingBox.getMinY(), m = boundingBox.getMaxY(); j <= m; j += incY) {
+	for (float i = boundingBox.getMinX(), n = boundingBox.getMaxX(); i <= n + incX * 0.5f; i += incX) {
+		for (float j = boundingBox.getMinY(), m = boundingBox.getMaxY(); j <= m + incY * 0.5f; j += incY) {
 			Vec2 currentTile = Vec2(i - (position.x == lastPosition.x ? deltaPosition.x : 0), j) / level->getTileSize();
 			if (boundingBox.getMinY() < 0 || level->getCollisionDataAt(currentTile) & 0x01) {
 				if (!onGround && velocity.y < 0) {
@@ -325,7 +321,7 @@ float Actor::doPlatformCollisionY(Retry::Level* level, const cocos2d::Rect &boun
 	float incX = (boundingBox.getMaxX() - boundingBox.getMinX()) / ceil(getWidth() / (level->getTileSize() - 1));
 	if (!incX) return position.y;
 
-	for (float i = boundingBox.getMinX(), n = boundingBox.getMaxX(); i <= n; i += incX) {
+	for (float i = boundingBox.getMinX(), n = boundingBox.getMaxX(); i <= n + incX * 0.5f; i += incX) {
 		Vec2 currentTile = Vec2(i - (position.x == lastPosition.x ? deltaPosition.x : 0), boundingBox.getMinY()) / level->getTileSize();
 		if ((level->getCollisionDataAt(currentTile) & 0x02) &&
 			!level->getCollisionDataAt(Vec2(currentTile.x, (boundingBox.getMinY() - deltaPosition.y) / level->getTileSize()))) {

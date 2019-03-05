@@ -51,6 +51,8 @@ private:
 
 	void toggleDebug();
 
+	void doAICalculations();
+
 	Retry::Player* player;
 	Retry::Actor* enemy;
 

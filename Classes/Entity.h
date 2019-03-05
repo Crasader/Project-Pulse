@@ -37,7 +37,6 @@ public:
 	cocos2d::Vec2 getAcceleration() { return acceleration; }
 
 	void setPosition(const cocos2d::Vec2 &position) {
-
 		lastPosition = this->position;
 
 		sprite->setPosition(position + sprite->getBoundingBox().size / 2);

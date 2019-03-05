@@ -33,7 +33,7 @@ Retry::Player::Player(std::string path, cocos2d::Vec2 pos) {
 	// HACK: Read in data from file maybe?
 	Attack* atk = new Attack();
 	atk->setDelay(0.0f);
-	atk->setDuration(0.3f);
+	atk->setDuration(1.0f);
 	atk->setRecovery(0.05f);
 	atk->setKnockBackAmount(3);
 	atk->setKnockBackDirection(Vec2(1, 0.25f));
@@ -112,7 +112,7 @@ Retry::Player::Player(std::string path, cocos2d::Vec2 pos) {
 	atk->getHitBox()->setParent(sprite);
 	attackList[0b10000000] = atk;
 
-
+	sideMoveSpeed = 700;
 }
 
 void Retry::Player::update(const float& delta) {

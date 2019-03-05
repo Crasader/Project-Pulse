@@ -94,7 +94,7 @@ bool MainScene::init() {
 	healthBarFront->setAnchorPoint(healthBarBack->getAnchorPoint());
 	healthBarFront->setPosition(healthBarBack->getPosition());
 	healthBarFront->setScale(healthBarBack->getScale());
-	
+
 	gui->addChild(healthBarBack, 100);
 	gui->addChild(healthBarFront, healthBarBack->getLocalZOrder() + 1);
 
@@ -159,7 +159,9 @@ void MainScene::update(float delta) {
 		enemy->bufferAction("jump");
 	if (Keyboard::isKeyPressed(KeyCode::RIGHT_CTRL) || Controller::isButtonPressed(ControllerButton::B))
 		enemy->bufferAction("punch");
-		
+
+	doAICalculations();
+
 	for (auto i : actorList) i->update(delta);
 
 	for (auto i : actorList) {
@@ -220,5 +222,44 @@ void MainScene::toggleDebug() {
 	for (auto i : actorList) {
 		i->getHurtBox()->setDebugDraw(doDraw);
 		i->getHitBox()->setDebugDraw(doDraw);
+	}
+}
+
+void MainScene::doAICalculations() {
+	//auto playerBBox = Retry::Collision::worldSpaceRect(player->getSprite(), player->getHurtBox()->getBoundingBox());
+	cocos2d::Rect playerBBox(player->getSprite()->convertToWorldSpace(player->getHurtBox()->getBoundingBox().origin),
+							 player->getHurtBox()->getBoundingBox().size);
+	for (cocos2d::Node* n = player->getSprite(); n != nullptr; n = n->getParent())
+		playerBBox.size = playerBBox.size * n->getScale();
+	playerBBox.origin = playerBBox.origin / this->getScale();
+	playerBBox.size = playerBBox.size / this->getScale();
+
+	for (auto i : actorList) {
+		if (i == player) continue;
+		cocos2d::Rect actorBBox(i->getSprite()->convertToWorldSpace(i->getHurtBox()->getBoundingBox().origin),
+								i->getHurtBox()->getBoundingBox().size);
+		for (cocos2d::Node* n = i->getSprite(); n != nullptr; n = n->getParent())
+			actorBBox.size = actorBBox.size * n->getScale();
+		actorBBox.origin = actorBBox.origin / this->getScale();
+		actorBBox.size = actorBBox.size / this->getScale();
+
+		if ((player->getPosition() - i->getPosition()).getLengthSq() < 2000 * 2000) {
+			if (abs(playerBBox.origin.x - actorBBox.origin.x + (playerBBox.size.width - actorBBox.size.width) * 0.5f) > 120) {
+				if (playerBBox.origin.x - actorBBox.origin.x < 0)
+					i->bufferAction("left");
+				else
+					i->bufferAction("right");
+
+				if (i->getVelocity().x == 0)
+					i->bufferAction("jump");
+			} else {
+				static bool doButton = true;
+				if (doButton) i->bufferAction("punch");
+				doButton ^= 1;
+			}
+
+		}
+
+
 	}
 }

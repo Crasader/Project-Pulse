@@ -52,7 +52,7 @@ public:
 	Attack* getCurrentAttack() const { return attackList.find(currentAttackKey) != attackList.end() ? attackList.at(currentAttackKey) : nullptr; }
 
 	bool isInvincible() const { return invincibilityTimer > 0; }
-	void setInvincible() { invincibilityTimer = invincibilityTime; }
+	void setInvincible(const float time) { invincibilityTimer = time; }
 
 protected:
 
@@ -71,7 +71,7 @@ protected:
 	float maxJumpHeight = 400;
 	float timeToMaxJumpHeight = 0.65f;
 
-	float sideMoveSpeed = 700;
+	float sideMoveSpeed = 250;
 	float timeToMaxSpeed = 0.1f;
 
 	int doJump = 0;
@@ -98,7 +98,6 @@ protected:
 	float doPlatformCollisionX(Retry::Level* level, const cocos2d::Rect &boundingBox);
 	float doPlatformCollisionY(Retry::Level* level, const cocos2d::Rect &boundingBox);
 
-	float invincibilityTime = 0.3f;
 	float invincibilityTimer = 0;
 
 	float followUpAttackWindow = 0.4f;

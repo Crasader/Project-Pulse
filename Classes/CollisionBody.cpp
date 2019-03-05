@@ -166,22 +166,22 @@ Rect Body::getBoundingBox() {
 	for (const auto &i : collisionRects) {
 		if (boundingBox.size.width == 0 && boundingBox.size.height == 0)
 			boundingBox = i.boundingBox;
-		boundingBox = boundingBox.unionWithRect(i.boundingBox);
+		boundingBox.merge(i.boundingBox);
 	}
 	for (const auto &i : collisionCircles) {
 		if (boundingBox.size.width == 0 && boundingBox.size.height == 0)
 			boundingBox = i.boundingBox;
-		boundingBox = boundingBox.unionWithRect(i.boundingBox);
+		boundingBox.merge(i.boundingBox);
 	}
 	for (const auto &i : collisionCapsules) {
 		if (boundingBox.size.width == 0 && boundingBox.size.height == 0)
 			boundingBox = i.boundingBox;
-		boundingBox = boundingBox.unionWithRect(i.boundingBox);
+		boundingBox.merge(i.boundingBox);
 	}
 	for (const auto &i : collisionPolygons) {
 		if (boundingBox.size.width == 0 && boundingBox.size.height == 0)
 			boundingBox = i.boundingBox;
-		boundingBox = boundingBox.unionWithRect(i.boundingBox);
+		boundingBox.merge(i.boundingBox);
 	}
 
 	return boundingBox;
