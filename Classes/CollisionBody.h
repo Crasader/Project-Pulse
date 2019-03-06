@@ -48,7 +48,7 @@ public:
 
 	Rect getBoundingBox();
 
-	void setTestPosition(Vec2 pos);
+	static void setTestPosition(Vec2 pos);
 private:
 	cocos2d::DrawNode* hitBox;
 

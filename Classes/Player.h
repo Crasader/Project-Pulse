@@ -18,6 +18,12 @@ struct KeyMap {
 namespace Retry
 {
 
+enum PulseMode : char {
+	REST,
+	PULSE,
+	COOLDOWN
+};
+
 class Player : public Actor
 {
 public:
@@ -34,7 +40,10 @@ public:
 	void removeButtonFromMapping(const std::string &action, const Retry::KeyCode &button);
 	void removeButtonFromMapping(const std::string &action, const Retry::MouseButton &button);
 	void removeButtonFromMapping(const std::string &action, const Retry::ControllerButton &button);
+
+	virtual void doAttackOnActor(Actor* actor) override;
 	
+	char getMode() { return pulseCooldown > 0 ? COOLDOWN : isPulse ? PULSE : REST; }
 
 private:
 	std::unordered_map<std::string, KeyMap> actionMapping;
@@ -44,7 +53,17 @@ private:
 	void performSideMovement(const float& delta) override;
 
 	void performJump(const float& delta) override;
+
+	void updatePulseMode(const float& delta);
+
+	bool isPulse = false;
+
+	float pulseCooldown = 0;
+	float pulseCooldownTimer = 3.0f;
+
+	float pulseDamageBoost = 1.5f;
+
+	float pulseKnockbackBoost = 1.5f;
 };
 
 }
-

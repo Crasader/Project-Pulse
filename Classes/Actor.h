@@ -31,7 +31,7 @@ public:
 
 	bool isAttackCollidingWith(Actor* body);
 
-	void doAttackOnActor(Actor* actor);
+	virtual void doAttackOnActor(Actor* actor);
 
 	// GETTERS AND SETTERS
 	float getMaxJumpHeight() const { return maxJumpHeight; }
@@ -72,7 +72,7 @@ protected:
 	float timeToMaxJumpHeight = 0.65f;
 
 	float sideMoveSpeed = 250;
-	float timeToMaxSpeed = 0.1f;
+	float timeToMaxSpeed = 0.4f;
 
 	int doJump = 0;
 	bool onGround = false;
@@ -106,6 +106,8 @@ protected:
 	std::unordered_map<char, Attack*> attackList;
 
 	float attackTimer = 0;
+
+	friend class Player;
 };
 
 class Attack {

@@ -101,6 +101,14 @@ bool MainScene::init() {
 	// ADD ALL GUI AND ACTORS BEFORE HERE
 	this->scheduleUpdate();
 
+	cocos2d::Label* label = cocos2d::Label::create();
+	label->setString("REST");
+	label->setPosition(Vec2(100, 700));
+	label->setScale(5);
+	label->setName("PULSEMODE");
+
+	gui->addChild(label);
+
 	for (auto i : gui->getChildren())
 		i->setPosition(i->getPosition() - cocos2d::Director::getInstance()->getVisibleSize() / 2);
 
@@ -149,7 +157,7 @@ void MainScene::update(float delta) {
 	if (Keyboard::isKeyDown(KeyCode::F2) || Controller::isButtonDown(ControllerButton::LEFT_BUMPER))
 		toggleDebug();
 
-	Retry::Config::setDebug(Controller::isAxisPressed(ControllerButton::LEFT_TRIGGER) || Keyboard::isKeyPressed(KeyCode::SHIFT));
+	Retry::Config::setDebug(Controller::isAxisPressed(ControllerButton::LEFT_TRIGGER) || Keyboard::isKeyPressed(KeyCode::CAPS_LOCK));
 
 	if (Keyboard::isKeyPressed(KeyCode::LEFT_ARROW) || Controller::isAxisPressed(ControllerButton::RIGHT_STICK_LEFT))
 		enemy->bufferAction("left");
@@ -192,13 +200,16 @@ void MainScene::update(float delta) {
 			dynamic_cast<cocos2d::GLViewImpl*>(cocos2d::Director::getInstance()->getOpenGLView())->setFullscreen();
 	}
 
+	std::string lmao = player->getMode() == 0 ? "REST" : player->getMode() == 1 ? "PULSE" : "COOLDOWN";
+	dynamic_cast<cocos2d::Label*>(gui->getChildByName("PULSEMODE"))->setString(lmao);
+
 	Retry::Camera::transformUI(gui);
 }
 
 void MainScene::initPlayer(cocos2d::Vec2 position) {
 	player = new Retry::Player("cybercop.png", position);
 
-	const cocos2d::Vec2 tileSize(128, 128);
+	const cocos2d::Vec2 tileSize(128, 130);
 
 	player->initAnimation("run", "cybercop.png", cocos2d::Vec2(0, 2), tileSize, 6);
 	player->initAnimation("idle", "cybercop.png", cocos2d::Vec2(0, 0), tileSize, 20);

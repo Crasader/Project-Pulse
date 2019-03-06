@@ -2,6 +2,8 @@
 
 #include "GameSettings.h"
 
+#include "KeyboardManager.h"
+
 namespace Retry {
 
 PerlinNoise Camera::perlin = PerlinNoise(128);
@@ -96,6 +98,7 @@ void Camera::update(float delta) {
 	moveBy((targetPoint - position) * delta / timeToTarget);
 
 	camera->setPosition(position * camera->getParent()->getScale() + offset);
+
 	camera->setRotation(angle);
 
 	addTrauma(-1 * delta);

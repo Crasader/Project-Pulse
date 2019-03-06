@@ -58,8 +58,8 @@ void Entity::initAnimation(std::string action, std::string file, Vec2 startCell,
 	int width = sprite->getTexture()->getPixelsWide() / frameSize.x;
 	for (int i = 0; i < numFrames; i++)
 	{
-		Vec2 startPosition((((int) startCell.x + i) % width) * frameSize.x, (startCell.y + ((int) startCell.x + i) / width) * frameSize.y);
-		temp->addSpriteFrame(cocos2d::SpriteFrame::create(file.c_str(), Rect(startPosition, Size(frameSize))));
+		Vec2 startPosition((((int) startCell.x + i) % width) * frameSize.x, (startCell.y + ((int) startCell.x + i) / width) * (frameSize.y) + 2);
+		temp->addSpriteFrame(cocos2d::SpriteFrame::create(file.c_str(), Rect(startPosition, Size(frameSize) - Size(0,2))));
 	}
 	temp->setLoops(1);
 

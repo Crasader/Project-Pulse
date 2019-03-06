@@ -347,6 +347,7 @@ CollisionRect worldSpaceRect(const cocos2d::Node* p, const CollisionRect &c) {
 	for (cocos2d::Node* n = (cocos2d::Node*) p; n != nullptr; n = n->getParent()) {
 		totalScale *= n->getScale();
 	}
+	totalScale = totalScale / cocos2d::Director::getInstance()->getRunningScene()->getScale();
 
 	newShape.size = c.size * totalScale;
 	newShape.rotation = -p->getParent()->getRotation() * 3.1415 / 180;
