@@ -314,8 +314,8 @@ void Player::doAttackOnActor(Actor * actor) {
 					pulseCooldown = pulseCooldownTimer;
 			} else if (getMode() == REST) {
 				this->adjustHealth(-damage * 0.5f);
-				if (health > maxHealth * 0.85f)
-					pulseCooldown = pulseCooldownTimer;
+				//if (health > maxHealth * 0.85f)
+				//	pulseCooldown = pulseCooldownTimer;
 			}
 		}
 
