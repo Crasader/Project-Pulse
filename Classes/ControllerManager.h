@@ -8,11 +8,8 @@
 #include <ctime>
 #include <unordered_map>
 
-
-
 namespace Retry
 {
-using cocos2d::Vec2;
 
 enum class ControllerButton;
 
@@ -35,11 +32,11 @@ public:
 
 	static float getAxis(const ControllerButton &axis, const int &id = 0, const bool &isDelta = false);
 
-	static const Vec2 getLeftStick(const int &id = 0);
-	static const Vec2 getDeltaLeftStick(const int &id = 0);
+	static const cocos2d::Vec2 getLeftStick(const int &id = 0);
+	static const cocos2d::Vec2 getDeltaLeftStick(const int &id = 0);
 
-	static const Vec2 getRightStick(const int &id = 0);
-	static const Vec2 getDeltaRightStick(const int &id = 0);
+	static const cocos2d::Vec2 getRightStick(const int &id = 0);
+	static const cocos2d::Vec2 getDeltaRightStick(const int &id = 0);
 
 	static const float getLeftTrigger(const int &id = 0);
 	static const float getDeltaLeftTrigger(const int &id = 0);
@@ -58,13 +55,13 @@ public:
 private:
 	static XBOXController controllers[4];
 
-	static Vec2 vibration[4][2];
+	static cocos2d::Vec2 vibration[4][2];
 
 	static float deadzone[4][4];
 
-	static const Vec2 radialDeadzone(const Vec2 &rawInput, const float &deadzone);
-	static const Vec2 squareDeadzone(const Vec2 &rawInput, const float &deadzone);
-	static const Vec2 crossDeadzone(const Vec2 &rawInput, const float &deadzone);
+	static const cocos2d::Vec2 radialDeadzone(const cocos2d::Vec2 &rawInput, const float &deadzone);
+	static const cocos2d::Vec2 squareDeadzone(const cocos2d::Vec2 &rawInput, const float &deadzone);
+	static const cocos2d::Vec2 crossDeadzone(const cocos2d::Vec2 &rawInput, const float &deadzone);
 
 	//static clock_t currentTime;
 
