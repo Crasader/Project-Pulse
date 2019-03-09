@@ -3,6 +3,8 @@
 
 #include "cocos2d.h"
 
+#include "Menu.h"
+
 class MenuScene : public cocos2d::Scene
 {
 public:
@@ -23,6 +25,8 @@ private:
 	cocos2d::Sprite* background;
 
 	cocos2d::Node* gui;
+
+	Retry::Menu* menu;
 };
 
 #endif

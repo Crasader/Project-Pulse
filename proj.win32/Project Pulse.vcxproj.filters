@@ -34,6 +34,9 @@
     <Filter Include="src\World Object">
       <UniqueIdentifier>{4130eb70-2a1c-4896-918c-f67428602ba4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\menu objects">
+      <UniqueIdentifier>{d9a117d4-6f18-4160-8075-0b01cb2d313a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -99,6 +102,12 @@
     <ClCompile Include="..\Classes\OptionsMenu.cpp">
       <Filter>src\scenes</Filter>
     </ClCompile>
+    <ClCompile Include="..\Classes\Menu.cpp">
+      <Filter>src\menu objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Button.cpp">
+      <Filter>src\menu objects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h">
@@ -163,6 +172,12 @@
     </ClInclude>
     <ClInclude Include="..\Classes\OptionsMenu.h">
       <Filter>src\scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Menu.h">
+      <Filter>src\menu objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Button.h">
+      <Filter>src\menu objects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

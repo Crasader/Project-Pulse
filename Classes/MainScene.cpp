@@ -54,7 +54,6 @@ using Retry::MouseButton;
 using Retry::Controller;
 using Retry::ControllerButton;
 
-
 cocos2d::Scene* MainScene::createScene() {
 	auto scene = MainScene::create();
 

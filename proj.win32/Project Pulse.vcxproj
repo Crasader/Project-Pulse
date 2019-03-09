@@ -157,6 +157,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)\Resources" /D /E /I /F /Y
     <ClCompile Include="..\Classes\Algorithms.cpp" />
     <ClCompile Include="..\Classes\AppDelegate.cpp" />
     <ClCompile Include="..\Classes\AudioPlayer.cpp" />
+    <ClCompile Include="..\Classes\Button.cpp" />
     <ClCompile Include="..\Classes\CameraManager.cpp" />
     <ClCompile Include="..\Classes\CollisionBody.cpp" />
     <ClCompile Include="..\Classes\ControllerManager.cpp" />
@@ -168,6 +169,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)\Resources" /D /E /I /F /Y
     <ClCompile Include="..\Classes\Level.cpp" />
     <ClCompile Include="..\Classes\MainScene.cpp" />
     <ClCompile Include="..\Classes\MenuScene.cpp" />
+    <ClCompile Include="..\Classes\Menu.cpp" />
     <ClCompile Include="..\Classes\MouseManager.cpp" />
     <ClCompile Include="..\Classes\OptionsMenu.cpp" />
     <ClCompile Include="..\Classes\PerlinNoise.cpp" />
@@ -180,6 +182,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)\Resources" /D /E /I /F /Y
     <ClInclude Include="..\Classes\Algorithms.h" />
     <ClInclude Include="..\Classes\AppDelegate.h" />
     <ClInclude Include="..\Classes\AudioPlayer.h" />
+    <ClInclude Include="..\Classes\Button.h" />
     <ClInclude Include="..\Classes\CameraManager.h" />
     <ClInclude Include="..\Classes\CollisionBody.h" />
     <ClInclude Include="..\Classes\ControllerManager.h" />
@@ -190,6 +193,7 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)\Resources" /D /E /I /F /Y
     <ClInclude Include="..\Classes\KeyboardManager.h" />
     <ClInclude Include="..\Classes\Level.h" />
     <ClInclude Include="..\Classes\MainScene.h" />
+    <ClInclude Include="..\Classes\Menu.h" />
     <ClInclude Include="..\Classes\MenuScene.h" />
     <ClInclude Include="..\Classes\MouseManager.h" />
     <ClInclude Include="..\Classes\OptionsMenu.h" />

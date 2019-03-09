@@ -11,7 +11,12 @@
 
 #include "MainScene.h"
 
+#include "Menu.h"
+
+#include "OptionsMenu.h"
+
 using cocos2d::Vec2;
+using cocos2d::Size;
 
 cocos2d::Scene* MenuScene::createScene()
 {
@@ -74,8 +79,19 @@ bool MenuScene::init()
 	mainMenu->addChild(playItem);
 	mainMenu->addChild(closeItem);
 	gui->addChild(mainMenu);
+	
+	menu = new Retry::Menu(Vec2(540, 300), this);
+	menu->addButton("button.png", Size(256, 80), [&]() {
+		cocos2d::Director::getInstance()->replaceScene(MainScene::createScene());
+	});
+	menu->addButton("button.png", Size(256, 80), [&]() {
+		cocos2d::Director::getInstance()->pushScene(OptionsMenu::createScene());
+	});
+	menu->addButton("button.png", Size(256, 80), [&]() {
+		cocos2d::Director::getInstance()->end();
+	});
+	//this->schedule(CC_CALLBACK_0(Retry::Menu::update, menu), "MenuUpdate");
 	this->addChild(gui);
-
 
 	this->scheduleUpdate();
 
@@ -89,15 +105,16 @@ void MenuScene::menuCloseCallback(Ref* pSender)
 
 void MenuScene::update(float delta)
 {
-	if (Retry::Keyboard::isKeyDown(Retry::KeyCode::ESCAPE) || 
-		Retry::Controller::isButtonDown(Retry::ControllerButton::B))
-		cocos2d::Director::getInstance()->end();
+	menu->update();
+	//if (Retry::Keyboard::isKeyDown(Retry::KeyCode::ESCAPE) || 
+	//	Retry::Controller::isButtonDown(Retry::ControllerButton::B))
+	//	cocos2d::Director::getInstance()->end();
 
-	if (Retry::Controller::isButtonDown(Retry::ControllerButton::A) ||
-		Retry::Keyboard::isKeyPressed(Retry::KeyCode::SPACE))
-	{
-		cocos2d::Director::getInstance()->replaceScene(MainScene::createScene());
-	}
+	//if (Retry::Controller::isButtonDown(Retry::ControllerButton::A) ||
+	//	Retry::Keyboard::isKeyPressed(Retry::KeyCode::SPACE))
+	//{
+	//	cocos2d::Director::getInstance()->replaceScene(MainScene::createScene());
+	//}
 
 
 }
