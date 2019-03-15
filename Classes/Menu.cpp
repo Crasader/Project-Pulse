@@ -66,8 +66,16 @@ void Menu::update() {
 void Menu::addButton(const std::string& sheet, const cocos2d::Size& dimension, const std::function<void(void)>& lambda) {
 	buttons.emplace_back(sheet, Vec2(0, nextHeight), dimension);
 	buttons.back().onPressed = lambda;
-	//Button button(sheet, Vec2(0, nextHeight), dimension);
-	//button.onPressed = lambda;
+
+	root->addChild(buttons.back().sprite);
+
+	nextHeight -= dimension.height + padding;
+}
+
+void Menu::addButton(const std::string& sheet, const cocos2d::Size& dimension, const std::string& text, const std::function<void(void)>& lambda) {
+	buttons.emplace_back(sheet, Vec2(0, nextHeight), dimension);
+	buttons.back().onPressed = lambda;
+	buttons.back().setString(text);
 
 	root->addChild(buttons.back().sprite);
 
@@ -89,7 +97,7 @@ void Menu::adjustForControls() {
 			 Keyboard::isKeyDown(KeyCode::W) ||
 			 Controller::isAxisDown(ControllerButton::LEFT_STICK_UP) ||
 			 Controller::isButtonDown(ControllerButton::DPAD_UP))
-		if (indexPosition == -1) indexPosition = buttons.size() - 1;
+		if (indexPosition == -1) indexPosition = 0;
 		else                     indexPosition = (indexPosition + buttons.size() - 1) % buttons.size();
 
 	else if (Keyboard::isKeyDown(KeyCode::DOWN_ARROW) ||

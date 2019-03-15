@@ -54,6 +54,8 @@ private:
 	void doAICalculations();
 
 	Retry::Player* player;
+	Retry::Entity* pulseParticle;
+
 	Retry::Actor* enemy;
 
 	std::vector<Retry::Actor*> actorList;

@@ -2,45 +2,54 @@
 
 #include "Algorithms.h"
 
-namespace Retry
-{
+using cocos2d::Vec2;
+using cocos2d::Size;
+using cocos2d::Rect;
+using cocos2d::Sprite;
+using cocos2d::SpriteFrame;
 
-Level::Level(int levelNum)
-{
+namespace Retry {
+
+Level::Level(int levelNum) {
+
 	levelDraw = cocos2d::Node::create();
 	debugDraw = cocos2d::DrawNode::create();
 
-	rooms.push_back(Room());
+	room = new Room;
 
-	for (auto r : rooms)
-	{
-		for (auto j : r.getTileData())
-		{
-
-			tileData[j.first] = Vec3(j.second.x, j.second.y, j.second.z);
-			collisionData[j.first] = j.second.w;
-		}
+	for (auto i : room->getTileData()) {
+		tileData[i.first] = Vec3(i.second.x, i.second.y, i.second.z);
+		collisionData[i.first] = i.second.w;
 	}
 
-	for (const auto &i : tileData)
-	{
-		auto sprite = cocos2d::Sprite::create("dirt.png");
+	//auto tileset = Sprite::create("tileset.png");
+	for (const auto &i : tileData) {
+		if (collisionData[i.first] & 0x80)
+			continue;
+		if (!collisionData[i.first] || collisionData[i.first] & 0x80) continue;
+
+		//auto sprite = Sprite::create("dirt.png");
+		auto frame = SpriteFrame::create("tileset.png", Rect(Vec2(i.second.x, i.second.y) * tileSize, Size(tileSize, tileSize)));
+		auto sprite = Sprite::createWithSpriteFrame(frame);
 		sprite->setAnchorPoint(Vec2::ZERO);
-		sprite->setScale(tileSize / sprite->getBoundingBox().size.width);
-		sprite->setPosition(convertLongToVec2(i.first) * tileSize);
+		sprite->setScale(2);
+		sprite->setPosition(convertLongToVec2(i.first) * tileSize * 2);
+		sprite->getTexture()->setAliasTexParameters();
 		levelDraw->addChild(sprite);
-
-		debugDraw->drawSolidRect(convertLongToVec2(i.first) * tileSize, (convertLongToVec2(i.first) + Vec2(1, 1)) * tileSize, cocos2d::Color4F(1, 0, 0, 0.3f));
 	}
-
-	//levelDraw->addChild(debugDraw);
 }
 
-char Level::getCollisionDataAt(const Vec2 &v)
-{
+char Level::getCollisionDataAt(const Vec2& v) {
 	if (v.x < 0 || v.y < 0) return 0;
-	if (collisionData.find(convertVec2ToLong(v)) != collisionData.end())
-		return collisionData.at(convertVec2ToLong(v));
+	if (collisionData.find(convertVec2ToLong(v / 2)) != collisionData.end())
+		return collisionData.at(convertVec2ToLong(v / 2));
+	return 0;
+}
+
+Vec3 Level::getTileDataAt(const Vec2& v) {
+	if (v.x < 0 || v.y < 0) return 0;
+	if (tileData.find(convertVec2ToLong(v / 2)) != tileData.end())
+		return tileData.at(convertVec2ToLong(v / 2));
 	return 0;
 }
 

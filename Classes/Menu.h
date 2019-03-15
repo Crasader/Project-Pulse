@@ -14,6 +14,7 @@ public:
 	void update();
 
 	void addButton(const std::string& sheet, const cocos2d::Size& dimension, const std::function<void(void)>& lambda);
+	void addButton(const std::string& sheet, const cocos2d::Size& dimension, const std::string& text, const std::function<void(void)>& lambda);
 
 	void setPadding(const int padding);
 

@@ -18,9 +18,9 @@ Actor::Actor(const std::string &name, const cocos2d::Vec2 &position) {
 	atk->setRecovery(0.05f);
 	atk->setKnockBackAmount(3);
 	atk->setKnockBackDirection(Vec2(1, 0.25f));
-	atk->getHitBox()->addRect(Vec2(64, 64), cocos2d::Size(100, 50));
+	atk->getHitBox()->addCapsule(Vec2(40, 46), cocos2d::Vec2(52, 46), 10);
 	atk->getHitBox()->setParent(sprite);
-	attackList[0b00000001] = atk;
+	attackList[PUNCH1] = atk;
 
 	atk = new Attack();
 	atk->setDamage(10);
@@ -29,9 +29,9 @@ Actor::Actor(const std::string &name, const cocos2d::Vec2 &position) {
 	atk->setRecovery(0.15f);
 	atk->setKnockBackAmount(3);
 	atk->setKnockBackDirection(Vec2(1, 0.25f));
-	atk->getHitBox()->addCircle(Vec2(96, 64), 24);
+	atk->getHitBox()->addCapsule(Vec2(40, 46), cocos2d::Vec2(52, 46), 10);
 	atk->getHitBox()->setParent(sprite);
-	attackList[0b00000100] = atk;
+	attackList[PUNCH2] = atk;
 
 	atk = new Attack();
 	atk->setDamage(20);
@@ -40,13 +40,25 @@ Actor::Actor(const std::string &name, const cocos2d::Vec2 &position) {
 	atk->setRecovery(0.05f);
 	atk->setKnockBackAmount(3);
 	atk->setKnockBackDirection(Vec2(1, 0.25f));
-	atk->getHitBox()->addRect(Vec2(64, 64), cocos2d::Size(150, 50));
+	atk->getHitBox()->addCapsule(Vec2(40, 46), cocos2d::Vec2(51, 46), 25);
 	atk->getHitBox()->setParent(sprite);
-	attackList[0b00010000] = atk;
+	attackList[PUNCHPUNCH] = atk;
+
+	0.125 * (0.08 / 0.125);
+
+	initAnimation("idle", name, Vec2(0, 0), Vec2(64, 64), 5);
+	initAnimation("punch1", name, Vec2(0, 1), Vec2(64, 64), 5);
+	initAnimation("punch2", name, Vec2(0, 2), Vec2(64, 64), 5);
+	initAnimation("punchpunch", name, Vec2(0, 3), Vec2(64, 64), 6);
+
+	runAnimation("idle", 0.1f);
+
+	hurtBox.addCapsule(Vec2(32, 16), Vec2(32, 48), 16);
 }
 
 Actor::~Actor() {
-
+	for (auto i : attackList)
+		delete i.second;
 }
 
 void Actor::setFlippedX(const bool& flip) {
@@ -117,17 +129,50 @@ bool Actor::isAttackCollidingWith(Actor* target) {
 }
 
 void Actor::updateAnimations(const float & delta) {
-	if (velocity.x != 0) {
-		setFlippedX(velocity.x < 0);
+	float attackFrameLength = 0.125f * (0.08f / 0.125f);
+
+	if (velocity.x != 0 && attackTimer < -this->followUpAttackWindow) {
+		if (isActionPressed("left") && !isActionPressed("right"))
+			setFlippedX(true);
+		if (isActionPressed("right") && !isActionPressed("left"))
+			setFlippedX(false);
+	}
+	if (attackTimer > -0.15) {
+		switch (currentAttackKey) {
+			case PUNCH1:
+				runAnimation("punch1", attackFrameLength); break;
+			case KICK1:
+				runAnimation("kick1", attackFrameLength); break;
+			case PUNCH2:
+				runAnimation("punch2", attackFrameLength); break;
+			case KICK2:
+				runAnimation("kick2", attackFrameLength); break;
+			case PUNCHPUNCH:
+				runAnimation("punchpunch", attackFrameLength); break;
+			case PUNCHKICK:
+				runAnimation("punchkick", attackFrameLength); break;
+			case KICKPUNCH:
+				runAnimation("kickpunch", attackFrameLength); break;
+			case KICKKICK:
+				runAnimation("kickkick", attackFrameLength); break;
+			case FALLPUNCH:
+				runAnimation("fallpunch", attackFrameLength); break;
+			case FALLKICK:
+				runAnimation("fallkick", attackFrameLength); break;
+		}
+		return;
 	}
 	if (onGround) {
 		if (velocity.x != 0) {
-			runAnimation("run", 0.077f);
+			//runAnimation("run", 0.077f);
 		} else {
 			runAnimation("idle", 0.12f);
 		}
 	} else {
-		runAnimation("jump", 0.1f);
+		//if (velocity.y > 0)
+		//	runAnimation("jump", 0.1f);
+		//else
+		//	runAnimation("fall", 0.1f);
 	}
 }
 
@@ -135,14 +180,15 @@ void Actor::performAttack(const float& delta) {
 
 	Attack* currAttack = getCurrentAttack();
 	if (currAttack != nullptr) {
-		if (attackTimer <= currAttack->getRecovery() + currAttack->getDuration() &&
-			attackTimer >= currAttack->getRecovery())
-			currAttack->getHitBox()->setDebugDraw(true);
-		else currAttack->getHitBox()->setDebugDraw(false);
+		// HACK: remove for demo
+		//if (attackTimer <= currAttack->getRecovery() + currAttack->getDuration() &&
+		//	attackTimer >= currAttack->getRecovery())
+		//	currAttack->getHitBox()->setDebugDraw(true);
+		//else currAttack->getHitBox()->setDebugDraw(false);
 	}
 
-	if (!isActionDown("punch") && !isActionDown("kick")) return;
 	if (attackTimer <= -followUpAttackWindow) currentAttackKey = 0;
+	if (!isActionDown("punch") && !isActionDown("kick")) return;
 
 	bool isKick = isActionDown("kick");
 
@@ -158,12 +204,18 @@ void Actor::performAttack(const float& delta) {
 	// └─────── Kick  Kick  Finisher
 	if (attackTimer <= 0) {
 		if (!currentAttackKey || currentAttackKey & 0b11110000) {
-			currentAttackKey = 0b1 << (char) isKick;
-		} else if (currentAttackKey & 0b11) {
+			currentAttackKey = (0b1 << (char) isKick) | (!onGround ? 0x80 : 0);
+		} else if (onGround && (currentAttackKey & 0b11)) {
 			currentAttackKey = 0b100 << (char) isKick;
-		} else if (currentAttackKey & 0b1100) {
+		} else if (onGround && (currentAttackKey & 0b1100)) {
 			char temp = (currentAttackKey >> 2) + 1;
 			currentAttackKey = 0b10000 << ((temp % 2) * 2 + (char) isKick);
+		}
+		if (currentAttackKey) {
+			if (isActionPressed("left") && !isActionPressed("right"))
+				setFlippedX(true);
+			else if (isActionPressed("right") && !isActionPressed("left"))
+				setFlippedX(false);
 		}
 
 		currAttack = getCurrentAttack();
@@ -216,6 +268,9 @@ void Actor::doAttackOnActor(Actor* actor) {
 		}
 		actor->setVelocity(kb);
 
+		actor->currentAttackKey = 0;
+		actor->attackTimer = -actor->followUpAttackWindow - 0.1f;
+
 		actor->invincibilityTimer = getCurrentAttack()->getDuration();
 	}
 
@@ -225,7 +280,7 @@ void Actor::updateActionBuffer(const float& delta) {
 	for (auto& i : actionBuffer) {
 		i.second.down = i.second.time == 1 && i.second.value == 0;
 		i.second.up = i.second.time == 0 && i.second.value == 1;
-		
+
 		i.second.value = i.second.time;
 		i.second.time = 0;
 	}
@@ -270,10 +325,14 @@ float Actor::doSolidCollisionX(Retry::Level* level, const cocos2d::Rect &boundin
 	float incY = (boundingBox.getMaxY() - boundingBox.getMinY()) / ceil(getHeight() / (level->getTileSize() - 1));
 	if (!incX || !incY) return position.x;
 
+	if (boundingBox.getMinX() < Camera::getMinX() || boundingBox.getMaxX() > Camera::getMinX())
+
 	for (float i = boundingBox.getMinX(), n = boundingBox.getMaxX(); i <= n + incX * 0.5f; i += incX) {
 		for (float j = boundingBox.getMinY(), m = boundingBox.getMaxY(); j <= m + incY * 0.5f; j += incY) {
 			Vec2 currentTile = Vec2(i, j - deltaPosition.y) / level->getTileSize();
-			if (boundingBox.getMinX() < 0 || level->getCollisionDataAt(currentTile) & 0x01) {
+			if (boundingBox.getMinX() < Camera::getMinX() || 
+				boundingBox.getMaxX() > Camera::getMaxX() || 
+				level->getCollisionDataAt(currentTile) & 0x01) {
 				position.x = lastPosition.x;
 				velocity.x = 0;
 
@@ -292,7 +351,8 @@ float Actor::doSolidCollisionY(Retry::Level* level, const cocos2d::Rect &boundin
 	for (float i = boundingBox.getMinX(), n = boundingBox.getMaxX(); i <= n + incX * 0.5f; i += incX) {
 		for (float j = boundingBox.getMinY(), m = boundingBox.getMaxY(); j <= m + incY * 0.5f; j += incY) {
 			Vec2 currentTile = Vec2(i - (position.x == lastPosition.x ? deltaPosition.x : 0), j) / level->getTileSize();
-			if (boundingBox.getMinY() < 0 || level->getCollisionDataAt(currentTile) & 0x01) {
+			// HACK: Not supposed to be Camera::getMinY()
+			if (boundingBox.getMinY() < Camera::getMinY() || level->getCollisionDataAt(currentTile) & 0x01) {
 				if (!onGround && velocity.y < 0) {
 					hasLanded = true;
 					onGround = true;

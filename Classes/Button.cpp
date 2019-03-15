@@ -23,6 +23,7 @@ Button::Button(const std::string& sheet, const Vec2& position, const Size& dimen
 	pressed = Sprite::createWithTexture(temp->getTexture(), Rect(Vec2(0, dimensions.height * 2), dimensions));
 
 	sprite = Sprite::createWithSpriteFrame(normal->getSpriteFrame());
+	sprite->setAnchorPoint(Vec2::ANCHOR_MIDDLE);
 	sprite->setPosition(position);
 	sprite->retain();
 
@@ -32,6 +33,12 @@ Button::Button(const std::string& sheet, const Vec2& position, const Size& dimen
 	hovered->setVisible(false);
 	sprite->addChild(pressed);
 	pressed->setVisible(false);
+
+	label = cocos2d::Label::create();
+	label->setPosition(sprite->getAnchorPointInPoints());
+	label->setAlignment(cocos2d::TextHAlignment::CENTER);
+	label->setSystemFontSize(30);
+	sprite->addChild(label);
 }
 Button::~Button() {
 	//sprite->removeFromParent();
@@ -72,6 +79,10 @@ bool Button::isMouseOver() const {
 			Mouse::getY() > worldPosition.y &&
 			Mouse::getX() < worldPosition.x + size.width &&
 			Mouse::getY() < worldPosition.y + size.height);
+}
+
+void Button::setString(const std::string& string) {
+	label->setString(string);
 }
 
 }

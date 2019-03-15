@@ -116,7 +116,7 @@ bool AppDelegate::applicationDidFinishLaunching() {
 	cocos2d::experimental::AudioEngine::lazyInit();
 
 	//dynamic_cast<GLViewImpl*>(director->getOpenGLView())->setFullscreen();
-	dynamic_cast<GLViewImpl*>(director->getOpenGLView())->setWindowed(smallResolutionSize.width, smallResolutionSize.height);
+	dynamic_cast<GLViewImpl*>(director->getOpenGLView())->setWindowed(largeResolutionSize.width, largeResolutionSize.height);
 	//glview->setDesignResolutionSize(glview->getFrameSize().width, glview->getFrameSize().height, ResolutionPolicy::NO_BORDER);
 
 	// create a scene. it's an autorelease object

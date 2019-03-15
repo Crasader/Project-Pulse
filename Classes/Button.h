@@ -30,6 +30,8 @@ public:
 
 	bool isMouseOver() const;
 
+	void setString(const std::string& string);
+
 protected:
 	bool isHovered;
 	bool isPressed;
@@ -41,6 +43,8 @@ protected:
 	cocos2d::Sprite* normal;
 	cocos2d::Sprite* hovered;
 	cocos2d::Sprite* pressed;
+
+	cocos2d::Label* label;
 
 	cocos2d::Sprite* sprite;
 

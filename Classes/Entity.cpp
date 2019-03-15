@@ -29,6 +29,7 @@ void Entity::init(std::string path, cocos2d::Vec2 position)
 		rt->end();
 		sprite = cocos2d::Sprite::createWithTexture(rt->getSprite()->getTexture());
 	}
+	sprite->getTexture()->setAliasTexParameters();
 	sprite->setAnchorPoint(cocos2d::Vec2(0.5f, 0.5f));
 	sprite->setPosition(position);
 	this->position = position;
@@ -59,7 +60,9 @@ void Entity::initAnimation(std::string action, std::string file, Vec2 startCell,
 	for (int i = 0; i < numFrames; i++)
 	{
 		Vec2 startPosition((((int) startCell.x + i) % width) * frameSize.x, (startCell.y + ((int) startCell.x + i) / width) * (frameSize.y) + 2);
-		temp->addSpriteFrame(cocos2d::SpriteFrame::create(file.c_str(), Rect(startPosition, Size(frameSize) - Size(0,2))));
+		auto frame = cocos2d::SpriteFrame::create(file.c_str(), Rect(startPosition, Size(frameSize) - Size(0, 2)));
+		//frame->getTexture()->setAliasTexParameters();
+		temp->addSpriteFrame(frame);
 	}
 	temp->setLoops(1);
 

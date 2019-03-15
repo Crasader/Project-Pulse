@@ -33,6 +33,8 @@ public:
 
 	void updateAnimations(const float& delta) override;
 
+	virtual bool doTerrainCollision(Level* level, const float &delta) override;
+
 	void addButtonToMapping(const std::string &action, const Retry::KeyCode &button);
 	void addButtonToMapping(const std::string &action, const Retry::MouseButton &button);
 	void addButtonToMapping(const std::string &action, const Retry::ControllerButton &button);
@@ -45,6 +47,8 @@ public:
 	
 	char getMode() { return pulseCooldown > 0 ? COOLDOWN : isPulse ? PULSE : REST; }
 
+	bool canMoveOn = true;
+
 private:
 	std::unordered_map<std::string, KeyMap> actionMapping;
 
@@ -55,6 +59,8 @@ private:
 	void performJump(const float& delta) override;
 
 	void updatePulseMode(const float& delta);
+
+	float doCameraCollision(Retry::Level* level, const cocos2d::Rect &boundingBox);
 
 	bool isPulse = false;
 

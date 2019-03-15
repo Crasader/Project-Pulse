@@ -62,32 +62,32 @@ bool MenuScene::init()
 		}
 	}
 
-	auto mainMenu = cocos2d::Menu::create();
+	//auto mainMenu = cocos2d::Menu::create();
 
-	auto playItem = cocos2d::MenuItemImage::create("CloseNormal.png", "CloseSelected.png", [&](Ref* sender) {
-		cocos2d::Director::getInstance()->replaceScene(MainScene::createScene());
-	});
-	playItem->setScale(2);
+	//auto playItem = cocos2d::MenuItemImage::create("CloseNormal.png", "CloseSelected.png", [&](Ref* sender) {
+	//	cocos2d::Director::getInstance()->replaceScene(MainScene::createScene());
+	//});
+	//playItem->setScale(2);
 
-	auto closeItem = cocos2d::MenuItemImage::create("Close1.png", "Close2.png", [&](Ref* sender) {
-		cocos2d::Director::getInstance()->end();
-	});
-	closeItem->setScale(0.25f);
-	closeItem->setPosition(Vec2(550, -300));
+	//auto closeItem = cocos2d::MenuItemImage::create("Close1.png", "Close2.png", [&](Ref* sender) {
+	//	cocos2d::Director::getInstance()->end();
+	//});
+	//closeItem->setScale(0.25f);
+	//closeItem->setPosition(Vec2(550, -300));
 
 
-	mainMenu->addChild(playItem);
-	mainMenu->addChild(closeItem);
-	gui->addChild(mainMenu);
+	//mainMenu->addChild(playItem);
+	//mainMenu->addChild(closeItem);
+	//gui->addChild(mainMenu);
 	
-	menu = new Retry::Menu(Vec2(540, 300), this);
-	menu->addButton("button.png", Size(256, 80), [&]() {
+	menu = new Retry::Menu(Vec2(960, 1080 / 5), this);
+	menu->addButton("button.png", Size(256, 80), "New Game", [&]() {
 		cocos2d::Director::getInstance()->replaceScene(MainScene::createScene());
 	});
-	menu->addButton("button.png", Size(256, 80), [&]() {
+	menu->addButton("button.png", Size(256, 80), "Settings", [&]() {
 		cocos2d::Director::getInstance()->pushScene(OptionsMenu::createScene());
 	});
-	menu->addButton("button.png", Size(256, 80), [&]() {
+	menu->addButton("button.png", Size(256, 80), "Exit to Desktop", [&]() {
 		cocos2d::Director::getInstance()->end();
 	});
 	//this->schedule(CC_CALLBACK_0(Retry::Menu::update, menu), "MenuUpdate");

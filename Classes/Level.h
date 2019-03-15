@@ -23,12 +23,13 @@ public:
 
 	cocos2d::Node* getDebugDraw() { return debugDraw; }
 
-	std::vector<Room> getRooms() { return rooms; }
+	Room* getRoom() { return room; }
 
 	//std::unordered_map<Vec2, Vec3> &getTileData() { return tileData; }
 	//std::unordered_map<Vec2, char> &getCollisionData() { return collisionData; }
 
-	char getCollisionDataAt(const Vec2 &v);
+	char getCollisionDataAt(const Vec2& v);
+	Vec3 getTileDataAt(const Vec2& v);
 
 	int getTileSize() const { return tileSize; }
 
@@ -38,14 +39,14 @@ private:
 	cocos2d::Node* levelDraw;
 	cocos2d::DrawNode* debugDraw;
 
-	std::vector<Room> rooms;
+	Room* room;
 	//, decltype(&vec2_hash)
 	std::unordered_map<long, Vec3> tileData;
 	std::unordered_map<long, char> collisionData;
 
 	Vec2 maxPositions;
 
-	const int tileSize = 32 * 2;
+	const int tileSize = 32;
 
 };
 

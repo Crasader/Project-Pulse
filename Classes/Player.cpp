@@ -33,92 +33,141 @@ Retry::Player::Player(std::string path, cocos2d::Vec2 pos) {
 	// HACK: Read in data from file maybe?
 	Attack* atk = new Attack();
 	atk->setDamage(10);
-	atk->setDelay(0.0f);
-	atk->setDuration(0.3f);
-	atk->setRecovery(0.05f);
+	atk->setDelay(0.3f * (0.08 / 0.125));
+	atk->setDuration(0.1f * (0.08 / 0.125));
+	atk->setRecovery(0.1f * (0.08 / 0.125));
 	atk->setKnockBackAmount(1);
 	atk->setKnockBackDirection(Vec2(1, 0.25f));
-	atk->getHitBox()->addRect(Vec2(64, 64), cocos2d::Size(100, 50));
+	atk->getHitBox()->addCapsule(Vec2(40, 46), cocos2d::Vec2(61, 46), 15);
 	atk->getHitBox()->setParent(sprite);
-	attackList[0b00000001] = atk;
+	attackList[PUNCH1] = atk;
 
 
 	atk = new Attack();
 	atk->setDamage(15);
-	atk->setDelay(0.1f);
-	atk->setDuration(0.3f);
-	atk->setRecovery(0.15f);
+	atk->setDelay(0.3f * (0.08 / 0.125));
+	atk->setDuration(0.1f * (0.08 / 0.125));
+	atk->setRecovery(0.2f * (0.08 / 0.125));
 	atk->setKnockBackAmount(5);
 	atk->setKnockBackDirection(Vec2(1, 0.25f));
-	atk->getHitBox()->addCircle(Vec2(96, 64), 24);
+	atk->getHitBox()->addCircle(Vec2(48, 12), 20);
 	atk->getHitBox()->setParent(sprite);
-	attackList[0b00000010] = atk;
+	attackList[KICK1] = atk;
 
 	atk = new Attack();
 	atk->setDamage(12);
-	atk->setDelay(0.0f);
-	atk->setDuration(0.4f);
-	atk->setRecovery(0.05f);
+	atk->setDelay(0.3f * (0.08 / 0.125));
+	atk->setDuration(0.1f * (0.08 / 0.125));
+	atk->setRecovery(0.1f * (0.08 / 0.125));
 	atk->setKnockBackAmount(1);
 	atk->setKnockBackDirection(Vec2(1, 0.25f));
-	atk->getHitBox()->addRect(Vec2(64, 64), cocos2d::Size(150, 50));
+	atk->getHitBox()->addCapsule(Vec2(40, 46), cocos2d::Vec2(61, 46), 15);
 	atk->getHitBox()->setParent(sprite);
-	attackList[0b00000100] = atk;
+	attackList[PUNCH2] = atk;
 
 	atk = new Attack();
 	atk->setDamage(18);
-	atk->setDelay(0.1f);
-	atk->setDuration(0.5f);
-	atk->setRecovery(0.11f);
+	atk->setDelay(0.3f * (0.08 / 0.125));
+	atk->setDuration(0.1f * (0.08 / 0.125));
+	atk->setRecovery(0.2f * (0.08 / 0.125));
 	atk->setKnockBackAmount(4);
 	atk->setKnockBackDirection(Vec2(1, 0.5f));
-	atk->getHitBox()->addCircle(Vec2(96, 64), 32);
+	atk->getHitBox()->addCircle(Vec2(46, 36), 30);
 	atk->getHitBox()->setParent(sprite);
-	attackList[0b00001000] = atk;
+	attackList[KICK2] = atk;
 
 	atk = new Attack();
 	atk->setDamage(20);
-	atk->setDelay(0.0f);
-	atk->setDuration(0.5f);
-	atk->setRecovery(0.25f);
+	atk->setDelay(0.45f * (0.08 / 0.125));
+	atk->setDuration(0.1f * (0.08 / 0.125));
+	atk->setRecovery(0.4f * (0.08 / 0.125));
 	atk->setKnockBackAmount(4);
 	atk->setKnockBackDirection(Vec2(0.25, 1));
-	atk->getHitBox()->addRect(Vec2(48, 64), cocos2d::Size(200, 90));
+	atk->getHitBox()->addRect(Vec2(24, 32), cocos2d::Size(100, 45));
 	atk->getHitBox()->setParent(sprite);
-	attackList[0b00010000] = atk;
+	attackList[PUNCHPUNCH] = atk;
 
 	atk = new Attack();
 	atk->setDamage(25);
-	atk->setDelay(0.1f);
-	atk->setDuration(0.5f);
-	atk->setRecovery(0.35f);
+	atk->setDelay(0.3f * (0.08 / 0.125));
+	atk->setDuration(0.1f * (0.08 / 0.125));
+	atk->setRecovery(0.3f * (0.08 / 0.125));
 	atk->setKnockBackAmount(8);
 	atk->setKnockBackDirection(Vec2(1, 1));
 	atk->getHitBox()->addCapsule(Vec2(64, 64), Vec2(128, 64), 24);
 	atk->getHitBox()->setParent(sprite);
-	attackList[0b00100000] = atk;
+	attackList[PUNCHKICK] = atk;
 
 	atk = new Attack();
 	atk->setDamage(30);
-	atk->setDelay(0.15f);
-	atk->setDuration(0.5f);
-	atk->setRecovery(0.15f);
+	atk->setDelay(0.45f * (0.08 / 0.125));
+	atk->setDuration(0.1f * (0.08 / 0.125));
+	atk->setRecovery(0.3f * (0.08 / 0.125));
 	atk->setKnockBackAmount(10);
 	atk->setKnockBackDirection(Vec2(1, 1));
 	atk->getHitBox()->addCapsule(Vec2(32, 64), cocos2d::Size(112, 64), 32);
 	atk->getHitBox()->setParent(sprite);
-	attackList[0b01000000] = atk;
+	attackList[KICKPUNCH] = atk;
 
 	atk = new Attack();
 	atk->setDamage(25);
-	atk->setDelay(0.2f);
-	atk->setDuration(0.5f);
-	atk->setRecovery(0.4f);
+	atk->setDelay(0.55f * (0.08 / 0.125));
+	atk->setDuration(0.1f * (0.08 / 0.125));
+	atk->setRecovery(0.3f * (0.08 / 0.125));
 	atk->setKnockBackAmount(15);
 	atk->setKnockBackDirection(Vec2(1, 1));
 	atk->getHitBox()->addCircle(Vec2(64, 64), 48);
 	atk->getHitBox()->setParent(sprite);
-	attackList[0b10000000] = atk;
+	attackList[KICKKICK] = atk;
+
+	atk = new Attack();
+	atk->setDamage(25);
+	atk->setDelay(0.55f * (0.08 / 0.125));
+	atk->setDuration(0.1f * (0.08 / 0.125));
+	atk->setRecovery(0.3f * (0.08 / 0.125));
+	atk->setKnockBackAmount(15);
+	atk->setKnockBackDirection(Vec2(1, 1));
+	atk->getHitBox()->addCircle(Vec2(64, 64), 48);
+	atk->getHitBox()->setParent(sprite);
+	attackList[FALLPUNCH] = atk;
+
+	atk = new Attack();
+	atk->setDamage(25);
+	atk->setDelay(0.55f * (0.08 / 0.125));
+	atk->setDuration(0.1f * (0.08 / 0.125));
+	atk->setRecovery(0.3f * (0.08 / 0.125));
+	atk->setKnockBackAmount(15);
+	atk->setKnockBackDirection(Vec2(1, 1));
+	atk->getHitBox()->addCircle(Vec2(64, 64), 48);
+	atk->getHitBox()->setParent(sprite);
+	attackList[FALLKICK] = atk;
+
+	const cocos2d::Vec2 tileSize(64, 64);
+
+	initAnimation("run", "cybercop.png", cocos2d::Vec2(0, 2), tileSize, 6);
+	initAnimation("idle", "cybercop.png", cocos2d::Vec2(0, 0), tileSize, 20);
+	initAnimation("jump", "cybercop.png", cocos2d::Vec2(6, 2), tileSize, 14);
+	initAnimation("fall", "cybercop.png", Vec2(6, 4), tileSize, 4);
+
+	initAnimation("punch1", "cybercop.png", Vec2(0, 6), tileSize, 5);
+	initAnimation("punch2", "cybercop.png", Vec2(5, 6), tileSize, 5);
+
+	initAnimation("kick1", "cybercop.png", Vec2(0, 5), tileSize, 6);
+	initAnimation("kick2", "cybercop.png", Vec2(0, 4), tileSize, 6);
+
+	initAnimation("punchpunch", "cybercop.png", Vec2(0, 7), tileSize, 8);
+	initAnimation("punchkick", "cybercop.png", Vec2(0, 8), tileSize, 6);
+	initAnimation("kickpunch", "cybercop.png", Vec2(0, 9), tileSize, 7);
+	initAnimation("kickkick", "cybercop.png", Vec2(0, 10), tileSize, 8);
+
+	initAnimation("fallpunch", "cybercop.png", Vec2(5, 11), tileSize, 5);
+	initAnimation("fallkick", "cybercop.png", Vec2(0, 11), tileSize, 5);
+
+	runAnimation("run", 0);
+
+	hurtBox.addCapsule(Vec2(32, 16), Vec2(32, 48), 16);
+
+	sprite->setScale(2);
 
 	sideMoveSpeed = 700;
 	timeToMaxSpeed = 0.1f;
@@ -159,8 +208,38 @@ void Retry::Player::update(const float& delta) {
 
 void Player::updateAnimations(const float& delta) {
 
-	if (velocity.x != 0) {
-		setFlippedX(velocity.x < 0);
+	float attackFrameLength = 0.125 * (0.08 / 0.125);
+
+	if (velocity.x != 0 && attackTimer < -this->followUpAttackWindow) {
+		if (isActionPressed("left") && !isActionPressed("right"))
+			setFlippedX(true);
+		if (isActionPressed("right") && !isActionPressed("left"))
+			setFlippedX(false);
+	}
+	if (attackTimer > -0.15) {
+		switch (currentAttackKey) {
+			case PUNCH1:
+				runAnimation("punch1", attackFrameLength); break;
+			case KICK1:
+				runAnimation("kick1", attackFrameLength); break;
+			case PUNCH2:
+				runAnimation("punch2", attackFrameLength); break;
+			case KICK2:
+				runAnimation("kick2", attackFrameLength); break;
+			case PUNCHPUNCH:
+				runAnimation("punchpunch", attackFrameLength); break;
+			case PUNCHKICK:
+				runAnimation("punchkick", attackFrameLength); break;
+			case KICKPUNCH:
+				runAnimation("kickpunch", attackFrameLength); break;
+			case KICKKICK:
+				runAnimation("kickkick", attackFrameLength); break;
+			case FALLPUNCH:
+				runAnimation("fallpunch", attackFrameLength); break;
+			case FALLKICK:
+				runAnimation("fallkick", attackFrameLength); break;
+		}
+		return;
 	}
 	if (onGround) {
 		if (velocity.x != 0) {
@@ -169,19 +248,64 @@ void Player::updateAnimations(const float& delta) {
 			runAnimation("idle", 0.12f);
 		}
 	} else {
-		runAnimation("jump", 0.1f);
+		if (velocity.y > 0)
+			runAnimation("jump", 0.1f);
+		else
+			runAnimation("fall", 0.1f);
 	}
 
+}
+
+bool Player::doTerrainCollision(Level * level, const float & delta) {
+
+	if (velocity.y < -800) onGround = false;
+
+	cocos2d::Rect boundingBox(sprite->convertToWorldSpace(hurtBox.getBoundingBox().origin), hurtBox.getBoundingBox().size);
+	for (cocos2d::Node* n = sprite; n != nullptr; n = n->getParent())
+		boundingBox.size = boundingBox.size * n->getScale();
+	boundingBox.origin = boundingBox.origin / cocos2d::Director::getInstance()->getRunningScene()->getScale();
+	boundingBox.size = boundingBox.size / cocos2d::Director::getInstance()->getRunningScene()->getScale();
+
+	//cocos2d::Rect boundingBox = hurtBox.getBoundingBox();
+
+	doSolidCollisionX(level, boundingBox);
+	doSolidCollisionY(level, boundingBox);
+
+	doPlatformCollisionX(level, boundingBox);
+	doPlatformCollisionY(level, boundingBox);
+
+	if (canMoveOn)
+		doCameraCollision(level, boundingBox);
+	canMoveOn = true;
+
+    // Update the sprite's position along with the character's position
+	setPosition(position);
+
+	return position != lastPosition;
+}
+
+float Player::doCameraCollision(Retry::Level* level, const cocos2d::Rect &boundingBox) {
+	Vec2 currentTile = (boundingBox.origin + Vec2(0, boundingBox.size.height / 2)) / level->getTileSize();
+	if (level->getCollisionDataAt(currentTile) & 0x80) {
+		Vec3 tileData = level->getTileDataAt(currentTile);
+		Camera::setMinX((currentTile - Vec2(0.5f, 0)).x * level->getTileSize());
+		Camera::setMinY(tileData.y * level->getTileSize() * 2);
+		Camera::setMaxX(Camera::getMinX() + tileData.x * level->getTileSize() * 2);
+		//Camera::setMaxY(Camera::getMinY() + tileData.z * level->getTileSize() * 2);
+	}
+	return position.x;
 }
 
 void Player::performSideMovement(const float & delta) {
 
 	sideMoveSpeed = getMode() == COOLDOWN ? 400 : 700;
 
-	if (isActionPressed("left") != isActionPressed("right")) {
+	bool midAttack = attackTimer > -followUpAttackWindow && onGround;
+
+	if ((isActionPressed("left") != isActionPressed("right")) && !midAttack) {
 		acceleration.x = (isActionPressed("left") ? -1 : 1) * sideMoveSpeed / timeToMaxSpeed / (!onGround ? (velocity.y > 100 ? 5.0f : 3.0f) : 1);
 	} else {
-		acceleration.x = !onGround ? 0 : -sign(velocity.x) * sideMoveSpeed / timeToMaxSpeed;
+		acceleration.x = !onGround ? 0 : -sign(velocity.x) * sideMoveSpeed / (!midAttack ? timeToMaxSpeed : 0.5f);
 		if (sign(velocity.x) * (velocity.x + acceleration.x * delta) < 0)
 			acceleration.x = velocity.x = 0;
 	}
@@ -191,7 +315,7 @@ void Player::performSideMovement(const float & delta) {
 
 void Player::performJump(const float & delta) {
 	if (onGround || Retry::Config::doDebug()) doJump = 0;
-	if (doJump < 2 && isActionDown("jump")) {
+	if (doJump < 2 && attackTimer < -0.15 && isActionDown("jump")) {
 		onGround = false;
 		velocity.y = 2 * maxJumpHeight / timeToMaxJumpHeight;
 		doJump++;
@@ -299,11 +423,14 @@ void Player::doAttackOnActor(Actor * actor) {
 		float damage = -abs(getCurrentAttack()->getDamage());
 
 		Vec2 kb = getCurrentAttack()->getKnockBackDirection() * getCurrentAttack()->getKnockBackAmount() * 100;
+		kb.x += velocity.x;
 		kb.x = sprite->isFlippedX() ? -kb.x : kb.x;
 		if (kb.y > 0) {
 			actor->doJump++;
 			actor->onGround = false;
 		}
+
+		Camera::setTrauma(0.15f);
 
 		if (currentAttackKey & 0xF0) {
 			if (getMode() == PULSE) {
@@ -312,10 +439,14 @@ void Player::doAttackOnActor(Actor * actor) {
 				kb = kb * pulseKnockbackBoost;
 				if (health < maxHealth * 0.15f)
 					pulseCooldown = pulseCooldownTimer;
+				Camera::setTrauma(0.6f);
+				Controller::vibrate(0.9f, 0.1f);
 			} else if (getMode() == REST) {
 				this->adjustHealth(-damage * 0.5f);
 				//if (health > maxHealth * 0.85f)
 				//	pulseCooldown = pulseCooldownTimer;
+				Camera::setTrauma(0.4f);
+				Controller::vibrate(0.6f, 0.1f);
 			}
 		}
 

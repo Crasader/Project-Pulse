@@ -6,15 +6,30 @@
 #include "Level.h"
 
 namespace {
+
 struct ActionInfo {
 	float time = 0;
 	bool down = false;
 	bool up = false;
 	float value = 0;
 };
+
 }
 
 namespace Retry {
+
+enum AttackKey : char {
+	PUNCH1 = 0x01,
+	KICK1 = 0x02,
+	PUNCH2 = 0x04,
+	KICK2 = 0x08,
+	PUNCHPUNCH = 0x10,
+	PUNCHKICK = 0x20,
+	KICKPUNCH = 0x40,
+	KICKKICK = 0x80,
+	FALLPUNCH = 0x81,
+	FALLKICK = 0x82
+};
 
 class Attack;
 
@@ -54,9 +69,14 @@ public:
 	bool isInvincible() const { return invincibilityTimer > 0; }
 	void setInvincible(const float time) { invincibilityTimer = time; }
 
-protected:
+	bool doPracticeDummy = false;
 
 	void setFlippedX(const bool& flip);
+
+	char getCurrentAttackKey() { return currentAttackKey; }
+
+protected:
+
 
 	virtual void performSideMovement(const float& delta);
 
@@ -100,7 +120,7 @@ protected:
 
 	float invincibilityTimer = 0;
 
-	float followUpAttackWindow = 0.4f;
+	float followUpAttackWindow = 0.3f;
 
 	char currentAttackKey = 0;
 	std::unordered_map<char, Attack*> attackList;

@@ -14,6 +14,11 @@ cocos2d::Node* Camera::followTarget;
 std::vector<std::pair<cocos2d::Node*, cocos2d::Vec2>> Camera::focusTargets;
 float Camera::timeToTarget;
 
+float Camera::minX = 0;
+float Camera::minY = 0;
+float Camera::maxX = 1000000;
+float Camera::maxY = 1000000;
+
 cocos2d::Vec2 Camera::position;
 cocos2d::Vec2 Camera::offset;
 float Camera::angle;
@@ -45,11 +50,11 @@ void Camera::update(float delta) {
 		float targetOffsetX = (cocos2d::Vec2(0.5f, 0.5f) - followTarget->getAnchorPoint()).x * followTarget->getContentSize().width;
 		float targetOffsetY = (cocos2d::Vec2(0.5f, 0.5f) - followTarget->getAnchorPoint()).y * followTarget->getContentSize().height;
 
-		cocos2d::Vec2 targetPoint = followTarget->getPosition() + cocos2d::Vec2(targetOffsetX, targetOffsetY);
-		if (targetPoint.x < cocos2d::Director::getInstance()->getVisibleSize().width / camera->getParent()->getScale() / 2)
-			targetPoint.x = cocos2d::Director::getInstance()->getVisibleSize().width / camera->getParent()->getScale() / 2;
-		if (targetPoint.y < cocos2d::Director::getInstance()->getVisibleSize().height / camera->getParent()->getScale() / 2)
-			targetPoint.y = cocos2d::Director::getInstance()->getVisibleSize().height / camera->getParent()->getScale() / 2;
+		//cocos2d::Vec2 targetPoint = followTarget->getPosition() + cocos2d::Vec2(targetOffsetX, targetOffsetY);
+		//if (targetPoint.x < cocos2d::Director::getInstance()->getVisibleSize().width / camera->getParent()->getScale() / 2)
+		//	targetPoint.x = cocos2d::Director::getInstance()->getVisibleSize().width / camera->getParent()->getScale() / 2;
+		//if (targetPoint.y < cocos2d::Director::getInstance()->getVisibleSize().height / camera->getParent()->getScale() / 2)
+		//	targetPoint.y = cocos2d::Director::getInstance()->getVisibleSize().height / camera->getParent()->getScale() / 2;
 
 	} else if (targetingMask & 0x4) {
 		float totalInfluence = 1;
@@ -90,10 +95,16 @@ void Camera::update(float delta) {
 		//if (camera->getParent()->getScale() > 1) camera->getParent()->setScale(1);
 	}
 
-	if (targetPoint.x < cocos2d::Director::getInstance()->getVisibleSize().width / camera->getParent()->getScale() / 2)
-		targetPoint.x = cocos2d::Director::getInstance()->getVisibleSize().width / camera->getParent()->getScale() / 2;
-	if (targetPoint.y < cocos2d::Director::getInstance()->getVisibleSize().height / camera->getParent()->getScale() / 2)
-		targetPoint.y = cocos2d::Director::getInstance()->getVisibleSize().height / camera->getParent()->getScale() / 2;
+	float wid = cocos2d::Director::getInstance()->getVisibleSize().width / camera->getParent()->getScale() / 2;
+	float hei = cocos2d::Director::getInstance()->getVisibleSize().height / camera->getParent()->getScale() / 2;
+	if (targetPoint.x - wid < minX)
+		targetPoint.x = minX + wid;
+	if (targetPoint.y - hei < minY)
+		targetPoint.y = minY + hei;
+	if (targetPoint.x + wid > maxX)
+		targetPoint.x = maxX - wid;
+	if (targetPoint.y + hei > maxY)
+		targetPoint.y = maxY - hei;
 
 	moveBy((targetPoint - position) * delta / timeToTarget);
 
@@ -134,6 +145,11 @@ void Camera::setCamera(cocos2d::Camera * camera) {
 
 	followTarget = nullptr;
 	focusTargets.clear();
+
+	minX = 0;
+	minY = 0;
+	maxX = 100000;
+	maxY = 100000;
 }
 
 void Camera::transformUI(cocos2d::Node* ui) {

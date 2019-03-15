@@ -21,7 +21,7 @@ public:
 
 	static void setTimeToTarget(float f);
 
-	static void doLazyFollow()  { Camera::targetingMask = 0x1; }
+	static void doLazyFollow() { Camera::targetingMask = 0x1; }
 	static void doFocusFollow() { Camera::targetingMask = 0x2; }
 	static void doMultiFollow() { Camera::targetingMask = 0x4; }
 
@@ -37,6 +37,16 @@ public:
 
 	static void transformUI(cocos2d::Node* ui);
 
+	static float getMinX() { return minX; }
+	static float getMinY() { return minY; }
+	static float getMaxX() { return maxX; }
+	static float getMaxY() { return maxY; }
+
+	static void setMinX(float x) { Camera::minX = x; }
+	static void setMinY(float y) { Camera::minY = y; }
+	static void setMaxX(float x) { Camera::maxX = x; }
+	static void setMaxY(float y) { Camera::maxY = y; }
+
 private:
 	static cocos2d::Camera* camera;
 
@@ -47,6 +57,10 @@ private:
 	static std::vector<std::pair<cocos2d::Node*, cocos2d::Vec2>> focusTargets;
 	static float timeToTarget;
 
+	static float minX;
+	static float minY;
+	static float maxX;
+	static float maxY;
 
 	static cocos2d::Vec2 position;
 	static cocos2d::Vec2 offset;

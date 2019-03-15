@@ -77,12 +77,57 @@ bool MainScene::init() {
 
 	initPlayer(Vec2(150, 400));
 
-	enemy = new Retry::Actor("HelloWorld.png", Vec2(6550, 2000));
-	enemy->getSprite()->setScale(0.5f);
-	enemy->getHurtBox()->addRect(Vec2(0, 0), Size(200, 250));
+	pulseParticle = new Retry::Entity("cybercoppulse.png", Vec2(0, 0));
+	pulseParticle->initAnimation("pulse", "cybercoppulse.png", Vec2(0, 0), Vec2(64, 64), 22);
+	pulseParticle->runAnimation("pulse", 0.1f);
+	pulseParticle->getSprite()->setPosition(Vec2(32,32));
+	player->getSprite()->addChild(pulseParticle->getSprite());
+
+	enemy = new Retry::Actor("goon.png", Vec2(6550, 2000));
+	enemy->getSprite()->setScale(2);
 	this->addChild(enemy->getSprite());
 
 	actorList.emplace_back(enemy);
+
+	enemy = new Retry::Actor("goon.png", Vec2(4400, 2000));
+	enemy->getSprite()->setScale(2);
+	enemy->doPracticeDummy = true;
+	enemy->setFlippedX(true);
+	this->addChild(enemy->getSprite());
+
+	actorList.emplace_back(enemy);
+
+	enemy = new Retry::Actor("goon.png", Vec2(10368, 1800));
+	enemy->getSprite()->setScale(2);
+	this->addChild(enemy->getSprite());
+
+	actorList.emplace_back(enemy);
+
+	enemy = new Retry::Actor("goon.png", Vec2(11328, 2000));
+	enemy->getSprite()->setScale(2);
+	this->addChild(enemy->getSprite());
+
+	actorList.emplace_back(enemy);
+
+	enemy = new Retry::Actor("goon.png", Vec2(13760, 7800));
+	enemy->getSprite()->setScale(2);
+	this->addChild(enemy->getSprite());
+
+	actorList.emplace_back(enemy);
+
+	enemy = new Retry::Actor("goon.png", Vec2(13184, 8000));
+	enemy->getSprite()->setScale(2);
+	this->addChild(enemy->getSprite());
+
+	actorList.emplace_back(enemy);
+
+	enemy = new Retry::Actor("goon.png", Vec2(12608, 7800));
+	enemy->getSprite()->setScale(2);
+	this->addChild(enemy->getSprite());
+
+	actorList.emplace_back(enemy);
+
+
 
 	healthBarBack = cocos2d::Sprite::create("healthbar.png", Rect(0, 0, 128, 32));
 	healthBarBack->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
@@ -100,14 +145,6 @@ bool MainScene::init() {
 	// ADD ALL GUI AND ACTORS BEFORE HERE
 	this->scheduleUpdate();
 
-	cocos2d::Label* label = cocos2d::Label::create();
-	label->setString("REST");
-	label->setPosition(Vec2(100, 700));
-	label->setScale(5);
-	label->setName("PULSEMODE");
-
-	gui->addChild(label);
-
 	for (auto i : gui->getChildren())
 		i->setPosition(i->getPosition() - cocos2d::Director::getInstance()->getVisibleSize() / 2);
 
@@ -116,12 +153,6 @@ bool MainScene::init() {
 	Retry::Camera::setCamera(this->getDefaultCamera());
 
 	Retry::Camera::setPosition(player->getSprite()->getPosition());
-
-	auto s = cocos2d::Sprite::create("CloseSelected.png");
-	s->retain();
-	s->setName("test");
-	s->setPosition(0, -10000);
-	this->addChild(s, 1000);
 
 	level = new Retry::Level(1);
 	this->addChild(level->getLevelDraw());
@@ -153,22 +184,13 @@ void MainScene::update(float delta) {
 	if (Keyboard::isKeyDown(KeyCode::Q) || Controller::isButtonDown(ControllerButton::BACK))
 		cocos2d::Director::getInstance()->replaceScene(MenuScene::create());
 
-	if (Keyboard::isKeyDown(KeyCode::F2) || Controller::isButtonDown(ControllerButton::LEFT_BUMPER))
-		toggleDebug();
+	//if (Keyboard::isKeyDown(KeyCode::F2) || Controller::isButtonDown(ControllerButton::LEFT_BUMPER))
+	//	toggleDebug();
 
 	Retry::Config::setDebug(Controller::isAxisPressed(ControllerButton::LEFT_TRIGGER) || Keyboard::isKeyPressed(KeyCode::CAPS_LOCK));
 
-	if (Keyboard::isKeyPressed(KeyCode::LEFT_ARROW) || Controller::isAxisPressed(ControllerButton::RIGHT_STICK_LEFT))
-		enemy->bufferAction("left");
-	if (Keyboard::isKeyPressed(KeyCode::RIGHT_ARROW) || Controller::isAxisPressed(ControllerButton::RIGHT_STICK_RIGHT))
-		enemy->bufferAction("right");
-	if (Keyboard::isKeyPressed(KeyCode::UP_ARROW) || Controller::isAxisPressed(ControllerButton::RIGHT_STICK_UP))
-		enemy->bufferAction("jump");
-	if (Keyboard::isKeyPressed(KeyCode::RIGHT_CTRL) || Controller::isButtonPressed(ControllerButton::B))
-		enemy->bufferAction("punch");
 
 	doAICalculations();
-
 	for (auto i : actorList) i->update(delta);
 
 	for (auto i : actorList) {
@@ -182,8 +204,8 @@ void MainScene::update(float delta) {
 				i->doAttackOnActor(player);
 	}
 
-	if (Controller::isButtonDown(ControllerButton::RIGHT_BUMPER))
-		player->adjustHealth(100);
+	pulseParticle->getSprite()->setVisible(player->getMode() == Retry::PulseMode::PULSE);
+	pulseParticle->runAnimation("pulse", 0.1f);
 
 	static float orgWidth = healthBarFront->getTextureRect().size.width;
 	float newWidth = player->getHealthRatio() * orgWidth;
@@ -194,32 +216,19 @@ void MainScene::update(float delta) {
 	static bool doFull = false;
 	if (Keyboard::isKeyDown(KeyCode::F11)) {
 		if (!(doFull = !doFull))
-			dynamic_cast<cocos2d::GLViewImpl*>(cocos2d::Director::getInstance()->getOpenGLView())->setWindowed(1280, 720);
+			dynamic_cast<cocos2d::GLViewImpl*>(cocos2d::Director::getInstance()->getOpenGLView())->setWindowed(1920, 1080);
 		else
 			dynamic_cast<cocos2d::GLViewImpl*>(cocos2d::Director::getInstance()->getOpenGLView())->setFullscreen();
 	}
 
-	std::string lmao = player->getMode() == 0 ? "REST" : player->getMode() == 1 ? "PULSE" : "COOLDOWN";
-	dynamic_cast<cocos2d::Label*>(gui->getChildByName("PULSEMODE"))->setString(lmao);
+	//std::string lmao = player->getMode() == 0 ? "REST" : player->getMode() == 1 ? "PULSE" : "COOLDOWN";
+	//dynamic_cast<cocos2d::Label*>(gui->getChildByName("PULSEMODE"))->setString(lmao);
 
 	Retry::Camera::transformUI(gui);
 }
 
 void MainScene::initPlayer(cocos2d::Vec2 position) {
 	player = new Retry::Player("cybercop.png", position);
-
-	const cocos2d::Vec2 tileSize(128, 130);
-
-	player->initAnimation("run", "cybercop.png", cocos2d::Vec2(0, 2), tileSize, 6);
-	player->initAnimation("idle", "cybercop.png", cocos2d::Vec2(0, 0), tileSize, 20);
-	player->initAnimation("jump", "cybercop.png", cocos2d::Vec2(6, 2), tileSize, 14);
-	player->runAnimation("run", 0);
-
-	//player->getHurtBox()->addRect(Vec2(32, 0), cocos2d::Size(64, 128));
-	player->getHurtBox()->addCapsule(Vec2(64, 32), Vec2(64, 96), 32);
-	//player->getHurtBox()->setDebugDrawColor(cocos2d::Color4F(1, 0, 0, 1));
-
-	player->getSprite()->setScale(1);
 
 	this->addChild(player->getSprite(), 100);
 	actorList.emplace_back(player);
@@ -253,8 +262,10 @@ void MainScene::doAICalculations() {
 		actorBBox.origin = actorBBox.origin / this->getScale();
 		actorBBox.size = actorBBox.size / this->getScale();
 
-		if ((player->getPosition() - i->getPosition()).getLengthSq() < 2000 * 2000) {
-			if (abs(playerBBox.origin.x - actorBBox.origin.x + (playerBBox.size.width - actorBBox.size.width) * 0.5f) > 120) {
+		if ((player->getPosition() - i->getPosition()).getLengthSq() < 1500 * 1500) {
+			if (player->getPosition().x > i->getPosition().x)
+				player->canMoveOn = false;
+			if (!(i->doPracticeDummy && i->getHealth() == i->getMaxHealth()) && abs(playerBBox.origin.x - actorBBox.origin.x + (playerBBox.size.width - actorBBox.size.width) * 0.5f) > 180) {
 				if (playerBBox.origin.x - actorBBox.origin.x < 0)
 					i->bufferAction("left");
 				else
@@ -264,12 +275,17 @@ void MainScene::doAICalculations() {
 					i->bufferAction("jump");
 			} else {
 				static bool doButton = true;
-				if (doButton) i->bufferAction("punch");
+				if ((doButton && i->getCurrentAttackKey() & 0b1111) || rand() % 1000 < 7) i->bufferAction("punch");
 				doButton ^= 1;
 			}
 
 		}
-
-
+	}
+	for (int i = 1; i < actorList.size(); i++) {
+		if (actorList[i]->getHealth() <= 0) {
+			actorList[i]->setPosition(Vec2(-1000, -1000));
+			//delete actorList[i];
+			actorList.erase(actorList.begin() + i--);
+		}
 	}
 }
