@@ -77,57 +77,54 @@ bool MainScene::init() {
 
 	initPlayer(Vec2(150, 400));
 
-	pulseParticle = new Retry::Entity("cybercoppulse.png", Vec2(0, 0));
-	pulseParticle->initAnimation("pulse", "cybercoppulse.png", Vec2(0, 0), Vec2(64, 64), 22);
-	pulseParticle->runAnimation("pulse", 0.1f);
-	pulseParticle->getSprite()->setPosition(Vec2(32,32));
-	player->getSprite()->addChild(pulseParticle->getSprite());
+	//pulseParticle = new Retry::Entity("cybercoppulse.png", Vec2(0, 0));
+	//pulseParticle->initAnimation("pulse", "cybercoppulse.png", Vec2(0, 0), Vec2(64, 64), 22);
+	//pulseParticle->runAnimation("pulse", 0.1f);
+	//pulseParticle->getSprite()->setPosition(Vec2(32,32));
+	//player->getSprite()->addChild(pulseParticle->getSprite());
 
-	enemy = new Retry::Actor("goon.png", Vec2(6550, 2000));
+	enemy = new Retry::GoonEnemy(Vec2(6550, 2000));
 	enemy->getSprite()->setScale(2);
 	this->addChild(enemy->getSprite());
 
 	actorList.emplace_back(enemy);
 
-	enemy = new Retry::Actor("goon.png", Vec2(4400, 2000));
+	enemy = new Retry::TutorialEnemy(Vec2(4400, 2000));
 	enemy->getSprite()->setScale(2);
-	enemy->doPracticeDummy = true;
 	enemy->setFlippedX(true);
 	this->addChild(enemy->getSprite());
 
 	actorList.emplace_back(enemy);
 
-	enemy = new Retry::Actor("goon.png", Vec2(10368, 1800));
+	enemy = new Retry::GoonEnemy(Vec2(10368, 1800));
 	enemy->getSprite()->setScale(2);
 	this->addChild(enemy->getSprite());
 
 	actorList.emplace_back(enemy);
 
-	enemy = new Retry::Actor("goon.png", Vec2(11328, 2000));
+	enemy = new Retry::GoonEnemy(Vec2(11328, 2000));
 	enemy->getSprite()->setScale(2);
 	this->addChild(enemy->getSprite());
 
 	actorList.emplace_back(enemy);
 
-	enemy = new Retry::Actor("goon.png", Vec2(13760, 7800));
+	enemy = new Retry::GoonEnemy(Vec2(13760, 7800));
 	enemy->getSprite()->setScale(2);
 	this->addChild(enemy->getSprite());
 
 	actorList.emplace_back(enemy);
 
-	enemy = new Retry::Actor("goon.png", Vec2(13184, 8000));
+	enemy = new Retry::GoonEnemy(Vec2(13184, 8000));
 	enemy->getSprite()->setScale(2);
 	this->addChild(enemy->getSprite());
 
 	actorList.emplace_back(enemy);
 
-	enemy = new Retry::Actor("goon.png", Vec2(12608, 7800));
+	enemy = new Retry::GoonEnemy(Vec2(12608, 7800));
 	enemy->getSprite()->setScale(2);
 	this->addChild(enemy->getSprite());
 
 	actorList.emplace_back(enemy);
-
-
 
 	healthBarBack = cocos2d::Sprite::create("healthbar.png", Rect(0, 0, 128, 32));
 	healthBarBack->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
@@ -189,23 +186,15 @@ void MainScene::update(float delta) {
 
 	Retry::Config::setDebug(Controller::isAxisPressed(ControllerButton::LEFT_TRIGGER) || Keyboard::isKeyPressed(KeyCode::CAPS_LOCK));
 
-
-	doAICalculations();
-	for (auto i : actorList) i->update(delta);
-
+	player->update(delta);
 	for (auto i : actorList) {
-		if (i != player || (i == player && !Retry::Config::doDebug()))
-			i->doTerrainCollision(level, delta);
+		i->update(delta);
 
-		if (i != player)
-			if (player->isAttackCollidingWith(i))
-				player->doAttackOnActor(i);
-			else if (i->isAttackCollidingWith(player))
-				i->doAttackOnActor(player);
+		i->doTerrainCollision(level, delta);
+
+		player->doAttackOnActor(i);
+		i->doAttackOnActor(player);
 	}
-
-	pulseParticle->getSprite()->setVisible(player->getMode() == Retry::PulseMode::PULSE);
-	pulseParticle->runAnimation("pulse", 0.1f);
 
 	static float orgWidth = healthBarFront->getTextureRect().size.width;
 	float newWidth = player->getHealthRatio() * orgWidth;
@@ -221,17 +210,13 @@ void MainScene::update(float delta) {
 			dynamic_cast<cocos2d::GLViewImpl*>(cocos2d::Director::getInstance()->getOpenGLView())->setFullscreen();
 	}
 
-	//std::string lmao = player->getMode() == 0 ? "REST" : player->getMode() == 1 ? "PULSE" : "COOLDOWN";
-	//dynamic_cast<cocos2d::Label*>(gui->getChildByName("PULSEMODE"))->setString(lmao);
-
 	Retry::Camera::transformUI(gui);
 }
 
 void MainScene::initPlayer(cocos2d::Vec2 position) {
-	player = new Retry::Player("cybercop.png", position);
+	player = new Retry::Player(position);
 
 	this->addChild(player->getSprite(), 100);
-	actorList.emplace_back(player);
 }
 
 void MainScene::toggleDebug() {
@@ -239,47 +224,36 @@ void MainScene::toggleDebug() {
 	static bool doDraw = false;
 	doDraw = !doDraw;
 	for (auto i : actorList) {
-		i->getHurtBox()->setDebugDraw(doDraw);
 		i->getHitBox()->setDebugDraw(doDraw);
 	}
 }
 
 void MainScene::doAICalculations() {
 	//auto playerBBox = Retry::Collision::worldSpaceRect(player->getSprite(), player->getHurtBox()->getBoundingBox());
-	cocos2d::Rect playerBBox(player->getSprite()->convertToWorldSpace(player->getHurtBox()->getBoundingBox().origin),
-							 player->getHurtBox()->getBoundingBox().size);
-	for (cocos2d::Node* n = player->getSprite(); n != nullptr; n = n->getParent())
-		playerBBox.size = playerBBox.size * n->getScale();
-	playerBBox.origin = playerBBox.origin / this->getScale();
-	playerBBox.size = playerBBox.size / this->getScale();
+	cocos2d::Rect playerBBox = player->getHitBox()->getWorldBoundingBox();
 
 	for (auto i : actorList) {
 		if (i == player) continue;
-		cocos2d::Rect actorBBox(i->getSprite()->convertToWorldSpace(i->getHurtBox()->getBoundingBox().origin),
-								i->getHurtBox()->getBoundingBox().size);
-		for (cocos2d::Node* n = i->getSprite(); n != nullptr; n = n->getParent())
-			actorBBox.size = actorBBox.size * n->getScale();
-		actorBBox.origin = actorBBox.origin / this->getScale();
-		actorBBox.size = actorBBox.size / this->getScale();
+		cocos2d::Rect actorBBox = i->getHitBox()->getWorldBoundingBox();
 
-		if ((player->getPosition() - i->getPosition()).getLengthSq() < 1500 * 1500) {
-			if (player->getPosition().x > i->getPosition().x)
-				player->canMoveOn = false;
-			if (!(i->doPracticeDummy && i->getHealth() == i->getMaxHealth()) && abs(playerBBox.origin.x - actorBBox.origin.x + (playerBBox.size.width - actorBBox.size.width) * 0.5f) > 180) {
-				if (playerBBox.origin.x - actorBBox.origin.x < 0)
-					i->bufferAction("left");
-				else
-					i->bufferAction("right");
+		//if ((player->getPosition() - i->getPosition()).getLengthSq() < 1500 * 1500) {
+		//	if (player->getPosition().x > i->getPosition().x)
+		//		player->canMoveOn = false;
+		//	if (!(i->doPracticeDummy && i->getHealth() == i->getMaxHealth()) && abs(playerBBox.origin.x - actorBBox.origin.x + (playerBBox.size.width - actorBBox.size.width) * 0.5f) > 180) {
+		//		if (playerBBox.origin.x - actorBBox.origin.x < 0)
+		//			i->bufferAction("left");
+		//		else
+		//			i->bufferAction("right");
 
-				if (i->getVelocity().x == 0)
-					i->bufferAction("jump");
-			} else {
-				static bool doButton = true;
-				if ((doButton && i->getCurrentAttackKey() & 0b1111) || rand() % 1000 < 7) i->bufferAction("punch");
-				doButton ^= 1;
-			}
+		//		if (i->getVelocity().x == 0)
+		//			i->bufferAction("jump");
+		//	} else {
+		//		static bool doButton = true;
+		//		if ((doButton && i->getCurrentAttackKey() & 0b1111) || rand() % 1000 < 7) i->bufferAction("punch");
+		//		doButton ^= 1;
+		//	}
 
-		}
+		//}
 	}
 	for (int i = 1; i < actorList.size(); i++) {
 		if (actorList[i]->getHealth() <= 0) {

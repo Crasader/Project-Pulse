@@ -1,7 +1,7 @@
 #pragma once
 #include "cocos2d.h"
 
-#include "Entity.h"
+#include "CollisionBody.h"
 
 #include "Level.h"
 
@@ -33,57 +33,52 @@ enum AttackKey : char {
 
 class Attack;
 
-class Actor : public Entity {
+class Actor {
 public:
 	Actor() = default;
-	Actor(const std::string &path, const cocos2d::Vec2 &position);
+	Actor(const std::string& path, const cocos2d::Vec2& position = { 0, 0 });
 	virtual ~Actor();
+	void kill(float delay = 0.0f);
 
-	void bufferAction(const std::string &action);
+	virtual void update(const float dt) = 0;
 
-	virtual void update(const float& delta) override;
-	virtual bool doTerrainCollision(Retry::Level* level, const float &delta);
+	void moveBy(cocos2d::Vec2 movement);
+
+	void initAnimation(std::string action, std::string file, cocos2d::Vec2 startCell, cocos2d::Vec2 frameSize, int numFrames);
+
+	void runAnimation(std::string action, float totalTime);
+
+	void bufferAction(const std::string& action);
+
+	virtual bool doTerrainCollision(Retry::Level* level, const float delta);
 
 	bool isAttackCollidingWith(Actor* body);
-
 	virtual void doAttackOnActor(Actor* actor);
 
-	// GETTERS AND SETTERS
-	float getMaxJumpHeight() const { return maxJumpHeight; }
-	float getTimeToMaxJumpHeight() const { return timeToMaxJumpHeight; }
-	void setMaxJumpHeigh(const float& f) { maxJumpHeight = f; }
-	void setTimeTomaxJumpHeight(const float& f) { timeToMaxJumpHeight = f; }
-
-	float getSideMoveSpeed() const { return sideMoveSpeed; }
-	float getTimeToMaxSpeed() const { return timeToMaxSpeed; }
-	void setSideMoveSpeed(const float& f) { sideMoveSpeed = f; }
-	void setTimeToMaxSpeed(const float& f) { timeToMaxSpeed = f; }
-
-	int getHealth() const { return (int) health; }
-	int getMaxHealth() const { return (int) maxHealth; }
-	float getHealthRatio() const { return health / maxHealth; }
-	void adjustHealth(const float &amount);
-
-	Attack* getCurrentAttack() const { return attackList.find(currentAttackKey) != attackList.end() ? attackList.at(currentAttackKey) : nullptr; }
-
-	bool isInvincible() const { return invincibilityTimer > 0; }
-	void setInvincible(const float time) { invincibilityTimer = time; }
-
-	bool doPracticeDummy = false;
-
-	void setFlippedX(const bool& flip);
-
-	char getCurrentAttackKey() { return currentAttackKey; }
+	void adjustHealth(const float amount);
 
 protected:
+	virtual void performSideMovement(const float delta);
 
+	virtual void performJump(const float delta);
+	virtual void updateAnimations(const float delta);
 
-	virtual void performSideMovement(const float& delta);
+	virtual void performAttack(const float delta);
 
-	virtual void performJump(const float& delta);
-	virtual void updateAnimations(const float& delta);
+	virtual void updateActionBuffer(const float delta);
 
-	virtual void performAttack(const float& delta);
+	bool isActionPressed(const std::string &action);
+	bool isActionDown(const std::string &action);
+	bool isActionUp(const std::string &action);
+
+	float actionPressedDuration(const std::string &action);
+	float actionPressedValue(const std::string &action);
+
+	float doSolidCollisionX(Retry::Level* level, const cocos2d::Rect &boundingBox);
+	float doSolidCollisionY(Retry::Level* level, const cocos2d::Rect &boundingBox);
+
+	float doPlatformCollisionX(Retry::Level* level, const cocos2d::Rect &boundingBox);
+	float doPlatformCollisionY(Retry::Level* level, const cocos2d::Rect &boundingBox);
 
 	float health = 100;
 	float maxHealth = 100;
@@ -99,24 +94,7 @@ protected:
 	bool hasLanded = false;
 	bool hasMoved = false;
 
-	std::unordered_map<std::string, cocos2d::Animation*> animations;
-
 	std::unordered_map<std::string, ActionInfo> actionBuffer;
-
-	virtual void updateActionBuffer(const float& delta);
-
-	bool isActionPressed(const std::string &action);
-	bool isActionDown(const std::string &action);
-	bool isActionUp(const std::string &action);
-
-	float actionPressedDuration(const std::string &action);
-	float actionPressedValue(const std::string &action);
-
-	float doSolidCollisionX(Retry::Level* level, const cocos2d::Rect &boundingBox);
-	float doSolidCollisionY(Retry::Level* level, const cocos2d::Rect &boundingBox);
-
-	float doPlatformCollisionX(Retry::Level* level, const cocos2d::Rect &boundingBox);
-	float doPlatformCollisionY(Retry::Level* level, const cocos2d::Rect &boundingBox);
 
 	float invincibilityTimer = 0;
 
@@ -127,7 +105,67 @@ protected:
 
 	float attackTimer = 0;
 
+	cocos2d::Sprite* sprite;
+	cocos2d::Vec2 position;
+	cocos2d::Vec2 velocity;
+	cocos2d::Vec2 acceleration;
+
+	cocos2d::Vec2 lastPosition;
+	cocos2d::Vec2 deltaPosition;
+
+	float totalTime;
+	std::string currentAnimation;
+	std::unordered_map<std::string, cocos2d::Animation*> animations;
+
+	Collision::Body hitBox;
+	cocos2d::Rect currentWorldHitBox;
+
 	friend class Player;
+
+public:
+	cocos2d::Sprite* getSprite() { return sprite; }
+	Retry::Collision::Body* getHitBox() { return &hitBox; }
+	const cocos2d::Rect& getCurrentWorldHitBox() const { return currentWorldHitBox; }
+
+	float getWidth() { return sprite->getBoundingBox().size.width; }
+	float getHeight() { return sprite->getBoundingBox().size.height; }
+
+	cocos2d::Vec2 getPosition() { return position; }
+	cocos2d::Vec2 getVelocity() { return velocity; }
+	cocos2d::Vec2 getAcceleration() { return acceleration; }
+
+	void setPosition(const cocos2d::Vec2 &position) {
+		lastPosition = this->position;
+
+		sprite->setPosition(position + sprite->getBoundingBox().size / 2);
+		this->position = position;
+
+		deltaPosition = this->position - this->lastPosition;
+	}
+	void setVelocity(cocos2d::Vec2 velocity) { this->velocity = velocity; }
+	void setAcceleration(cocos2d::Vec2 accel) { this->acceleration = accel; }
+
+	float getMaxJumpHeight() const { return maxJumpHeight; }
+	float getTimeToMaxJumpHeight() const { return timeToMaxJumpHeight; }
+	void setMaxJumpHeigh(const float& f) { maxJumpHeight = f; }
+	void setTimeTomaxJumpHeight(const float& f) { timeToMaxJumpHeight = f; }
+
+	float getSideMoveSpeed() const { return sideMoveSpeed; }
+	float getTimeToMaxSpeed() const { return timeToMaxSpeed; }
+	void setSideMoveSpeed(const float& f) { sideMoveSpeed = f; }
+	void setTimeToMaxSpeed(const float& f) { timeToMaxSpeed = f; }
+
+	int getHealth() const { return (int) health; }
+	int getMaxHealth() const { return (int) maxHealth; }
+	float getHealthRatio() const { return health / maxHealth; }
+
+	char getCurrentAttackKey() { return currentAttackKey; }
+	Attack* getCurrentAttack() const { return attackList.find(currentAttackKey) != attackList.end() ? attackList.at(currentAttackKey) : nullptr; }
+
+	bool isInvincible() const { return invincibilityTimer > 0; }
+	void setInvincible(const float time) { invincibilityTimer = time; }
+
+	void setFlippedX(const bool flip);
 };
 
 class Attack {
@@ -142,12 +180,12 @@ public:
 	float getRecovery() const { return recovery; }
 	Retry::Collision::Body* getHitBox() const { return &hitBox; }
 
-	void setDamage(const float& dmg) { damage = dmg; }
-	void setKnockBackAmount(const float& kbAmt) { this->kbAmt = kbAmt; }
+	void setDamage(const float dmg) { damage = dmg; }
+	void setKnockBackAmount(const float kbAmt) { this->kbAmt = kbAmt; }
 	void setKnockBackDirection(const cocos2d::Vec2& kbDir) { this->kbDir = cocos2d::Vec2(abs(kbDir.x), kbDir.y).getNormalized(); }
-	void setDelay(const float& delay) { this->delay = delay; }
-	void setDuration(const float& duration) { this->duration = duration; }
-	void setRecovery(const float& recovery) { this->recovery = recovery; }
+	void setDelay(const float delay) { this->delay = delay; }
+	void setDuration(const float duration) { this->duration = duration; }
+	void setRecovery(const float recovery) { this->recovery = recovery; }
 
 private:
 	float damage = 0;

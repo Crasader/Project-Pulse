@@ -6,54 +6,29 @@
 #include "GameSettings.h"
 #include "Algorithms.h"
 
+using cocos2d::Vec2;
+using cocos2d::Size;
+using cocos2d::Rect;
+
 namespace Retry {
 
-Actor::Actor(const std::string &name, const cocos2d::Vec2 &position) {
-	init(name, position);
+Actor::Actor(const std::string &path, const cocos2d::Vec2 &position) {
 
-	Attack* atk = new Attack();
-	atk->setDamage(10);
-	atk->setDelay(0.0f);
-	atk->setDuration(0.3f);
-	atk->setRecovery(0.05f);
-	atk->setKnockBackAmount(3);
-	atk->setKnockBackDirection(Vec2(1, 0.25f));
-	atk->getHitBox()->addCapsule(Vec2(40, 46), cocos2d::Vec2(52, 46), 10);
-	atk->getHitBox()->setParent(sprite);
-	attackList[PUNCH1] = atk;
+	sprite = cocos2d::Sprite::create(path);
+	if (sprite == nullptr) {
+		cocos2d::log("Sprite %s could not be loaded!", path.c_str());
+		auto rt = cocos2d::RenderTexture::create(128, 128);
+		rt->beginWithClear(1, 0, 1, 1);
+		rt->end();
+		sprite = cocos2d::Sprite::createWithTexture(rt->getSprite()->getTexture());
+	}
+	sprite->getTexture()->setAliasTexParameters();
+	sprite->setAnchorPoint(cocos2d::Vec2(0.5f, 0.5f));
+	sprite->setPosition(position);
+	this->position = position;
 
-	atk = new Attack();
-	atk->setDamage(10);
-	atk->setDelay(0.1f);
-	atk->setDuration(0.3f);
-	atk->setRecovery(0.15f);
-	atk->setKnockBackAmount(3);
-	atk->setKnockBackDirection(Vec2(1, 0.25f));
-	atk->getHitBox()->addCapsule(Vec2(40, 46), cocos2d::Vec2(52, 46), 10);
-	atk->getHitBox()->setParent(sprite);
-	attackList[PUNCH2] = atk;
-
-	atk = new Attack();
-	atk->setDamage(20);
-	atk->setDelay(0.0f);
-	atk->setDuration(0.4f);
-	atk->setRecovery(0.05f);
-	atk->setKnockBackAmount(3);
-	atk->setKnockBackDirection(Vec2(1, 0.25f));
-	atk->getHitBox()->addCapsule(Vec2(40, 46), cocos2d::Vec2(51, 46), 25);
-	atk->getHitBox()->setParent(sprite);
-	attackList[PUNCHPUNCH] = atk;
-
-	0.125 * (0.08 / 0.125);
-
-	initAnimation("idle", name, Vec2(0, 0), Vec2(64, 64), 5);
-	initAnimation("punch1", name, Vec2(0, 1), Vec2(64, 64), 5);
-	initAnimation("punch2", name, Vec2(0, 2), Vec2(64, 64), 5);
-	initAnimation("punchpunch", name, Vec2(0, 3), Vec2(64, 64), 6);
-
-	runAnimation("idle", 0.1f);
-
-	hurtBox.addCapsule(Vec2(32, 16), Vec2(32, 48), 16);
+	new (&hitBox)  Retry::Collision::Body(sprite);
+	hitBox.setDebugDrawColor(cocos2d::Color4F(1, 0, 0, 0.3f));
 }
 
 Actor::~Actor() {
@@ -61,46 +36,77 @@ Actor::~Actor() {
 		delete i.second;
 }
 
-void Actor::setFlippedX(const bool& flip) {
+void Actor::kill(float delay) {
+	sprite->runAction(cocos2d::RemoveSelf::create());
+}
+
+void Actor::moveBy(cocos2d::Vec2 movement) {
+	setPosition(position + movement);
+	//position += movement;
+	//sprite->setPosition(position);
+}
+
+void Actor::initAnimation(std::string action, std::string file, Vec2 startCell, Vec2 frameSize, int numFrames) {
+	//TODO: Add more functionality
+	auto temp = cocos2d::Animation::create();
+	int width = sprite->getTexture()->getPixelsWide() / frameSize.x;
+	for (int i = 0; i < numFrames; i++) {
+		Vec2 startPosition((((int) startCell.x + i) % width) * frameSize.x, (startCell.y + ((int) startCell.x + i) / width) * (frameSize.y) + 2);
+		auto frame = cocos2d::SpriteFrame::create(file.c_str(), Rect(startPosition, Size(frameSize) - Size(0, 2)));
+		//frame->getTexture()->setAliasTexParameters();
+		temp->addSpriteFrame(frame);
+	}
+	temp->setLoops(1);
+
+	animations[action] = temp;
+	animations[action]->retain();
+}
+
+void Actor::runAnimation(std::string action, float totalTime) {
+	if (animations.find(action) == animations.end()) return;
+
+	auto currentAnimate = (cocos2d::Animate*)sprite->getActionByTag('anim');
+
+	if (totalTime > 0) animations[action]->setDelayPerUnit(totalTime);
+
+	if (currentAnimation != action) {
+		currentAnimation = action;
+		sprite->stopAllActionsByTag('anim');
+		auto tempAnim = cocos2d::Animate::create(animations[action]->clone());
+		tempAnim->setTag('anim');
+		sprite->runAction(tempAnim);
+	} else if (currentAnimate == nullptr) {
+		sprite->stopAllActionsByTag('anim');
+		auto tempAnim = cocos2d::Animate::create(animations[action]->clone());
+		tempAnim->setTag('anim');
+		sprite->runAction(tempAnim);
+	} else {
+		float elapsed = currentAnimate->getElapsed();
+		if (this->totalTime != totalTime && elapsed > 0) {
+			sprite->stopAllActionsByTag('anim');
+			auto tempAnim = cocos2d::Animate::create(animations[action]->clone());
+			tempAnim->setTag('anim');
+			sprite->runAction(tempAnim);
+			((cocos2d::Animate*)sprite->getActionByTag('anim'))->step(elapsed);
+		}
+	}
+	this->totalTime = totalTime;
+	//cocos2d::log("%f", ((cocos2d::Animate*)sprite->getActionByTag('anim')));
+}
+
+void Actor::setFlippedX(const bool flip) {
 	if (sprite->isFlippedX() == flip) return;
 
 	sprite->setFlippedX(flip);
 	hitBox.redraw();
-	hurtBox.redraw();
 	for (auto i : attackList) i.second->getHitBox()->redraw();
 }
 
-void Actor::update(const float& delta) {
-	acceleration = cocos2d::Vec2(0, -2 * maxJumpHeight / (timeToMaxJumpHeight * timeToMaxJumpHeight));
-
-	updateActionBuffer(delta);
-
-	performSideMovement(delta);
-
-	performJump(delta);
-
-	moveBy(velocity * delta + 0.5f * acceleration * delta * delta);
-
-	velocity.y += (!isActionPressed("jump") || velocity.y < 0 ? 2 : 1) * acceleration.y * delta;
-	velocity.y = clamp(velocity.y, -2000, 2000);
-
-	performAttack(delta);
-
-	updateAnimations(delta);
-
-	invincibilityTimer -= delta;
-	attackTimer -= delta;
-}
-
-bool Actor::doTerrainCollision(Retry::Level* level, const float &delta) {
+bool Actor::doTerrainCollision(Retry::Level* level, const float delta) {
 
 	if (velocity.y < -800) onGround = false;
 
-	cocos2d::Rect boundingBox(sprite->convertToWorldSpace(hurtBox.getBoundingBox().origin), hurtBox.getBoundingBox().size);
-	for (cocos2d::Node* n = sprite; n != nullptr; n = n->getParent())
-		boundingBox.size = boundingBox.size * n->getScale();
-	boundingBox.origin = boundingBox.origin / cocos2d::Director::getInstance()->getRunningScene()->getScale();
-	boundingBox.size = boundingBox.size / cocos2d::Director::getInstance()->getRunningScene()->getScale();
+	Rect boundingBox = hitBox.getWorldBoundingBox();
 
 	//cocos2d::Rect boundingBox = hurtBox.getBoundingBox();
 
@@ -124,11 +130,11 @@ bool Actor::isAttackCollidingWith(Actor* target) {
 			return false;
 
 		return (!target->isInvincible() &&
-				currentAttack->getHitBox()->isCollidingWith(target->getHurtBox()));
+				currentAttack->getHitBox()->isCollidingWith(target->getHitBox()));
 	} else return false;
 }
 
-void Actor::updateAnimations(const float & delta) {
+void Actor::updateAnimations(const float delta) {
 	float attackFrameLength = 0.125f * (0.08f / 0.125f);
 
 	if (velocity.x != 0 && attackTimer < -this->followUpAttackWindow) {
@@ -176,7 +182,7 @@ void Actor::updateAnimations(const float & delta) {
 	}
 }
 
-void Actor::performAttack(const float& delta) {
+void Actor::performAttack(const float delta) {
 
 	Attack* currAttack = getCurrentAttack();
 	if (currAttack != nullptr) {
@@ -224,7 +230,7 @@ void Actor::performAttack(const float& delta) {
 	}
 }
 
-void Actor::performSideMovement(const float & delta) {
+void Actor::performSideMovement(const float delta) {
 	if (isActionPressed("left") != isActionPressed("right")) {
 		acceleration.x = (isActionPressed("left") ? -1 : 1) * sideMoveSpeed / timeToMaxSpeed / (!onGround ? (velocity.y > 100 ? 5.0f : 3.0f) : 1);
 	} else {
@@ -236,7 +242,7 @@ void Actor::performSideMovement(const float & delta) {
 	velocity.x = sign(velocity.x) * clamp(abs(velocity.x), 0, sideMoveSpeed + (doJump ? 100 : 0));
 }
 
-void Actor::performJump(const float & delta) {
+void Actor::performJump(const float delta) {
 	if (onGround || Retry::Config::doDebug()) doJump = 0;
 	if (doJump < 2 && isActionDown("jump")) {
 		onGround = false;
@@ -251,7 +257,7 @@ void Actor::performJump(const float & delta) {
 	}
 }
 
-void Actor::adjustHealth(const float &amount) {
+void Actor::adjustHealth(const float amount) {
 	this->health += amount;
 	this->health = clamp(this->health, 0, this->maxHealth);
 }
@@ -276,7 +282,7 @@ void Actor::doAttackOnActor(Actor* actor) {
 
 }
 
-void Actor::updateActionBuffer(const float& delta) {
+void Actor::updateActionBuffer(const float delta) {
 	for (auto& i : actionBuffer) {
 		i.second.down = i.second.time == 1 && i.second.value == 0;
 		i.second.up = i.second.time == 0 && i.second.value == 1;

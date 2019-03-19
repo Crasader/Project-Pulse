@@ -187,6 +187,19 @@ Rect Body::getBoundingBox() {
 	return boundingBox;
 }
 
+Rect Body::getWorldBoundingBox() {
+	Rect boundingBox = getBoundingBox();
+
+	boundingBox.origin = hitBox->getParent()->convertToWorldSpace(boundingBox.origin);
+
+	for (cocos2d::Node* n = hitBox->getParent(); n != nullptr; n = n->getParent())
+		boundingBox.size = boundingBox.size * n->getScale();
+	boundingBox.origin = boundingBox.origin / cocos2d::Director::getInstance()->getRunningScene()->getScale();
+	boundingBox.size = boundingBox.size / cocos2d::Director::getInstance()->getRunningScene()->getScale();
+
+	return boundingBox;
+}
+
 std::vector<Vec2> newRectVerts(const CollisionRect &rect) {
 	std::vector<Vec2> newVerts;
 

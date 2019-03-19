@@ -47,6 +47,7 @@ public:
 	bool isCollidingWith(const Body* body);
 
 	Rect getBoundingBox();
+	Rect getWorldBoundingBox();
 
 	static void setTestPosition(Vec2 pos);
 private:

@@ -25,9 +25,6 @@
     <Filter Include="src\utilities">
       <UniqueIdentifier>{f72efda9-644f-4d8e-b577-2f34dfe38b88}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\entities\agents">
-      <UniqueIdentifier>{e9984e12-7bdb-4ae5-a643-ba291b7c6ae0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\Collision">
       <UniqueIdentifier>{c5ab7375-ef44-42ba-b3ac-1414d22f0b45}</UniqueIdentifier>
     </Filter>
@@ -72,18 +69,6 @@
     <ClCompile Include="..\Classes\Algorithms.cpp">
       <Filter>src\utilities</Filter>
     </ClCompile>
-    <ClCompile Include="..\Classes\Actor.cpp">
-      <Filter>src\entities\agents</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\Enemy.cpp">
-      <Filter>src\entities\agents</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\Player.cpp">
-      <Filter>src\entities\agents</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Classes\Entity.cpp">
-      <Filter>src\entities</Filter>
-    </ClCompile>
     <ClCompile Include="..\Classes\CXBOXController.cpp">
       <Filter>src\utilities</Filter>
     </ClCompile>
@@ -107,6 +92,15 @@
     </ClCompile>
     <ClCompile Include="..\Classes\Button.cpp">
       <Filter>src\menu objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Actor.cpp">
+      <Filter>src\entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Enemy.cpp">
+      <Filter>src\entities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Classes\Player.cpp">
+      <Filter>src\entities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -143,18 +137,6 @@
     <ClInclude Include="..\Classes\Algorithms.h">
       <Filter>src\utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\Classes\Actor.h">
-      <Filter>src\entities\agents</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\Enemy.h">
-      <Filter>src\entities\agents</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\Player.h">
-      <Filter>src\entities\agents</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Classes\Entity.h">
-      <Filter>src\entities</Filter>
-    </ClInclude>
     <ClInclude Include="..\Classes\CXBOXController.h">
       <Filter>src\utilities</Filter>
     </ClInclude>
@@ -178,6 +160,15 @@
     </ClInclude>
     <ClInclude Include="..\Classes\Button.h">
       <Filter>src\menu objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Actor.h">
+      <Filter>src\entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Enemy.h">
+      <Filter>src\entities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Classes\Player.h">
+      <Filter>src\entities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

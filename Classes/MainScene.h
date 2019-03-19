@@ -28,6 +28,7 @@
 #include "cocos2d.h"
 
 #include "Player.h"
+#include "Enemy.h"
 
 #include "Level.h"
 
@@ -54,9 +55,9 @@ private:
 	void doAICalculations();
 
 	Retry::Player* player;
-	Retry::Entity* pulseParticle;
+	//Retry::Actor* pulseParticle;
 
-	Retry::Actor* enemy;
+	Retry::Enemy* enemy;
 
 	std::vector<Retry::Actor*> actorList;
 

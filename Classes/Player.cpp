@@ -8,8 +8,8 @@
 
 namespace Retry {
 
-Retry::Player::Player(std::string path, cocos2d::Vec2 pos) {
-	init(path, pos);
+Retry::Player::Player(const cocos2d::Vec2& pos)
+	: Actor("cybercop.png", pos) {
 
 	addButtonToMapping("jump", KeyCode::SPACE);
 	addButtonToMapping("jump", KeyCode::W);
@@ -165,7 +165,7 @@ Retry::Player::Player(std::string path, cocos2d::Vec2 pos) {
 
 	runAnimation("run", 0);
 
-	hurtBox.addCapsule(Vec2(32, 16), Vec2(32, 48), 16);
+	hitBox.addCapsule(Vec2(32, 16), Vec2(32, 48), 16);
 
 	sprite->setScale(2);
 
@@ -173,7 +173,7 @@ Retry::Player::Player(std::string path, cocos2d::Vec2 pos) {
 	timeToMaxSpeed = 0.1f;
 }
 
-void Retry::Player::update(const float& delta) {
+void Retry::Player::update(const float delta) {
 	acceleration = cocos2d::Vec2(0, -2 * maxJumpHeight / (timeToMaxJumpHeight * timeToMaxJumpHeight));
 
 	updateActionBuffer(delta);
@@ -206,7 +206,7 @@ void Retry::Player::update(const float& delta) {
 		isPulse = !isPulse;
 }
 
-void Player::updateAnimations(const float& delta) {
+void Player::updateAnimations(const float delta) {
 
 	float attackFrameLength = 0.125 * (0.08 / 0.125);
 
@@ -256,15 +256,11 @@ void Player::updateAnimations(const float& delta) {
 
 }
 
-bool Player::doTerrainCollision(Level * level, const float & delta) {
+bool Player::doTerrainCollision(Level * level, const float delta) {
 
 	if (velocity.y < -800) onGround = false;
 
-	cocos2d::Rect boundingBox(sprite->convertToWorldSpace(hurtBox.getBoundingBox().origin), hurtBox.getBoundingBox().size);
-	for (cocos2d::Node* n = sprite; n != nullptr; n = n->getParent())
-		boundingBox.size = boundingBox.size * n->getScale();
-	boundingBox.origin = boundingBox.origin / cocos2d::Director::getInstance()->getRunningScene()->getScale();
-	boundingBox.size = boundingBox.size / cocos2d::Director::getInstance()->getRunningScene()->getScale();
+	cocos2d::Rect boundingBox = hitBox.getWorldBoundingBox();
 
 	//cocos2d::Rect boundingBox = hurtBox.getBoundingBox();
 
@@ -278,7 +274,7 @@ bool Player::doTerrainCollision(Level * level, const float & delta) {
 		doCameraCollision(level, boundingBox);
 	canMoveOn = true;
 
-    // Update the sprite's position along with the character's position
+	// Update the sprite's position along with the character's position
 	setPosition(position);
 
 	return position != lastPosition;
@@ -296,7 +292,7 @@ float Player::doCameraCollision(Retry::Level* level, const cocos2d::Rect &boundi
 	return position.x;
 }
 
-void Player::performSideMovement(const float & delta) {
+void Player::performSideMovement(const float delta) {
 
 	sideMoveSpeed = getMode() == COOLDOWN ? 400 : 700;
 
@@ -313,7 +309,7 @@ void Player::performSideMovement(const float & delta) {
 	velocity.x = sign(velocity.x) * clamp(abs(velocity.x), 0, sideMoveSpeed + (doJump ? 100 : 0));
 }
 
-void Player::performJump(const float & delta) {
+void Player::performJump(const float delta) {
 	if (onGround || Retry::Config::doDebug()) doJump = 0;
 	if (doJump < 2 && attackTimer < -0.15 && isActionDown("jump")) {
 		onGround = false;
@@ -328,7 +324,7 @@ void Player::performJump(const float & delta) {
 	}
 }
 
-void Player::updatePulseMode(const float & delta) {
+void Player::updatePulseMode(const float delta) {
 
 
 
@@ -337,7 +333,7 @@ void Player::updatePulseMode(const float & delta) {
 
 }
 
-void Retry::Player::updateActionBuffer(const float& delta) {
+void Retry::Player::updateActionBuffer(const float delta) {
 	for (auto &i : actionBuffer) {
 		float time = 0;
 		int count = 0;
