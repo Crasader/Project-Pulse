@@ -20,6 +20,8 @@ public:
 
 	void setPosition(const cocos2d::Vec2 position) { root->setPosition(position); }
 
+	void setScale(const int scale) { root->setScale(scale); }
+
 protected:
 	void adjustForControls();
 

@@ -12,7 +12,7 @@ public:
 
 	virtual void update(const float delta) override;
 
-	virtual void updateAI(const Player* player, const float delta) = 0;
+	virtual void updateAI(Player* player, const float delta) = 0;
 };
 
 class GoonEnemy : public Enemy {
@@ -21,7 +21,7 @@ public:
 
 	virtual void update(const float delta) override;
 
-	virtual void updateAI(const Player* player, const float delta) override;
+	virtual void updateAI(Player* player, const float delta) override;
 };
 
 
@@ -32,7 +32,7 @@ public:
 
 	virtual void update(const float delta) override;
 
-	virtual void updateAI(const Player* player, const float delta) override;
+	virtual void updateAI(Player* player, const float delta) override;
 };
 
 }

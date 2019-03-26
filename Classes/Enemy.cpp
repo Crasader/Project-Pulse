@@ -1,3 +1,4 @@
+#include "Player.h"
 #include "Enemy.h"
 
 #include "Algorithms.h"
@@ -55,7 +56,6 @@ GoonEnemy::GoonEnemy(const cocos2d::Vec2& pos)
 	runAnimation("idle", 0.1f);
 
 	hitBox.addCapsule(Vec2(32, 16), Vec2(32, 48), 16);
-	hitBox.addCapsule(Vec2(32, 16), Vec2(32, 48), 16);
 }
 
 TutorialEnemy::TutorialEnemy(const cocos2d::Vec2& pos)
@@ -63,41 +63,80 @@ TutorialEnemy::TutorialEnemy(const cocos2d::Vec2& pos)
 }
 
 void Enemy::update(const float delta) {
-	acceleration = cocos2d::Vec2(0, -2 * maxJumpHeight / (timeToMaxJumpHeight * timeToMaxJumpHeight));
-
 	updateActionBuffer(delta);
 
+	acceleration = cocos2d::Vec2(0, -2 * maxJumpHeight / (timeToMaxJumpHeight * timeToMaxJumpHeight));
 	performSideMovement(delta);
-
 	performJump(delta);
 
 	moveBy(velocity * delta + 0.5f * acceleration * delta * delta);
-
 	velocity.y += (!isActionPressed("jump") || velocity.y < 0 ? 2 : 1) * acceleration.y * delta;
 	velocity.y = clamp(velocity.y, -2000, 2000);
 
 	performAttack(delta);
-
 	updateAnimations(delta);
-
 	invincibilityTimer -= delta;
 	attackTimer -= delta;
 }
 
 void GoonEnemy::update(const float delta) {
-
+	Enemy::update(delta);
 }
 
 void TutorialEnemy::update(const float delta) {
-
+	Enemy::update(delta);
 }
 
-void GoonEnemy::updateAI(const Player* player, const float delta) {
+void GoonEnemy::updateAI(Player* player, const float delta) {
+	const cocos2d::Rect playerBBox = player->getHitBox()->getWorldBoundingBox();
 
+	cocos2d::Rect actorBBox = hitBox.getWorldBoundingBox();
+
+	if ((player->getPosition() - getPosition()).getLengthSq() < 1500 * 1500) {
+		if (player->getPosition().x > getPosition().x)
+			player->canMoveOn = false;
+
+		if (abs(playerBBox.origin.x - actorBBox.origin.x + (playerBBox.size.width - actorBBox.size.width) * 0.5f) > 180) {
+			if (playerBBox.origin.x - actorBBox.origin.x < 0)
+				bufferAction("left");
+			else
+				bufferAction("right");
+
+			if (velocity.x == 0)
+				bufferAction("jump");
+		} else {
+			static bool doButton = true;
+			if ((doButton && getCurrentAttackKey() & 0b1111) || rand() % 1000 < 7) bufferAction("punch");
+			doButton ^= 1;
+		}
+	}
 }
 
-void TutorialEnemy::updateAI(const Player* player, const float delta) {
+void TutorialEnemy::updateAI(Player* player, const float delta) {
+	const cocos2d::Rect playerBBox = player->getHitBox()->getWorldBoundingBox();
 
+	cocos2d::Rect actorBBox = hitBox.getWorldBoundingBox();
+
+	if ((player->getPosition() - getPosition()).getLengthSq() < 1500 * 1500) {
+		if (player->getPosition().x > getPosition().x)
+			player->canMoveOn = false;
+		
+		float distBetweenBBoxes = abs(playerBBox.origin.x - actorBBox.origin.x + (playerBBox.size.width - actorBBox.size.width) * 0.5f);
+	
+		if (health < maxHealth && distBetweenBBoxes > 180) {
+			if (playerBBox.origin.x - actorBBox.origin.x < 0)
+				bufferAction("left");
+			else
+				bufferAction("right");
+
+			if (velocity.x == 0)
+				bufferAction("jump");
+		} else {
+			static bool doButton = true;
+			if ((doButton && getCurrentAttackKey() & 0b1111) || rand() % 1000 < 7) if (attackTimer < 0) bufferAction("punch");
+			doButton ^= 1;
+		}
+	}
 }
 
 }

@@ -39,6 +39,8 @@ Button::Button(const std::string& sheet, const Vec2& position, const Size& dimen
 	label->setAlignment(cocos2d::TextHAlignment::CENTER);
 	label->setSystemFontSize(30);
 	sprite->addChild(label);
+
+	sprite->getTexture()->setAliasTexParameters();
 }
 Button::~Button() {
 	//sprite->removeFromParent();
@@ -75,10 +77,15 @@ void Button::setScale(const float scale) {
 
 bool Button::isMouseOver() const {
 	Vec2 worldPosition = sprite->convertToWorldSpace(Vec2::ZERO);
+	float scale = [&]()->float {
+		float s = 1;
+		for (cocos2d::Node* n = sprite; n != nullptr; n = n->getParent()) s *= n->getScale();
+		return s;
+	}();
 	return (Mouse::getX() > worldPosition.x &&
 			Mouse::getY() > worldPosition.y &&
-			Mouse::getX() < worldPosition.x + size.width &&
-			Mouse::getY() < worldPosition.y + size.height);
+			Mouse::getX() < worldPosition.x + size.width * scale &&
+			Mouse::getY() < worldPosition.y + size.height * scale);
 }
 
 void Button::setString(const std::string& string) {

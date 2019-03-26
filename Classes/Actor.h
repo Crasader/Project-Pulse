@@ -178,6 +178,7 @@ public:
 	float getDelay() const { return delay; }
 	float getDuration() const { return duration; }
 	float getRecovery() const { return recovery; }
+	float getHitStun() const { return hitStun; }
 	Retry::Collision::Body* getHitBox() const { return &hitBox; }
 
 	void setDamage(const float dmg) { damage = dmg; }
@@ -186,6 +187,7 @@ public:
 	void setDelay(const float delay) { this->delay = delay; }
 	void setDuration(const float duration) { this->duration = duration; }
 	void setRecovery(const float recovery) { this->recovery = recovery; }
+	void setHitStun(const float hitStun) { this->hitStun = hitStun; }
 
 private:
 	float damage = 0;
@@ -197,7 +199,16 @@ private:
 	float duration = 0.5f;
 	float recovery = 0.2f;
 
+	float hitStun = 0.0f;
+
 	mutable Collision::Body hitBox;
+};
+
+class MenuActor : public Actor {
+public:
+	MenuActor(const std::string& path, const cocos2d::Vec2& position, const cocos2d::Size& frameSize, const int numFrames);
+
+	virtual void update(const float delta) override;
 };
 
 }

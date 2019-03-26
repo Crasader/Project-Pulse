@@ -163,7 +163,6 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)\Resources" /D /E /I /F /Y
     <ClCompile Include="..\Classes\ControllerManager.cpp" />
     <ClCompile Include="..\Classes\CXBOXController.cpp" />
     <ClCompile Include="..\Classes\Enemy.cpp" />
-    <ClCompile Include="..\Classes\Entity.cpp" />
     <ClCompile Include="..\Classes\GameSettings.cpp" />
     <ClCompile Include="..\Classes\KeyboardManager.cpp" />
     <ClCompile Include="..\Classes\Level.cpp" />
@@ -188,7 +187,6 @@ xcopy "$(ProjectDir)..\Resources" "$(OutDir)\Resources" /D /E /I /F /Y
     <ClInclude Include="..\Classes\ControllerManager.h" />
     <ClInclude Include="..\Classes\CXBOXController.h" />
     <ClInclude Include="..\Classes\Enemy.h" />
-    <ClInclude Include="..\Classes\Entity.h" />
     <ClInclude Include="..\Classes\GameSettings.h" />
     <ClInclude Include="..\Classes\KeyboardManager.h" />
     <ClInclude Include="..\Classes\Level.h" />

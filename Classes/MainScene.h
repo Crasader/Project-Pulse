@@ -52,20 +52,21 @@ private:
 
 	void toggleDebug();
 
-	void doAICalculations();
+	//void doAICalculations();
 
 	Retry::Player* player;
 	//Retry::Actor* pulseParticle;
 
 	Retry::Enemy* enemy;
 
-	std::vector<Retry::Actor*> actorList;
+	std::vector<Retry::Enemy*> enemyList;
 
 	std::vector<cocos2d::Sprite*> background;
 
 	std::vector<cocos2d::Sprite*> cameraAnchors;
 
-	cocos2d::Sprite* healthBarBack;
+	cocos2d::Sprite* healthBarBackRest;
+	cocos2d::Sprite* healthBarBackPulse;
 	cocos2d::Sprite* healthBarFront;
 
 	cocos2d::Node* gui;

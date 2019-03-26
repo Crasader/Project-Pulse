@@ -18,25 +18,20 @@
 using cocos2d::Vec2;
 using cocos2d::Size;
 
-cocos2d::Scene* MenuScene::createScene()
-{
+cocos2d::Scene* MenuScene::createScene() {
 	return MenuScene::create();
 }
 
-void MenuScene::onExit()
-{
+void MenuScene::onExit() {
 	Scene::onExit();
 }
 
-void MenuScene::onEnter()
-{
+void MenuScene::onEnter() {
 	Scene::onEnter();
 }
 
-bool MenuScene::init()
-{
-	if (!Scene::init())
-	{
+bool MenuScene::init() {
+	if (!Scene::init()) {
 		return false;
 	}
 
@@ -46,51 +41,28 @@ bool MenuScene::init()
 	Retry::Mouse::createListener(_eventDispatcher, this);
 	Retry::Controller::createListener(this);
 
-	auto cobble = cocos2d::Sprite::create("cobblestone.png");
-	auto cSize = cobble->getContentSize();
-	auto sSize = cocos2d::Director::getInstance()->getVisibleSize();
+	backGround = new Retry::MenuActor("title_background.png", { 960, 1080 / 2 }, { 80, 45 }, 60);
+	backGround->getSprite()->setScale(1080.0f / 42.0f);
+	gui->addChild(backGround->getSprite());
 
-	for (int i = 0; i < (int) sSize.width / (int) cSize.width + 2; i++)
-	{
-		for (int j = 0; j < (int) sSize.height / (int) cSize.height + 2; j++)
-		{
-			auto newCobble = cocos2d::Sprite::create("cobblestone.png");
-			newCobble->setAnchorPoint(Vec2(0, 0));
-			newCobble->setPosition(i * cSize.width, j * cSize.height);
-			newCobble->setColor(cocos2d::Color3B(127, 127, 127));
-			this->addChild(newCobble);
-		}
-	}
+	title = new Retry::MenuActor("title_title.png", { 50, 1040 }, { 64, 32 }, 60);
+	title->getSprite()->setAnchorPoint(cocos2d::Vec2::ANCHOR_TOP_LEFT);
+	title->getSprite()->setScale(8.0f * 0.7f);
+	gui->addChild(title->getSprite());
 
-	//auto mainMenu = cocos2d::Menu::create();
-
-	//auto playItem = cocos2d::MenuItemImage::create("CloseNormal.png", "CloseSelected.png", [&](Ref* sender) {
-	//	cocos2d::Director::getInstance()->replaceScene(MainScene::createScene());
-	//});
-	//playItem->setScale(2);
-
-	//auto closeItem = cocos2d::MenuItemImage::create("Close1.png", "Close2.png", [&](Ref* sender) {
-	//	cocos2d::Director::getInstance()->end();
-	//});
-	//closeItem->setScale(0.25f);
-	//closeItem->setPosition(Vec2(550, -300));
-
-
-	//mainMenu->addChild(playItem);
-	//mainMenu->addChild(closeItem);
-	//gui->addChild(mainMenu);
-	
-	menu = new Retry::Menu(Vec2(960, 1080 / 5), this);
-	menu->addButton("button.png", Size(256, 80), "New Game", [&]() {
+	menu = new Retry::Menu(Vec2(230, 700), gui);
+	menu->addButton("startbutton.png", Size(64, 32), [&]() {
 		cocos2d::Director::getInstance()->replaceScene(MainScene::createScene());
 	});
-	menu->addButton("button.png", Size(256, 80), "Settings", [&]() {
+	menu->addButton("optionsbutton.png", Size(64, 32), [&]() {
 		cocos2d::Director::getInstance()->pushScene(OptionsMenu::createScene());
 	});
-	menu->addButton("button.png", Size(256, 80), "Exit to Desktop", [&]() {
+	menu->addButton("exitbutton.png", Size(64, 32), [&]() {
 		cocos2d::Director::getInstance()->end();
 	});
-	//this->schedule(CC_CALLBACK_0(Retry::Menu::update, menu), "MenuUpdate");
+	menu->setScale(8.0f * 0.7f);
+	menu->setPadding(10);
+
 	this->addChild(gui);
 
 	this->scheduleUpdate();
@@ -98,23 +70,12 @@ bool MenuScene::init()
 	return true;
 }
 
-void MenuScene::menuCloseCallback(Ref* pSender)
-{
+void MenuScene::menuCloseCallback(Ref* pSender) {
 	cocos2d::Director::getInstance()->end();
 }
 
-void MenuScene::update(float delta)
-{
+void MenuScene::update(float delta) {
 	menu->update();
-	//if (Retry::Keyboard::isKeyDown(Retry::KeyCode::ESCAPE) || 
-	//	Retry::Controller::isButtonDown(Retry::ControllerButton::B))
-	//	cocos2d::Director::getInstance()->end();
-
-	//if (Retry::Controller::isButtonDown(Retry::ControllerButton::A) ||
-	//	Retry::Keyboard::isKeyPressed(Retry::KeyCode::SPACE))
-	//{
-	//	cocos2d::Director::getInstance()->replaceScene(MainScene::createScene());
-	//}
-
-
+	backGround->update(delta);
+	title->update(delta);
 }

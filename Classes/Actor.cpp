@@ -14,7 +14,7 @@ namespace Retry {
 
 Actor::Actor(const std::string &path, const cocos2d::Vec2 &position) {
 
-	sprite = cocos2d::Sprite::create(path);
+	sprite = cocos2d::Sprite::create(path, { 0, 0, 1, 1 });
 	if (sprite == nullptr) {
 		cocos2d::log("Sprite %s could not be loaded!", path.c_str());
 		auto rt = cocos2d::RenderTexture::create(128, 128);
@@ -165,6 +165,8 @@ void Actor::updateAnimations(const float delta) {
 				runAnimation("fallpunch", attackFrameLength); break;
 			case FALLKICK:
 				runAnimation("fallkick", attackFrameLength); break;
+			default:
+				runAnimation("idle", 0.12f); break;
 		}
 		return;
 	}
@@ -187,10 +189,10 @@ void Actor::performAttack(const float delta) {
 	Attack* currAttack = getCurrentAttack();
 	if (currAttack != nullptr) {
 		// HACK: remove for demo
-		//if (attackTimer <= currAttack->getRecovery() + currAttack->getDuration() &&
-		//	attackTimer >= currAttack->getRecovery())
-		//	currAttack->getHitBox()->setDebugDraw(true);
-		//else currAttack->getHitBox()->setDebugDraw(false);
+		if (attackTimer <= currAttack->getRecovery() + currAttack->getDuration() &&
+			attackTimer >= currAttack->getRecovery())
+			currAttack->getHitBox()->setDebugDraw(true);
+		else currAttack->getHitBox()->setDebugDraw(false);
 	}
 
 	if (attackTimer <= -followUpAttackWindow) currentAttackKey = 0;
@@ -275,7 +277,7 @@ void Actor::doAttackOnActor(Actor* actor) {
 		actor->setVelocity(kb);
 
 		actor->currentAttackKey = 0;
-		actor->attackTimer = -actor->followUpAttackWindow - 0.1f;
+		actor->attackTimer = getCurrentAttack()->getHitStun();
 
 		actor->invincibilityTimer = getCurrentAttack()->getDuration();
 	}
@@ -333,19 +335,19 @@ float Actor::doSolidCollisionX(Retry::Level* level, const cocos2d::Rect &boundin
 
 	if (boundingBox.getMinX() < Camera::getMinX() || boundingBox.getMaxX() > Camera::getMinX())
 
-	for (float i = boundingBox.getMinX(), n = boundingBox.getMaxX(); i <= n + incX * 0.5f; i += incX) {
-		for (float j = boundingBox.getMinY(), m = boundingBox.getMaxY(); j <= m + incY * 0.5f; j += incY) {
-			Vec2 currentTile = Vec2(i, j - deltaPosition.y) / level->getTileSize();
-			if (boundingBox.getMinX() < Camera::getMinX() || 
-				boundingBox.getMaxX() > Camera::getMaxX() || 
-				level->getCollisionDataAt(currentTile) & 0x01) {
-				position.x = lastPosition.x;
-				velocity.x = 0;
+		for (float i = boundingBox.getMinX(), n = boundingBox.getMaxX(); i <= n + incX * 0.5f; i += incX) {
+			for (float j = boundingBox.getMinY(), m = boundingBox.getMaxY(); j <= m + incY * 0.5f; j += incY) {
+				Vec2 currentTile = Vec2(i, j - deltaPosition.y) / level->getTileSize();
+				if (boundingBox.getMinX() < Camera::getMinX() ||
+					boundingBox.getMaxX() > Camera::getMaxX() ||
+					level->getCollisionDataAt(currentTile) & 0x01) {
+					position.x = lastPosition.x;
+					velocity.x = 0;
 
-				return position.x;
+					return position.x;
+				}
 			}
 		}
-	}
 	return position.x;
 }
 
@@ -403,6 +405,17 @@ float Actor::doPlatformCollisionY(Retry::Level* level, const cocos2d::Rect &boun
 		}
 	}
 	return position.y;
+}
+
+MenuActor::MenuActor(const std::string& path, const cocos2d::Vec2& position, const cocos2d::Size& frameSize, const int numFrames)
+	: Actor(path, position) {
+	initAnimation("animation", path, Vec2::ZERO, frameSize, numFrames);
+	sprite->setScale(8.0f * 0.7f);
+	runAnimation("animation", 0.1f);
+}
+
+void MenuActor::update(const float delta) {
+	runAnimation("animation", 0.05f);
 }
 
 }

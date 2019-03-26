@@ -29,115 +29,123 @@ Retry::Player::Player(const cocos2d::Vec2& pos)
 	addButtonToMapping("kick", KeyCode::L);
 	addButtonToMapping("kick", ControllerButton::Y);
 
-
 	// HACK: Read in data from file maybe?
 	Attack* atk = new Attack();
 	atk->setDamage(10);
-	atk->setDelay(0.3f * (0.08 / 0.125));
-	atk->setDuration(0.1f * (0.08 / 0.125));
-	atk->setRecovery(0.1f * (0.08 / 0.125));
+	atk->setDelay(0.3f * (0.08f / 0.125f));
+	atk->setDuration(0.1f * (0.08f / 0.125f));
+	atk->setRecovery(0.1f * (0.08f / 0.125f));
 	atk->setKnockBackAmount(1);
 	atk->setKnockBackDirection(Vec2(1, 0.25f));
+	atk->setHitStun(1.0f);
 	atk->getHitBox()->addCapsule(Vec2(40, 46), cocos2d::Vec2(61, 46), 15);
 	atk->getHitBox()->setParent(sprite);
 	attackList[PUNCH1] = atk;
 
-
 	atk = new Attack();
 	atk->setDamage(15);
-	atk->setDelay(0.3f * (0.08 / 0.125));
-	atk->setDuration(0.1f * (0.08 / 0.125));
-	atk->setRecovery(0.2f * (0.08 / 0.125));
+	atk->setDelay(0.3f * (0.08f / 0.125f));
+	atk->setDuration(0.1f * (0.08f / 0.125f));
+	atk->setRecovery(0.2f * (0.08f / 0.125f));
 	atk->setKnockBackAmount(5);
 	atk->setKnockBackDirection(Vec2(1, 0.25f));
+	atk->setHitStun(1.0f);
 	atk->getHitBox()->addCircle(Vec2(48, 12), 20);
 	atk->getHitBox()->setParent(sprite);
 	attackList[KICK1] = atk;
 
 	atk = new Attack();
 	atk->setDamage(12);
-	atk->setDelay(0.3f * (0.08 / 0.125));
-	atk->setDuration(0.1f * (0.08 / 0.125));
-	atk->setRecovery(0.1f * (0.08 / 0.125));
+	atk->setDelay(0.3f * (0.08f / 0.125f));
+	atk->setDuration(0.1f * (0.08f / 0.125f));
+	atk->setRecovery(0.1f * (0.08f / 0.125f));
 	atk->setKnockBackAmount(1);
 	atk->setKnockBackDirection(Vec2(1, 0.25f));
+	atk->setHitStun(1.0f);
 	atk->getHitBox()->addCapsule(Vec2(40, 46), cocos2d::Vec2(61, 46), 15);
 	atk->getHitBox()->setParent(sprite);
 	attackList[PUNCH2] = atk;
 
 	atk = new Attack();
 	atk->setDamage(18);
-	atk->setDelay(0.3f * (0.08 / 0.125));
-	atk->setDuration(0.1f * (0.08 / 0.125));
-	atk->setRecovery(0.2f * (0.08 / 0.125));
+	atk->setDelay(0.3f * (0.08f / 0.125f));
+	atk->setDuration(0.1f * (0.08f / 0.125f));
+	atk->setRecovery(0.2f * (0.08f / 0.125f));
 	atk->setKnockBackAmount(4);
 	atk->setKnockBackDirection(Vec2(1, 0.5f));
+	atk->setHitStun(1.0f);
 	atk->getHitBox()->addCircle(Vec2(46, 36), 30);
 	atk->getHitBox()->setParent(sprite);
 	attackList[KICK2] = atk;
 
 	atk = new Attack();
 	atk->setDamage(20);
-	atk->setDelay(0.45f * (0.08 / 0.125));
-	atk->setDuration(0.1f * (0.08 / 0.125));
-	atk->setRecovery(0.4f * (0.08 / 0.125));
+	atk->setDelay(0.45f * (0.08f / 0.125f));
+	atk->setDuration(0.1f * (0.08f / 0.125f));
+	atk->setRecovery(0.4f * (0.08f / 0.125f));
 	atk->setKnockBackAmount(4);
 	atk->setKnockBackDirection(Vec2(0.25, 1));
-	atk->getHitBox()->addRect(Vec2(24, 32), cocos2d::Size(100, 45));
+	atk->setHitStun(1.0f);
+	atk->getHitBox()->addCapsule(Vec2(50, 10), Vec2(50, 50), 24);
 	atk->getHitBox()->setParent(sprite);
 	attackList[PUNCHPUNCH] = atk;
 
 	atk = new Attack();
 	atk->setDamage(25);
-	atk->setDelay(0.3f * (0.08 / 0.125));
-	atk->setDuration(0.1f * (0.08 / 0.125));
-	atk->setRecovery(0.3f * (0.08 / 0.125));
+	atk->setDelay(0.3f * (0.08f / 0.125f));
+	atk->setDuration(0.1f * (0.08f / 0.125f));
+	atk->setRecovery(0.3f * (0.08f / 0.125f));
 	atk->setKnockBackAmount(8);
 	atk->setKnockBackDirection(Vec2(1, 1));
-	atk->getHitBox()->addCapsule(Vec2(64, 64), Vec2(128, 64), 24);
+	atk->setHitStun(1.0f);
+	atk->getHitBox()->addCapsule(Vec2(50, 10), Vec2(50, 50), 24);
 	atk->getHitBox()->setParent(sprite);
 	attackList[PUNCHKICK] = atk;
 
 	atk = new Attack();
 	atk->setDamage(30);
-	atk->setDelay(0.45f * (0.08 / 0.125));
-	atk->setDuration(0.1f * (0.08 / 0.125));
-	atk->setRecovery(0.3f * (0.08 / 0.125));
+	atk->setDelay(0.45f * (0.08f / 0.125f));
+	atk->setDuration(0.1f * (0.08f / 0.125f));
+	atk->setRecovery(0.3f * (0.08f / 0.125f));
 	atk->setKnockBackAmount(10);
 	atk->setKnockBackDirection(Vec2(1, 1));
-	atk->getHitBox()->addCapsule(Vec2(32, 64), cocos2d::Size(112, 64), 32);
+	atk->setHitStun(1.0f);
+	atk->getHitBox()->addCapsule(Vec2(50, 10), Vec2(50, 50), 24);
 	atk->getHitBox()->setParent(sprite);
 	attackList[KICKPUNCH] = atk;
 
 	atk = new Attack();
 	atk->setDamage(25);
-	atk->setDelay(0.55f * (0.08 / 0.125));
-	atk->setDuration(0.1f * (0.08 / 0.125));
-	atk->setRecovery(0.3f * (0.08 / 0.125));
+	atk->setDelay(0.55f * (0.08f / 0.125f));
+	atk->setDuration(0.1f * (0.08f / 0.125f));
+	atk->setRecovery(0.3f * (0.08f / 0.125f));
 	atk->setKnockBackAmount(15);
 	atk->setKnockBackDirection(Vec2(1, 1));
-	atk->getHitBox()->addCircle(Vec2(64, 64), 48);
+	atk->setHitStun(1.0f);
+	atk->getHitBox()->addCapsule(Vec2(50, 10), Vec2(50, 50), 24);
 	atk->getHitBox()->setParent(sprite);
 	attackList[KICKKICK] = atk;
 
 	atk = new Attack();
 	atk->setDamage(25);
-	atk->setDelay(0.55f * (0.08 / 0.125));
-	atk->setDuration(0.1f * (0.08 / 0.125));
-	atk->setRecovery(0.3f * (0.08 / 0.125));
+	atk->setDelay(0.55f * (0.08f / 0.125f));
+	atk->setDuration(0.1f * (0.08f / 0.125f));
+	atk->setRecovery(0.3f * (0.08f / 0.125f));
 	atk->setKnockBackAmount(15);
 	atk->setKnockBackDirection(Vec2(1, 1));
+	atk->setHitStun(1.0f);
 	atk->getHitBox()->addCircle(Vec2(64, 64), 48);
 	atk->getHitBox()->setParent(sprite);
 	attackList[FALLPUNCH] = atk;
 
 	atk = new Attack();
 	atk->setDamage(25);
-	atk->setDelay(0.55f * (0.08 / 0.125));
-	atk->setDuration(0.1f * (0.08 / 0.125));
-	atk->setRecovery(0.3f * (0.08 / 0.125));
+	atk->setDelay(0.55f * (0.08f / 0.125f));
+	atk->setDuration(0.1f * (0.08f / 0.125f));
+	atk->setRecovery(0.3f * (0.08f / 0.125f));
 	atk->setKnockBackAmount(15);
 	atk->setKnockBackDirection(Vec2(1, 1));
+	atk->setHitStun(1.0f);
 	atk->getHitBox()->addCircle(Vec2(64, 64), 48);
 	atk->getHitBox()->setParent(sprite);
 	attackList[FALLKICK] = atk;
@@ -169,17 +177,15 @@ Retry::Player::Player(const cocos2d::Vec2& pos)
 
 	sprite->setScale(2);
 
-	sideMoveSpeed = 700;
+	sideMoveSpeed = 550;
 	timeToMaxSpeed = 0.1f;
 }
 
 void Retry::Player::update(const float delta) {
-	acceleration = cocos2d::Vec2(0, -2 * maxJumpHeight / (timeToMaxJumpHeight * timeToMaxJumpHeight));
-
 	updateActionBuffer(delta);
 
+	acceleration = cocos2d::Vec2(0, -2 * maxJumpHeight / (timeToMaxJumpHeight * timeToMaxJumpHeight));
 	performSideMovement(delta);
-
 	performJump(delta);
 
 	if (hasLanded) {
@@ -194,11 +200,10 @@ void Retry::Player::update(const float delta) {
 	velocity.y = clamp(velocity.y, -2000, 2000);
 
 	performAttack(delta);
-
 	updateAnimations(delta);
-
 	invincibilityTimer -= delta;
 	attackTimer -= delta;
+
 	if (pulseCooldown > 0) pulseCooldown -= delta;
 	else if (health < maxHealth * 0.15f) isPulse = false;
 
@@ -208,7 +213,7 @@ void Retry::Player::update(const float delta) {
 
 void Player::updateAnimations(const float delta) {
 
-	float attackFrameLength = 0.125 * (0.08 / 0.125);
+	float attackFrameLength = 0.125 * (0.08f / 0.125f);
 
 	if (velocity.x != 0 && attackTimer < -this->followUpAttackWindow) {
 		if (isActionPressed("left") && !isActionPressed("right"))
@@ -294,19 +299,20 @@ float Player::doCameraCollision(Retry::Level* level, const cocos2d::Rect &boundi
 
 void Player::performSideMovement(const float delta) {
 
-	sideMoveSpeed = getMode() == COOLDOWN ? 400 : 700;
+	//sideMoveSpeed = getMode() == COOLDOWN ?  : sideMoveSpeed;
+	float newSideMove = getMode() == COOLDOWN ? sideMoveSpeed * 0.7f : sideMoveSpeed;
 
 	bool midAttack = attackTimer > -followUpAttackWindow && onGround;
 
 	if ((isActionPressed("left") != isActionPressed("right")) && !midAttack) {
-		acceleration.x = (isActionPressed("left") ? -1 : 1) * sideMoveSpeed / timeToMaxSpeed / (!onGround ? (velocity.y > 100 ? 5.0f : 3.0f) : 1);
+		acceleration.x = (isActionPressed("left") ? -1 : 1) * newSideMove / timeToMaxSpeed / (!onGround ? (velocity.y > 100 ? 3.0f : 1.5f) : 1);
 	} else {
-		acceleration.x = !onGround ? 0 : -sign(velocity.x) * sideMoveSpeed / (!midAttack ? timeToMaxSpeed : 0.5f);
+		acceleration.x = -sign(velocity.x) * newSideMove / (!midAttack ? timeToMaxSpeed : 0.5f) * (!onGround ? 0.2f : 1);
 		if (sign(velocity.x) * (velocity.x + acceleration.x * delta) < 0)
 			acceleration.x = velocity.x = 0;
 	}
 	velocity.x += acceleration.x * delta;
-	velocity.x = sign(velocity.x) * clamp(abs(velocity.x), 0, sideMoveSpeed + (doJump ? 100 : 0));
+	velocity.x = sign(velocity.x) * clamp(abs(velocity.x), 0, newSideMove + (doJump ? 100 : 0));
 }
 
 void Player::performJump(const float delta) {
@@ -448,6 +454,10 @@ void Player::doAttackOnActor(Actor * actor) {
 
 		actor->adjustHealth(damage);
 		actor->setVelocity(kb);
+
+		actor->currentAttackKey = 0;
+		actor->attackTimer = getCurrentAttack()->getHitStun();
+
 		actor->invincibilityTimer = getCurrentAttack()->getDuration();
 	}
 }

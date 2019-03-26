@@ -58,8 +58,11 @@ void Menu::update() {
 		} else
 			buttons[indexPosition].setHovered();
 
-		buttons[(indexPosition + buttons.size() - 1) % buttons.size()].setNormal();
-		buttons[(indexPosition + 1) % buttons.size()].setNormal();
+		//buttons[(indexPosition + buttons.size() - 1) % buttons.size()].setNormal();
+		//buttons[(indexPosition + 1) % buttons.size()].setNormal();
+		for (int i = 0; i < buttons.size(); i++) 
+			if (i == indexPosition) continue; 
+			else                    buttons[i].setNormal();
 	}
 }
 
@@ -87,16 +90,20 @@ void Menu::setPadding(const int padding) {
 	nextHeight = 0;
 	for (auto& i : buttons) {
 		i.setPosition(Vec2(0, nextHeight));
-		nextHeight += i.size.height + padding;
+		nextHeight -= i.size.height + padding;
 	}
 }
 
 void Menu::adjustForControls() {
-	if (Mouse::getDeltaPos().getLengthSq() > 1) indexPosition = -1;
-	else if (Keyboard::isKeyDown(KeyCode::UP_ARROW) ||
-			 Keyboard::isKeyDown(KeyCode::W) ||
-			 Controller::isAxisDown(ControllerButton::LEFT_STICK_UP) ||
-			 Controller::isButtonDown(ControllerButton::DPAD_UP))
+	if (Mouse::getDeltaPos().getLengthSq() > 1) {
+		for (const auto& i : buttons)
+			if (i.isMouseOver()) indexPosition = -1;
+	}
+
+	if (Keyboard::isKeyDown(KeyCode::UP_ARROW) ||
+		Keyboard::isKeyDown(KeyCode::W) ||
+		Controller::isAxisDown(ControllerButton::LEFT_STICK_UP) ||
+		Controller::isButtonDown(ControllerButton::DPAD_UP))
 		if (indexPosition == -1) indexPosition = 0;
 		else                     indexPosition = (indexPosition + buttons.size() - 1) % buttons.size();
 

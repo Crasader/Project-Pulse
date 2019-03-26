@@ -5,6 +5,8 @@
 
 #include "Menu.h"
 
+#include "Actor.h"
+
 class MenuScene : public cocos2d::Scene
 {
 public:
@@ -22,11 +24,13 @@ public:
 	void update(float delta);
 
 private:
-	cocos2d::Sprite* background;
-
 	cocos2d::Node* gui;
 
 	Retry::Menu* menu;
+
+	Retry::MenuActor* backGround;
+
+	Retry::MenuActor* title;
 };
 
 #endif

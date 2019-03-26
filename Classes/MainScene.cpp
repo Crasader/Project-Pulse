@@ -87,57 +87,67 @@ bool MainScene::init() {
 	enemy->getSprite()->setScale(2);
 	this->addChild(enemy->getSprite());
 
-	actorList.emplace_back(enemy);
+	enemyList.emplace_back(enemy);
 
-	enemy = new Retry::TutorialEnemy(Vec2(4400, 2000));
+	//enemy = new Retry::TutorialEnemy(Vec2(4400, 2000));
+	enemy = new Retry::TutorialEnemy(Vec2(1500, 1000));
 	enemy->getSprite()->setScale(2);
 	enemy->setFlippedX(true);
 	this->addChild(enemy->getSprite());
 
-	actorList.emplace_back(enemy);
+	enemyList.emplace_back(enemy);
 
 	enemy = new Retry::GoonEnemy(Vec2(10368, 1800));
 	enemy->getSprite()->setScale(2);
 	this->addChild(enemy->getSprite());
 
-	actorList.emplace_back(enemy);
+	enemyList.emplace_back(enemy);
 
 	enemy = new Retry::GoonEnemy(Vec2(11328, 2000));
 	enemy->getSprite()->setScale(2);
 	this->addChild(enemy->getSprite());
 
-	actorList.emplace_back(enemy);
+	enemyList.emplace_back(enemy);
 
 	enemy = new Retry::GoonEnemy(Vec2(13760, 7800));
 	enemy->getSprite()->setScale(2);
 	this->addChild(enemy->getSprite());
 
-	actorList.emplace_back(enemy);
+	enemyList.emplace_back(enemy);
 
 	enemy = new Retry::GoonEnemy(Vec2(13184, 8000));
 	enemy->getSprite()->setScale(2);
 	this->addChild(enemy->getSprite());
 
-	actorList.emplace_back(enemy);
+	enemyList.emplace_back(enemy);
 
 	enemy = new Retry::GoonEnemy(Vec2(12608, 7800));
 	enemy->getSprite()->setScale(2);
 	this->addChild(enemy->getSprite());
 
-	actorList.emplace_back(enemy);
+	enemyList.emplace_back(enemy);
 
-	healthBarBack = cocos2d::Sprite::create("healthbar.png", Rect(0, 0, 128, 32));
-	healthBarBack->setAnchorPoint(Vec2::ANCHOR_BOTTOM_LEFT);
-	healthBarBack->setPosition(Vec2(50, 50));
-	healthBarBack->setScale(3);
+	healthBarBackRest = cocos2d::Sprite::create("healthbar.png", Rect(0, 0, 64, 32));
+	healthBarBackRest->setAnchorPoint(Vec2::ANCHOR_TOP_LEFT);
+	healthBarBackRest->setPosition(Vec2(0, cocos2d::Director::getInstance()->getOpenGLView()->getDesignResolutionSize().height));
+	healthBarBackRest->setScale(8);
+	healthBarBackRest->getTexture()->setAliasTexParameters();
 
-	healthBarFront = cocos2d::Sprite::create("healthbar.png", Rect(0, 32, 128, 32));
-	healthBarFront->setAnchorPoint(healthBarBack->getAnchorPoint());
-	healthBarFront->setPosition(healthBarBack->getPosition());
-	healthBarFront->setScale(healthBarBack->getScale());
+	healthBarBackPulse = cocos2d::Sprite::create("healthbar.png", Rect(0, 32, 64, 32));
+	healthBarBackPulse->setAnchorPoint(healthBarBackRest->getAnchorPoint());
+	healthBarBackPulse->setPosition(healthBarBackRest->getPosition());
+	healthBarBackPulse->setScale(healthBarBackRest->getScale());
+	healthBarBackPulse->getTexture()->setAliasTexParameters();
 
-	gui->addChild(healthBarBack, 100);
-	gui->addChild(healthBarFront, healthBarBack->getLocalZOrder() + 1);
+	healthBarFront = cocos2d::Sprite::create("healthbar.png", Rect(0, 64, 64, 32));
+	healthBarFront->setAnchorPoint(healthBarBackRest->getAnchorPoint());
+	healthBarFront->setPosition(healthBarBackRest->getPosition());
+	healthBarFront->setScale(healthBarBackRest->getScale());
+	healthBarFront->getTexture()->setAliasTexParameters();
+
+	gui->addChild(healthBarBackRest, 100);
+	gui->addChild(healthBarBackPulse, 101);
+	gui->addChild(healthBarFront, 102);
 
 	// ADD ALL GUI AND ACTORS BEFORE HERE
 	this->scheduleUpdate();
@@ -156,7 +166,7 @@ bool MainScene::init() {
 
 	Retry::Camera::lazyFollowTarget(player->getSprite(), 0.25f);
 
-	for (auto i : actorList) {
+	for (auto i : enemyList) {
 		Retry::Camera::addTarget(i->getSprite());
 	}
 
@@ -187,18 +197,22 @@ void MainScene::update(float delta) {
 	Retry::Config::setDebug(Controller::isAxisPressed(ControllerButton::LEFT_TRIGGER) || Keyboard::isKeyPressed(KeyCode::CAPS_LOCK));
 
 	player->update(delta);
-	for (auto i : actorList) {
+	player->doTerrainCollision(level, delta);
+	for (auto i : enemyList) {
 		i->update(delta);
 
 		i->doTerrainCollision(level, delta);
 
-		player->doAttackOnActor(i);
-		i->doAttackOnActor(player);
-	}
+		if (i->isAttackCollidingWith(player)) i->doAttackOnActor(player);
+		if (player->isAttackCollidingWith(i)) player->doAttackOnActor(i);
 
-	static float orgWidth = healthBarFront->getTextureRect().size.width;
-	float newWidth = player->getHealthRatio() * orgWidth;
-	healthBarFront->setTextureRect(Rect(Vec2(0, 32), Size(newWidth, healthBarFront->getTextureRect().size.height)));
+		i->updateAI(player, delta);
+	}
+	//static float orgWidth = healthBarFront->getTextureRect().size.width;
+	float newWidth = player->getHealthRatio() * (62  - 10);
+	healthBarFront->setTextureRect(Rect(Vec2(0, 64), Size(10 + newWidth, healthBarFront->getTextureRect().size.height)));
+
+	healthBarBackPulse->setVisible(player->getMode() == Retry::PULSE);
 
 	Retry::Camera::update(delta);
 
@@ -223,43 +237,7 @@ void MainScene::toggleDebug() {
 	//Retry::Config::toggleDebug();
 	static bool doDraw = false;
 	doDraw = !doDraw;
-	for (auto i : actorList) {
+	for (auto i : enemyList) {
 		i->getHitBox()->setDebugDraw(doDraw);
-	}
-}
-
-void MainScene::doAICalculations() {
-	//auto playerBBox = Retry::Collision::worldSpaceRect(player->getSprite(), player->getHurtBox()->getBoundingBox());
-	cocos2d::Rect playerBBox = player->getHitBox()->getWorldBoundingBox();
-
-	for (auto i : actorList) {
-		if (i == player) continue;
-		cocos2d::Rect actorBBox = i->getHitBox()->getWorldBoundingBox();
-
-		//if ((player->getPosition() - i->getPosition()).getLengthSq() < 1500 * 1500) {
-		//	if (player->getPosition().x > i->getPosition().x)
-		//		player->canMoveOn = false;
-		//	if (!(i->doPracticeDummy && i->getHealth() == i->getMaxHealth()) && abs(playerBBox.origin.x - actorBBox.origin.x + (playerBBox.size.width - actorBBox.size.width) * 0.5f) > 180) {
-		//		if (playerBBox.origin.x - actorBBox.origin.x < 0)
-		//			i->bufferAction("left");
-		//		else
-		//			i->bufferAction("right");
-
-		//		if (i->getVelocity().x == 0)
-		//			i->bufferAction("jump");
-		//	} else {
-		//		static bool doButton = true;
-		//		if ((doButton && i->getCurrentAttackKey() & 0b1111) || rand() % 1000 < 7) i->bufferAction("punch");
-		//		doButton ^= 1;
-		//	}
-
-		//}
-	}
-	for (int i = 1; i < actorList.size(); i++) {
-		if (actorList[i]->getHealth() <= 0) {
-			actorList[i]->setPosition(Vec2(-1000, -1000));
-			//delete actorList[i];
-			actorList.erase(actorList.begin() + i--);
-		}
 	}
 }
