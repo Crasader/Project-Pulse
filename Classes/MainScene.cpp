@@ -73,6 +73,9 @@ bool MainScene::init() {
 		return false;
 	}
 
+	Retry::Audio::stopMusic();
+	Retry::Audio::playMusic("sound/music/level.mp3", true, 0.2f);
+
 	gui = cocos2d::Node::create();
 
 	initPlayer(Vec2(150, 400));
@@ -184,12 +187,15 @@ void MainScene::menuCloseCallback(Ref* pSender) {
 }
 
 void MainScene::update(float delta) {
+	Retry::Camera::transformUI(gui);
+
+	if (cocos2d::Director::getInstance()->getRunningScene() != this) return;
 
 	if (Keyboard::isKeyDown(KeyCode::ESCAPE) || Controller::isButtonDown(ControllerButton::START))
-		cocos2d::Director::getInstance()->pushScene(OptionsMenu::createScene());
+		cocos2d::Director::getInstance()->pushScene(cocos2d::TransitionFadeTR::create(1.0f, OptionsMenu::createScene()));
 
 	if (Keyboard::isKeyDown(KeyCode::Q) || Controller::isButtonDown(ControllerButton::BACK))
-		cocos2d::Director::getInstance()->replaceScene(MenuScene::create());
+		cocos2d::Director::getInstance()->replaceScene(cocos2d::TransitionFadeBL::create(1.0f, MenuScene::create()));
 
 	//if (Keyboard::isKeyDown(KeyCode::F2) || Controller::isButtonDown(ControllerButton::LEFT_BUMPER))
 	//	toggleDebug();
@@ -198,18 +204,24 @@ void MainScene::update(float delta) {
 
 	player->update(delta);
 	player->doTerrainCollision(level, delta);
-	for (auto i : enemyList) {
-		i->update(delta);
+	for (int i = 0; i < enemyList.size(); i++) {
 
-		i->doTerrainCollision(level, delta);
+		if (enemyList[i]->shouldBeRemoved()) {
+			enemyList.erase(enemyList.begin() + i--);
+			continue;
+		}
 
-		if (i->isAttackCollidingWith(player)) i->doAttackOnActor(player);
-		if (player->isAttackCollidingWith(i)) player->doAttackOnActor(i);
+		enemyList[i]->update(delta);
 
-		i->updateAI(player, delta);
+		enemyList[i]->doTerrainCollision(level, delta);
+
+		if (enemyList[i]->isAttackCollidingWith(player)) enemyList[i]->doAttackOnActor(player);
+		if (player->isAttackCollidingWith(enemyList[i])) player->doAttackOnActor(enemyList[i]);
+
+		enemyList[i]->updateAI(player, delta);
 	}
 	//static float orgWidth = healthBarFront->getTextureRect().size.width;
-	float newWidth = player->getHealthRatio() * (62  - 10);
+	float newWidth = player->getHealthRatio() * (62 - 10);
 	healthBarFront->setTextureRect(Rect(Vec2(0, 64), Size(10 + newWidth, healthBarFront->getTextureRect().size.height)));
 
 	healthBarBackPulse->setVisible(player->getMode() == Retry::PULSE);
@@ -224,7 +236,6 @@ void MainScene::update(float delta) {
 			dynamic_cast<cocos2d::GLViewImpl*>(cocos2d::Director::getInstance()->getOpenGLView())->setFullscreen();
 	}
 
-	Retry::Camera::transformUI(gui);
 }
 
 void MainScene::initPlayer(cocos2d::Vec2 position) {

@@ -82,11 +82,18 @@ bool OptionsMenu::init()
 
 void OptionsMenu::update(float delta)
 {
-	if (Retry::Keyboard::isKeyDown(Retry::KeyCode::ESCAPE) ||
+	if (cocos2d::Director::getInstance()->getRunningScene() == this &&
+		Retry::Keyboard::isKeyDown(Retry::KeyCode::ESCAPE) ||
 		Retry::Controller::isButtonDown(Retry::ControllerButton::B) ||
 		Retry::Controller::isButtonDown(Retry::ControllerButton::START))
-		cocos2d::Director::getInstance()->popScene();
-
+		//cocos2d::Director::getInstance()->popScene();
+	{
+		Retry::Audio::playEffect("sound/sound effects/buttonpress.mp3");
+		DirectorEx* directorEx = static_cast<DirectorEx*>(cocos2d::Director::getInstance());
+		Scene* prevScene = directorEx->previousScene();
+		Scene* pScene = cocos2d::TransitionFadeBL::create(1.0f, prevScene);
+		directorEx->popScene(pScene);
+	}
 
 }
 
@@ -117,4 +124,23 @@ void OptionsMenu::initCheckBoxForSetting(const std::string &s)
 
 	widgets.push_back(box);
 	//toggleMenu->addSubItem(box);
+}
+
+cocos2d::Scene* DirectorEx::previousScene() {
+	size_t sceneCount = _scenesStack.size();
+	if (sceneCount <= 1) {
+		return nullptr;
+	}
+	return _scenesStack.at(sceneCount - 2);
+}
+
+void DirectorEx::popScene(cocos2d::Scene* trans) {
+	_scenesStack.popBack();
+	size_t sceneCount = _scenesStack.size();
+	if (sceneCount == 0) {
+		end();
+	} else {
+		_sendCleanupToScene = true;
+		_nextScene = trans;
+	}
 }

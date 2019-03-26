@@ -63,7 +63,7 @@ void Camera::update(float delta) {
 		cocos2d::Vec2 minMaxY = cocos2d::Vec2(followTarget->getPositionY(), followTarget->getPositionY());
 
 		for (auto i : focusTargets) {
-			if (i.first == followTarget) continue;
+			if (i.first == followTarget || !i.first->isVisible()) continue;
 			cocos2d::Vec2 lmao = followTarget->getPosition() - i.first->getPosition();
 			lmao.y *= 1920.0f / 1080.0f;
 			float influence = 1 - normalizeInRange(lmao.length(), i.second.x, i.second.y);

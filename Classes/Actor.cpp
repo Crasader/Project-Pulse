@@ -5,6 +5,7 @@
 #include "KeyboardManager.h"
 #include "GameSettings.h"
 #include "Algorithms.h"
+#include "AudioPlayer.h"
 
 using cocos2d::Vec2;
 using cocos2d::Size;
@@ -37,7 +38,18 @@ Actor::~Actor() {
 }
 
 void Actor::kill(float delay) {
-	sprite->runAction(cocos2d::RemoveSelf::create());
+	if (!deathTimer) return;
+
+	auto removeSelf = cocos2d::Hide::create();
+	auto wait = cocos2d::DelayTime::create(delay);
+	cocos2d::Animate* animate;
+	if (animations.find("death") != animations.end())
+		animate = cocos2d::Animate::create(animations.at("death")->clone());
+	else
+		animate = cocos2d::Animate::create(animations.at("idle")->clone());
+	sprite->runAction(cocos2d::Sequence::create(animate, wait, removeSelf, nullptr));
+
+	deathTimer = 0;
 }
 
 void Actor::moveBy(cocos2d::Vec2 movement) {
@@ -143,6 +155,10 @@ void Actor::updateAnimations(const float delta) {
 		if (isActionPressed("right") && !isActionPressed("left"))
 			setFlippedX(false);
 	}
+	if (invincibilityTimer > 0) {
+		runAnimation("hitstun", 0.08f);
+		return;
+	}
 	if (attackTimer > -0.15) {
 		switch (currentAttackKey) {
 			case PUNCH1:
@@ -165,14 +181,15 @@ void Actor::updateAnimations(const float delta) {
 				runAnimation("fallpunch", attackFrameLength); break;
 			case FALLKICK:
 				runAnimation("fallkick", attackFrameLength); break;
-			default:
-				runAnimation("idle", 0.12f); break;
 		}
 		return;
 	}
+	runAnimation("idle", 0.12f);
+
 	if (onGround) {
 		if (velocity.x != 0) {
 			//runAnimation("run", 0.077f);
+			runAnimation("idle", 0.12f);
 		} else {
 			runAnimation("idle", 0.12f);
 		}
@@ -189,9 +206,11 @@ void Actor::performAttack(const float delta) {
 	Attack* currAttack = getCurrentAttack();
 	if (currAttack != nullptr) {
 		// HACK: remove for demo
-		if (attackTimer <= currAttack->getRecovery() + currAttack->getDuration() &&
-			attackTimer >= currAttack->getRecovery())
-			currAttack->getHitBox()->setDebugDraw(true);
+		if (Retry::Config::doDebug())
+			if (attackTimer <= currAttack->getRecovery() + currAttack->getDuration() &&
+				attackTimer >= currAttack->getRecovery())
+				currAttack->getHitBox()->setDebugDraw(true);
+			else currAttack->getHitBox()->setDebugDraw(false);
 		else currAttack->getHitBox()->setDebugDraw(false);
 	}
 
@@ -219,16 +238,25 @@ void Actor::performAttack(const float delta) {
 			char temp = (currentAttackKey >> 2) + 1;
 			currentAttackKey = 0b10000 << ((temp % 2) * 2 + (char) isKick);
 		}
+		static float scaler = 200;
 		if (currentAttackKey) {
-			if (isActionPressed("left") && !isActionPressed("right"))
+			if (isActionPressed("left") && !isActionPressed("right")) {
 				setFlippedX(true);
-			else if (isActionPressed("right") && !isActionPressed("left"))
+				if (velocity.x > -scaler) velocity.x = -scaler;
+			} else if (isActionPressed("right") && !isActionPressed("left")) {
 				setFlippedX(false);
+				if (velocity.x < scaler) velocity.x = scaler;
+			}
 		}
 
 		currAttack = getCurrentAttack();
 		if (currAttack != nullptr)
 			attackTimer = currAttack->getDelay() + currAttack->getDuration() + currAttack->getRecovery();
+
+		if (currentAttackKey & 0b01010101)
+			Retry::Audio::playEffect("sound/sound effects/punchmiss.mp3");
+		else if (currentAttackKey & 0b10101010)
+			Retry::Audio::playEffect("sound/sound effects/kickmiss.mp3");
 	}
 }
 
@@ -241,7 +269,7 @@ void Actor::performSideMovement(const float delta) {
 			acceleration.x = velocity.x = 0;
 	}
 	velocity.x += acceleration.x * delta;
-	velocity.x = sign(velocity.x) * clamp(abs(velocity.x), 0, sideMoveSpeed + (doJump ? 100 : 0));
+	velocity.x = sign(velocity.x) * clamp(abs(velocity.x), 0, sideMoveSpeed + (doJump ? 100 : 0) + (invincibilityTimer > 0) * 1000);
 }
 
 void Actor::performJump(const float delta) {
@@ -415,7 +443,7 @@ MenuActor::MenuActor(const std::string& path, const cocos2d::Vec2& position, con
 }
 
 void MenuActor::update(const float delta) {
-	runAnimation("animation", 0.05f);
+	runAnimation("animation", 0.1f);
 }
 
 }

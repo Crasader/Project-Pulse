@@ -67,7 +67,7 @@ private:
 	float pulseCooldown = 0;
 	float pulseCooldownTimer = 3.0f;
 
-	float pulseDamageBoost = 1.5f;
+	float pulseDamageBoost = 0.5f;
 
 	float pulseKnockbackBoost = 1.5f;
 };

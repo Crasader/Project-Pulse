@@ -35,6 +35,9 @@ bool MenuScene::init() {
 		return false;
 	}
 
+	Retry::Audio::stopMusic();
+	Retry::Audio::playMusic("sound/music/menu.mp3", true, 0.5f);
+
 	gui = Node::create();
 
 	Retry::Keyboard::createListener(_eventDispatcher, this);
@@ -52,10 +55,10 @@ bool MenuScene::init() {
 
 	menu = new Retry::Menu(Vec2(230, 700), gui);
 	menu->addButton("startbutton.png", Size(64, 32), [&]() {
-		cocos2d::Director::getInstance()->replaceScene(MainScene::createScene());
+		cocos2d::Director::getInstance()->replaceScene(cocos2d::TransitionFadeTR::create(1.0f, MainScene::createScene()));
 	});
 	menu->addButton("optionsbutton.png", Size(64, 32), [&]() {
-		cocos2d::Director::getInstance()->pushScene(OptionsMenu::createScene());
+		cocos2d::Director::getInstance()->pushScene(cocos2d::TransitionFadeTR::create(1.0f, OptionsMenu::createScene()));
 	});
 	menu->addButton("exitbutton.png", Size(64, 32), [&]() {
 		cocos2d::Director::getInstance()->end();

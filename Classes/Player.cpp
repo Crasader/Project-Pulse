@@ -35,9 +35,10 @@ Retry::Player::Player(const cocos2d::Vec2& pos)
 	atk->setDelay(0.3f * (0.08f / 0.125f));
 	atk->setDuration(0.1f * (0.08f / 0.125f));
 	atk->setRecovery(0.1f * (0.08f / 0.125f));
-	atk->setKnockBackAmount(1);
-	atk->setKnockBackDirection(Vec2(1, 0.25f));
+	atk->setKnockBackAmount(2);
+	atk->setKnockBackDirection(Vec2(1, -0.25f));
 	atk->setHitStun(1.0f);
+	atk->setSoundFile("punch1");
 	atk->getHitBox()->addCapsule(Vec2(40, 46), cocos2d::Vec2(61, 46), 15);
 	atk->getHitBox()->setParent(sprite);
 	attackList[PUNCH1] = atk;
@@ -47,9 +48,10 @@ Retry::Player::Player(const cocos2d::Vec2& pos)
 	atk->setDelay(0.3f * (0.08f / 0.125f));
 	atk->setDuration(0.1f * (0.08f / 0.125f));
 	atk->setRecovery(0.2f * (0.08f / 0.125f));
-	atk->setKnockBackAmount(5);
-	atk->setKnockBackDirection(Vec2(1, 0.25f));
+	atk->setKnockBackAmount(2);
+	atk->setKnockBackDirection(Vec2(1, -0.25f));
 	atk->setHitStun(1.0f);
+	atk->setSoundFile("kick1");
 	atk->getHitBox()->addCircle(Vec2(48, 12), 20);
 	atk->getHitBox()->setParent(sprite);
 	attackList[KICK1] = atk;
@@ -59,9 +61,10 @@ Retry::Player::Player(const cocos2d::Vec2& pos)
 	atk->setDelay(0.3f * (0.08f / 0.125f));
 	atk->setDuration(0.1f * (0.08f / 0.125f));
 	atk->setRecovery(0.1f * (0.08f / 0.125f));
-	atk->setKnockBackAmount(1);
-	atk->setKnockBackDirection(Vec2(1, 0.25f));
+	atk->setKnockBackAmount(2);
+	atk->setKnockBackDirection(Vec2(1, -0.25f));
 	atk->setHitStun(1.0f);
+	atk->setSoundFile("punch2");
 	atk->getHitBox()->addCapsule(Vec2(40, 46), cocos2d::Vec2(61, 46), 15);
 	atk->getHitBox()->setParent(sprite);
 	attackList[PUNCH2] = atk;
@@ -71,9 +74,10 @@ Retry::Player::Player(const cocos2d::Vec2& pos)
 	atk->setDelay(0.3f * (0.08f / 0.125f));
 	atk->setDuration(0.1f * (0.08f / 0.125f));
 	atk->setRecovery(0.2f * (0.08f / 0.125f));
-	atk->setKnockBackAmount(4);
-	atk->setKnockBackDirection(Vec2(1, 0.5f));
+	atk->setKnockBackAmount(2);
+	atk->setKnockBackDirection(Vec2(1, -0.25f));
 	atk->setHitStun(1.0f);
+	atk->setSoundFile("kick2");
 	atk->getHitBox()->addCircle(Vec2(46, 36), 30);
 	atk->getHitBox()->setParent(sprite);
 	attackList[KICK2] = atk;
@@ -84,8 +88,9 @@ Retry::Player::Player(const cocos2d::Vec2& pos)
 	atk->setDuration(0.1f * (0.08f / 0.125f));
 	atk->setRecovery(0.4f * (0.08f / 0.125f));
 	atk->setKnockBackAmount(4);
-	atk->setKnockBackDirection(Vec2(0.25, 1));
-	atk->setHitStun(1.0f);
+	atk->setKnockBackDirection(Vec2(0.25f, -1.0f));
+	atk->setHitStun(0.25f);
+	atk->setSoundFile("punchpunch");
 	atk->getHitBox()->addCapsule(Vec2(50, 10), Vec2(50, 50), 24);
 	atk->getHitBox()->setParent(sprite);
 	attackList[PUNCHPUNCH] = atk;
@@ -95,9 +100,10 @@ Retry::Player::Player(const cocos2d::Vec2& pos)
 	atk->setDelay(0.3f * (0.08f / 0.125f));
 	atk->setDuration(0.1f * (0.08f / 0.125f));
 	atk->setRecovery(0.3f * (0.08f / 0.125f));
-	atk->setKnockBackAmount(8);
-	atk->setKnockBackDirection(Vec2(1, 1));
-	atk->setHitStun(1.0f);
+	atk->setKnockBackAmount(12);
+	atk->setKnockBackDirection(Vec2(1, 0.25f));
+	atk->setHitStun(0.5f);
+	atk->setSoundFile("punchkick");
 	atk->getHitBox()->addCapsule(Vec2(50, 10), Vec2(50, 50), 24);
 	atk->getHitBox()->setParent(sprite);
 	attackList[PUNCHKICK] = atk;
@@ -106,10 +112,11 @@ Retry::Player::Player(const cocos2d::Vec2& pos)
 	atk->setDamage(30);
 	atk->setDelay(0.45f * (0.08f / 0.125f));
 	atk->setDuration(0.1f * (0.08f / 0.125f));
-	atk->setRecovery(0.3f * (0.08f / 0.125f));
-	atk->setKnockBackAmount(10);
-	atk->setKnockBackDirection(Vec2(1, 1));
-	atk->setHitStun(1.0f);
+	atk->setRecovery(0.1f * (0.08f / 0.125f));
+	atk->setKnockBackAmount(15);
+	atk->setKnockBackDirection(Vec2(0.1f, 1.0f));
+	atk->setHitStun(0.5f);
+	atk->setSoundFile("kickpunch");
 	atk->getHitBox()->addCapsule(Vec2(50, 10), Vec2(50, 50), 24);
 	atk->getHitBox()->setParent(sprite);
 	attackList[KICKPUNCH] = atk;
@@ -120,8 +127,9 @@ Retry::Player::Player(const cocos2d::Vec2& pos)
 	atk->setDuration(0.1f * (0.08f / 0.125f));
 	atk->setRecovery(0.3f * (0.08f / 0.125f));
 	atk->setKnockBackAmount(15);
-	atk->setKnockBackDirection(Vec2(1, 1));
+	atk->setKnockBackDirection(Vec2(0.1f, -1.0f));
 	atk->setHitStun(1.0f);
+	atk->setSoundFile("kickkick");
 	atk->getHitBox()->addCapsule(Vec2(50, 10), Vec2(50, 50), 24);
 	atk->getHitBox()->setParent(sprite);
 	attackList[KICKKICK] = atk;
@@ -134,6 +142,7 @@ Retry::Player::Player(const cocos2d::Vec2& pos)
 	atk->setKnockBackAmount(15);
 	atk->setKnockBackDirection(Vec2(1, 1));
 	atk->setHitStun(1.0f);
+	//atk->setSoundFile("punch1.mp3");
 	atk->getHitBox()->addCircle(Vec2(64, 64), 48);
 	atk->getHitBox()->setParent(sprite);
 	attackList[FALLPUNCH] = atk;
@@ -146,6 +155,7 @@ Retry::Player::Player(const cocos2d::Vec2& pos)
 	atk->setKnockBackAmount(15);
 	atk->setKnockBackDirection(Vec2(1, 1));
 	atk->setHitStun(1.0f);
+	//atk->setSoundFile("punch1.mp3");
 	atk->getHitBox()->addCircle(Vec2(64, 64), 48);
 	atk->getHitBox()->setParent(sprite);
 	attackList[FALLKICK] = atk;
@@ -171,6 +181,8 @@ Retry::Player::Player(const cocos2d::Vec2& pos)
 	initAnimation("fallpunch", "cybercop.png", Vec2(5, 11), tileSize, 5);
 	initAnimation("fallkick", "cybercop.png", Vec2(0, 11), tileSize, 5);
 
+	initAnimation("hitstun", "cybercop.png", Vec2(0, 12), tileSize, 10);
+
 	runAnimation("run", 0);
 
 	hitBox.addCapsule(Vec2(32, 16), Vec2(32, 48), 16);
@@ -184,13 +196,14 @@ Retry::Player::Player(const cocos2d::Vec2& pos)
 void Retry::Player::update(const float delta) {
 	updateActionBuffer(delta);
 
-	acceleration = cocos2d::Vec2(0, -2 * maxJumpHeight / (timeToMaxJumpHeight * timeToMaxJumpHeight));
 	performSideMovement(delta);
 	performJump(delta);
+	acceleration = cocos2d::Vec2(0, -2 * maxJumpHeight / (timeToMaxJumpHeight * timeToMaxJumpHeight));
 
 	if (hasLanded) {
 		Retry::Camera::addTrauma(0.3f);
 		Controller::vibrate(0.2f, 0.1f);
+		Retry::Audio::playEffect("sound/sound effects/land.mp3");
 		hasLanded = false;
 	}
 
@@ -220,6 +233,10 @@ void Player::updateAnimations(const float delta) {
 			setFlippedX(true);
 		if (isActionPressed("right") && !isActionPressed("left"))
 			setFlippedX(false);
+	}
+	if (invincibilityTimer > 0) {
+		runAnimation("hitstun", 0.05f);
+		return;
 	}
 	if (attackTimer > -0.15) {
 		switch (currentAttackKey) {
@@ -321,6 +338,8 @@ void Player::performJump(const float delta) {
 		onGround = false;
 		velocity.y = 2 * maxJumpHeight / timeToMaxJumpHeight;
 		doJump++;
+
+		Retry::Audio::playEffect("sound/sound effects/jump.mp3");
 
 		if (isActionPressed("left") && velocity.x > 0 || isActionPressed("right") && velocity.x < 0) {
 			velocity.x *= -0.5f;
@@ -424,8 +443,10 @@ void Player::doAttackOnActor(Actor * actor) {
 	if (getCurrentAttack()) {
 		float damage = -abs(getCurrentAttack()->getDamage());
 
+		velocity.x /= 2;
+
 		Vec2 kb = getCurrentAttack()->getKnockBackDirection() * getCurrentAttack()->getKnockBackAmount() * 100;
-		kb.x += velocity.x;
+		kb.x += velocity.x / 4;
 		kb.x = sprite->isFlippedX() ? -kb.x : kb.x;
 		if (kb.y > 0) {
 			actor->doJump++;
@@ -434,23 +455,22 @@ void Player::doAttackOnActor(Actor * actor) {
 
 		Camera::setTrauma(0.15f);
 
-		if (currentAttackKey & 0xF0) {
-			if (getMode() == PULSE) {
+		switch (getMode()) {
+			case PULSE:
+				damage += damage * pulseDamageBoost * (currentAttackKey & 0xF0 ? 1 : pulseDamageBoost);
 				this->adjustHealth(damage * 0.5f);
-				damage *= pulseDamageBoost;
-				kb = kb * pulseKnockbackBoost;
-				if (health < maxHealth * 0.15f)
+				if (health < maxHealth * 0.25f)
 					pulseCooldown = pulseCooldownTimer;
-				Camera::setTrauma(0.6f);
+				Camera::setTrauma(0.2f + (currentAttackKey & 0xF0 ? 0.2f : 0));
 				Controller::vibrate(0.9f, 0.1f);
-			} else if (getMode() == REST) {
-				this->adjustHealth(-damage * 0.5f);
-				//if (health > maxHealth * 0.85f)
-				//	pulseCooldown = pulseCooldownTimer;
-				Camera::setTrauma(0.4f);
+				break;
+			case REST:
+				this->adjustHealth(-damage * pulseDamageBoost * (currentAttackKey & 0xF0 ? 1 : pulseDamageBoost));
+				Camera::setTrauma(0.1f + (currentAttackKey & 0xF0 ? 0.2f : 0));
 				Controller::vibrate(0.6f, 0.1f);
-			}
+				break;
 		}
+
 
 		actor->adjustHealth(damage);
 		actor->setVelocity(kb);
@@ -459,6 +479,8 @@ void Player::doAttackOnActor(Actor * actor) {
 		actor->attackTimer = getCurrentAttack()->getHitStun();
 
 		actor->invincibilityTimer = getCurrentAttack()->getDuration();
+
+		Retry::Audio::playEffect("sound/sound effects/" + getCurrentAttack()->getSoundFile() + ".mp3");
 	}
 }
 

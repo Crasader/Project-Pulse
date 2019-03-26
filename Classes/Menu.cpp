@@ -4,6 +4,8 @@
 #include "MouseManager.h"
 #include "KeyboardManager.h"
 #include "ControllerManager.h"
+#include "AudioPlayer.h"
+
 
 using cocos2d::Node;
 using cocos2d::Vec2;
@@ -37,10 +39,14 @@ void Menu::update() {
 		// still being pressed, then keep the button pressed
 		for (auto& i : buttons) {
 			if (i.isMouseOver()) {
+				if (i.getIsNormal()) Retry::Audio::playEffect("sound/sound effects/buttonhover.mp3", 0, 0.6f);
+
 				if (Mouse::isButtonDown(MouseButton::LEFT))
 					i.setPressed();
-				else if (Mouse::isButtonUp(MouseButton::LEFT))
+				else if (Mouse::isButtonUp(MouseButton::LEFT)) {
+					Retry::Audio::playEffect("sound/sound effects/buttonpress.mp3");
 					i.onPressed();
+				}
 				else if (!Mouse::isButtonPressed(MouseButton::LEFT))
 					i.setHovered();
 				break;
@@ -53,8 +59,10 @@ void Menu::update() {
 			buttons[indexPosition].setPressed();
 		else if (buttons[indexPosition].isPressed) {
 			if (Controller::isButtonUp(ControllerButton::A) ||
-				Keyboard::isKeyUp(KeyCode::SPACE))
+				Keyboard::isKeyUp(KeyCode::SPACE)) {
+				Retry::Audio::playEffect("sound/sound effects/buttonpress.mp3");
 				buttons[indexPosition].onPressed();
+			}
 		} else
 			buttons[indexPosition].setHovered();
 
@@ -95,6 +103,8 @@ void Menu::setPadding(const int padding) {
 }
 
 void Menu::adjustForControls() {
+	auto temp = indexPosition;
+
 	if (Mouse::getDeltaPos().getLengthSq() > 1) {
 		for (const auto& i : buttons)
 			if (i.isMouseOver()) indexPosition = -1;
@@ -113,6 +123,8 @@ void Menu::adjustForControls() {
 			 Controller::isButtonDown(ControllerButton::DPAD_DOWN))
 		if (indexPosition == -1) indexPosition = 0;
 		else                     indexPosition = (indexPosition + 1) % buttons.size();
+
+	if (temp != indexPosition) Retry::Audio::playEffect("sound/sound effects/buttonhover.mp3", 0, 0.6f);
 }
 
 }

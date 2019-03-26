@@ -105,6 +105,8 @@ protected:
 
 	float attackTimer = 0;
 
+	float deathTimer = 0.1f;
+
 	cocos2d::Sprite* sprite;
 	cocos2d::Vec2 position;
 	cocos2d::Vec2 velocity;
@@ -166,6 +168,8 @@ public:
 	void setInvincible(const float time) { invincibilityTimer = time; }
 
 	void setFlippedX(const bool flip);
+
+	bool shouldBeRemoved() { return deathTimer <= 0; }
 };
 
 class Attack {
@@ -179,15 +183,17 @@ public:
 	float getDuration() const { return duration; }
 	float getRecovery() const { return recovery; }
 	float getHitStun() const { return hitStun; }
+	std::string getSoundFile() const { return soundFile; }
 	Retry::Collision::Body* getHitBox() const { return &hitBox; }
 
-	void setDamage(const float dmg) { damage = dmg; }
+	void setDamage(const float damage) { this->damage = damage; }
 	void setKnockBackAmount(const float kbAmt) { this->kbAmt = kbAmt; }
 	void setKnockBackDirection(const cocos2d::Vec2& kbDir) { this->kbDir = cocos2d::Vec2(abs(kbDir.x), kbDir.y).getNormalized(); }
 	void setDelay(const float delay) { this->delay = delay; }
 	void setDuration(const float duration) { this->duration = duration; }
 	void setRecovery(const float recovery) { this->recovery = recovery; }
 	void setHitStun(const float hitStun) { this->hitStun = hitStun; }
+	void setSoundFile(const std::string& soundFile) { this->soundFile = soundFile; }
 
 private:
 	float damage = 0;
@@ -200,6 +206,8 @@ private:
 	float recovery = 0.2f;
 
 	float hitStun = 0.0f;
+
+	std::string soundFile = "";
 
 	mutable Collision::Body hitBox;
 };

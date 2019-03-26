@@ -52,6 +52,7 @@ GoonEnemy::GoonEnemy(const cocos2d::Vec2& pos)
 	initAnimation("punch1", "goon.png", Vec2(0, 1), Vec2(64, 64), 5);
 	initAnimation("punch2", "goon.png", Vec2(0, 2), Vec2(64, 64), 5);
 	initAnimation("punchpunch", "goon.png", Vec2(0, 3), Vec2(64, 64), 6);
+	initAnimation("hitstun", "goon.png", Vec2(0, 4), Vec2(64, 64), 12);
 
 	runAnimation("idle", 0.1f);
 
@@ -63,6 +64,11 @@ TutorialEnemy::TutorialEnemy(const cocos2d::Vec2& pos)
 }
 
 void Enemy::update(const float delta) {
+	if (health <= 0) {
+		kill();
+		return;
+	}
+
 	updateActionBuffer(delta);
 
 	acceleration = cocos2d::Vec2(0, -2 * maxJumpHeight / (timeToMaxJumpHeight * timeToMaxJumpHeight));
@@ -85,6 +91,7 @@ void GoonEnemy::update(const float delta) {
 
 void TutorialEnemy::update(const float delta) {
 	Enemy::update(delta);
+	if (health == maxHealth) velocity.x = 0;
 }
 
 void GoonEnemy::updateAI(Player* player, const float delta) {

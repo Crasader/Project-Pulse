@@ -6,8 +6,7 @@
 
 #include <vector>
 
-class OptionsMenu : public cocos2d::Scene
-{
+class OptionsMenu : public cocos2d::Scene {
 public:
 	// implement the "static create()" method manually
 	CREATE_FUNC(OptionsMenu);
@@ -28,5 +27,13 @@ private:
 
 	void initCheckBoxForSetting(const std::string &s);
 };
+
+namespace {
+class DirectorEx : public cocos2d::Director {
+public:
+	cocos2d::Scene* previousScene();
+	void popScene(cocos2d::Scene* trans);
+};
+}
 
 #endif
